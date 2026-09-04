@@ -1,0 +1,16 @@
+# Android Studio
+.idea/
+*.iml
+
+# Gradle
+.gradle/
+build/
+
+# Local SDK
+local.properties
+
+# Compilación
+app/build/
+
+# OS
+.DS_Store
