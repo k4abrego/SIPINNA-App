@@ -11,10 +11,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.sippina_aplicacion.ui.theme.SIPPINAAplicacionTheme
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.NavHost
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -23,12 +23,10 @@ class MainActivity : ComponentActivity() {
         setContent {
             SIPPINAAplicacionTheme {
                 AppPrincipal()
-
             }
         }
     }
 }
-
 
 @Composable
 fun AppPrincipal(modifier: Modifier = Modifier) {
@@ -63,15 +61,19 @@ fun AppNavHost(
         }
 
         composable(Pantalla.PantallaInicio.ruta) {
-            PantallaInicio()
+            PantallaInicio(
+                onNavegarAReporte = {
+                    navController.navigate(Pantalla.PantallaReporte.ruta)
+                }
+            )
         }
     }
 }
 
 @Preview(showBackground = true)
 @Composable
-fun GreetingPreview() {
+fun AppPrincipalPreview() {
     SIPPINAAplicacionTheme {
-
+        AppPrincipal()
     }
 }
