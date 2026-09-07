@@ -3,6 +3,7 @@ package com.example.sippina_aplicacion.view.reportes
 import android.R.attr.id
 import android.R.attr.start
 import android.view.View
+import android.widget.Button
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -24,6 +25,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material.icons.outlined.Face
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -35,7 +37,8 @@ import androidx.compose.material3.FloatingActionButtonDefaults.shape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedCard
-import androidx.compose.material3.OutlinedIconButton
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Surface
@@ -52,6 +55,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontWeight
@@ -66,6 +70,7 @@ import com.example.sippina_aplicacion.ui.theme.SIPPINAAplicacionTheme
 import com.example.sippina_aplicacion.view.PantallasReporte.BarraDePasos
 import com.example.sippina_aplicacion.view.colorAzul
 import com.example.sippina_aplicacion.viewmodel.ReporteVM
+import java.util.Locale
 
 
 @Composable
@@ -140,6 +145,7 @@ fun Detalles(
 
         }
         Spacer(modifier = modifier.height(20.dp))
+
         Column(modifier = modifier.fillMaxWidth()) {
             Text(
                 text = "Cantidad de menores involucrados",
@@ -157,10 +163,10 @@ fun Detalles(
                 OutlinedCard(
                     shape = RoundedCornerShape(10.dp),
                     border = BorderStroke(1.5.dp, color = Color.Blue),
-                    colors = CardDefaults.outlinedCardColors(Color.Red),
+                    colors = CardDefaults.outlinedCardColors(Color.Blue),
                     modifier = Modifier
                         .weight(1f)
-                        .height(14.dp)
+                        .height(24.dp)
                 ) {
                     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.CenterStart)
                     {
@@ -172,33 +178,117 @@ fun Detalles(
                             modifier = Modifier.padding(start = 16.dp)
                         )
                     }
-                    OutlinedIconButton(
-                        onClick = { cantidadMenores++ },
-                        shape = RoundedCornerShape(10.dp),
-                        border = BorderStroke(1.5.dp, Color.Blue),
-                        modifier = Modifier.size(44.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Add,
-                            contentDescription = "Aumentar",
-                            tint = Color.White
-                        )
-                    }
 
+                }
+                OutlinedButton(
+                    onClick = { cantidadMenores++ }, shape = RoundedCornerShape(10.dp),
+                    modifier = Modifier.size(34.dp), border = BorderStroke(1.5.dp, Color.Blue),
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Add,
+                        tint = Color.Blue,
+                        contentDescription = "Aumentar"
+                    )
+                }
+                OutlinedButton(
+                    onClick = { if (cantidadMenores > 0) cantidadMenores-- },
+                    shape = RoundedCornerShape(10.dp),
+                    border = BorderStroke(1.5.dp, Color.Blue),
+                    modifier = Modifier.size(34.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Remove,
+                        contentDescription = "Disminuir",
+                        tint = Color.Blue
 
-
+                    )
                 }
 
 
             }
 
 
+        }
+        Spacer(modifier = Modifier.height(20.dp))
+        Column(modifier = Modifier.fillMaxWidth())
+        {
+            Text(
+                text = "Estaba algún adulto involucrado?", fontSize = 16.sp,
+                fontWeight = FontWeight.Bold, color = Color.Blue
+            )
+
+        }
+        Spacer(modifier = Modifier.height(12.dp))
+
+        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp))
+        {
+            val opciones = listOf("Si", "No", "No sé")
+            opciones.forEach { opcion ->
+                val seleccionado = opcionAdulto == opcion
+                OutlinedButton(
+                    onClick = { opcionAdulto = opcion },
+                    shape = RoundedCornerShape(10.dp),
+                    border = BorderStroke(1.5.dp, Color.Blue),
+                    colors = ButtonDefaults.outlinedButtonColors(
+                        containerColor = if (seleccionado) Color(0xFFE8F1FC) else Color.Transparent,
+                        contentColor = Color.Blue
+                    ), modifier = Modifier
+                        .weight(1f)
+                        .height(34.dp)
+                ) { Text(opcion, fontSize = 15.sp, fontWeight = FontWeight.Bold)
+
+                }
+            }
+
+
+        }
+        Spacer(modifier = Modifier.height(20.dp))
+        Column(modifier = Modifier.fillMaxWidth())
+        {
+            Text(text = "Describe lo que viste",fontSize = 16.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color.Blue)
+            Spacer(modifier = Modifier.height(8.dp))
+
+            OutlinedTextField(value = descripcionText,
+                onValueChange = { descripcionText = it },
+                shape = RoundedCornerShape(12.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(50.dp),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = Color.Blue,
+                    unfocusedBorderColor = Color.White,
+                    focusedContainerColor = Color.White,
+                    unfocusedContainerColor = Color.White))
 
         }
 
+        Spacer(modifier = Modifier.height(34.dp))
+
+        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween){
+            Button(onClick = {onAtras()}, colors = ButtonDefaults.buttonColors(Color.LightGray, Color.Blue ), modifier = Modifier.width(150.dp)){
+                Text(text = "Atrás", fontSize = 13.sp, fontWeight = FontWeight.Bold)
+
+            }
+            Button(onClick = {onSiguiente()},colors = ButtonDefaults.buttonColors(Color.LightGray, Color.Blue ), modifier = Modifier.width(150.dp)) {
+                Text(text = "Siguiente", fontSize = 13.sp, fontWeight = FontWeight.Bold)
+            }
+        }
+
+
 
     }
+
+
+
 }
+private fun formatearHora(valor:Float ):String{
+    val horas = valor.toInt()
+    val minutos = ((valor - horas)* 60).toInt()
+    return String.format(Locale.getDefault(), "%02d:%02d", horas , minutos )
+}
+
 
 
 @Preview(

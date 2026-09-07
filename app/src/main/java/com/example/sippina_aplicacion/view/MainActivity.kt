@@ -15,6 +15,12 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.sippina_aplicacion.ui.theme.SIPPINAAplicacionTheme
+import com.example.sippina_aplicacion.view.PantallasReporte.Detalles2
+import com.example.sippina_aplicacion.view.PantallasReporte.DondeOcurrio
+import com.example.sippina_aplicacion.view.PantallasReporte.Evidencia
+import com.example.sippina_aplicacion.view.PantallasReporte.PrivacidadSeguimiento
+import com.example.sippina_aplicacion.view.PantallasReporte.ReporteGenerado
+import com.example.sippina_aplicacion.view.reportes.Detalles
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -50,6 +56,7 @@ fun AppNavHost(
         startDestination = Pantalla.PantallaCarga.ruta,
         modifier = modifier
     ) {
+
         composable(Pantalla.PantallaCarga.ruta) {
             PantallaCarga(
                 onNavegarAInicio = {
@@ -63,12 +70,83 @@ fun AppNavHost(
         composable(Pantalla.PantallaInicio.ruta) {
             PantallaInicio(
                 onNavegarAReporte = {
-                    navController.navigate(Pantalla.PantallaReporte.ruta)
+                    navController.navigate(Pantalla.DondeOcurrio.ruta)
+                }
+            )
+        }
+
+
+        composable(Pantalla.DondeOcurrio.ruta) {
+            DondeOcurrio(
+                onSiguiente = {
+                    navController.navigate(Pantalla.Detalles.ruta)
+                },
+                onAtras = {
+                    navController.popBackStack()
+                }
+            )
+        }
+
+
+        composable(Pantalla.Detalles.ruta) {
+            Detalles(
+                onSiguiente = {
+                    navController.navigate(Pantalla.Detalles2.ruta)
+                },
+                onAtras = {
+                    navController.popBackStack()
+                }
+            )
+        }
+
+
+        composable(Pantalla.Detalles2.ruta) {
+            Detalles2(
+                onSiguiente = {
+                    navController.navigate(Pantalla.Evidencia.ruta)
+                },
+                onAtras = {
+                    navController.popBackStack()
+                }
+            )
+        }
+
+
+        composable(Pantalla.Evidencia.ruta) {
+            Evidencia(
+                onSiguiente = {
+                    navController.navigate(Pantalla.PrivacidadSeguimiento.ruta)
+                },
+                onAtras = {
+                    navController.popBackStack()
+                }
+            )
+        }
+
+        composable(Pantalla.PrivacidadSeguimiento.ruta) {
+            PrivacidadSeguimiento(
+                onSiguiente = {
+                    navController.navigate(Pantalla.ReporteGenerado.ruta)
+                },
+                onAtras = {
+                    navController.popBackStack()
+                }
+            )
+        }
+
+
+        composable(Pantalla.ReporteGenerado.ruta) {
+            ReporteGenerado(
+                onVolverInicio = {
+                    navController.navigate(Pantalla.PantallaInicio.ruta) {
+                        popUpTo(Pantalla.PantallaInicio.ruta) { inclusive = true }
+                    }
                 }
             )
         }
     }
 }
+
 
 @Preview(showBackground = true)
 @Composable
