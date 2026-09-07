@@ -44,7 +44,7 @@ fun PantallaCarga(
 
 
 }
-
-@Preview (showBackground = true)
-@Composable
-fun Pantalla.PantallaCarga
+//
+//@Preview (showBackground = true)
+//@Composable
+//fun PantallaCarga

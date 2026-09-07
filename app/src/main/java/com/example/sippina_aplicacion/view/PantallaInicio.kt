@@ -68,6 +68,6 @@ fun PantallaInicio(
 }
 
 
-@Preview (showBackground = true)
-@Composable
-fun Pantalla.PantallaInicio
+//@Preview (showBackground = true)
+//@Composable
+//fun Pantalla.PantallaInicio
