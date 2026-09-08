@@ -1,7 +1,5 @@
 package com.example.sippina_aplicacion.view
 
-import android.R.attr.top
-import android.graphics.drawable.Icon
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement

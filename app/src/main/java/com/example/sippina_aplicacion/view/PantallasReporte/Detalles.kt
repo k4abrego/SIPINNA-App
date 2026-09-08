@@ -1,4 +1,4 @@
-package com.example.sippina_aplicacion.view.reportes
+package com.example.sippina_aplicacion.view.PantallasReporte
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
@@ -113,7 +113,7 @@ fun Detalles(
                 Text(text = "Horario aprox", fontSize = 16.sp, fontWeight = FontWeight.Bold)
                 Box(modifier = Modifier.background(Color.Blue, shape = RoundedCornerShape(6.dp))) {
                     Text(
-                        text = "12",
+                        text = formatearHora(horaSlider),
                         fontSize = 25.sp,
                         fontWeight = FontWeight.SemiBold,
                         color = Color.White

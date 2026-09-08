@@ -20,7 +20,7 @@ import com.example.sippina_aplicacion.view.PantallasReporte.DondeOcurrio
 import com.example.sippina_aplicacion.view.PantallasReporte.Evidencia
 import com.example.sippina_aplicacion.view.PantallasReporte.PrivacidadSeguimiento
 import com.example.sippina_aplicacion.view.PantallasReporte.ReporteGenerado
-import com.example.sippina_aplicacion.view.reportes.Detalles
+import com.example.sippina_aplicacion.view.PantallasReporte.Detalles
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

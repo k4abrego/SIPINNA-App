@@ -40,7 +40,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.sippina_aplicacion.R
 import com.example.sippina_aplicacion.ui.theme.SIPPINAAplicacionTheme
-import com.example.sippina_aplicacion.view.reportes.Detalles
+import com.example.sippina_aplicacion.view.PantallasReporte.Detalles
 import com.example.sippina_aplicacion.viewmodel.ReporteVM
 
 @Composable

@@ -83,7 +83,7 @@ fun DondeOcurrio(
         BarraDePasos()
         Spacer(modifier = modifier.height(12.dp))
         Text(
-            text = "Puedes selccionar en el mapa, al usar ubicación actual o buscar una dirección",
+            text = "Puedes seleccionar en el mapa, al usar ubicación actual o buscar una dirección",
             fontSize = 15.sp, color = Color.Blue,
             fontWeight = FontWeight.SemiBold
         )
