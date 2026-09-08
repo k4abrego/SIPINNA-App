@@ -28,7 +28,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -50,37 +49,42 @@ fun PantallaInicio(
     modifier: Modifier = Modifier,
     viewModel: ReporteVM = viewModel(),
     accionBoton: () -> Unit = {},
-    onNavegarAReporte:() ->Unit = {}
+    onNavegarAReporte: () -> Unit = {},
+    onNavegarAPerfil: () -> Unit = {}
 ) {
-    val fondoDegradado = Brush.verticalGradient(
-        colors = listOf(
-            Color(0xFFD3E7FF),
-            Color(0xFFBCA7E8)
-        )
-    )
 
     Box(
-        modifier = modifier
-            .background(Color.White)
-            .fillMaxSize()
-    )
-    {
-        Column(modifier = modifier.fillMaxSize().padding(horizontal = 24.dp , vertical = 15.dp)) {
+        modifier = modifier.background(Color.White).fillMaxSize()
+    ) {
+
+        Column(
+            modifier = Modifier.fillMaxSize().padding(
+                    horizontal = 24.dp,
+                    vertical = 15.dp)
+        ) {
+
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 15.dp, bottom = 23.dp),
+                modifier = Modifier.fillMaxWidth().padding(
+                        top = 15.dp,
+                        bottom = 23.dp
+                    ),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
-            )
-            {
+            ) {
+
                 Image(
-                    painter = painterResource(id = R.drawable.imagensippina),
-                    contentDescription = "Logo Sippina",
+                    painter = painterResource(
+                        id = R.drawable.imagensippina
+                    ),
+                    contentDescription = "Logo Sippinna",
                     modifier = Modifier.size(100.dp)
                 )
+
                 Row {
-                    IconButton(onClick = {/* Esta es para la accion de notificaciones  */ }) {
+
+                    IconButton(onClick = { // Acción de notificaciones
+                        }
+                    ) {
                         Icon(
                             imageVector = Icons.Outlined.Notifications,
                             contentDescription = "Notificaciones",
@@ -88,7 +92,8 @@ fun PantallaInicio(
                             modifier = Modifier.size(40.dp)
                         )
                     }
-                    IconButton(onClick = {/* Esta es para la accion del perfil  */ }) {
+
+                    IconButton(onClick = onNavegarAPerfil) {
                         Icon(
                             imageVector = Icons.Outlined.Person,
                             contentDescription = "Perfil",
@@ -98,59 +103,91 @@ fun PantallaInicio(
                     }
                 }
             }
-            Text(text = "¡Hola!", fontSize = 30.sp,
-                fontWeight = FontWeight.Bold,
-            )
-
-            Spacer(modifier = Modifier.height(15.dp))
 
             Text(
-                text = "Gracias por ayudar a proteger a\nlos niños , niñas y adolescentes.",
+                text = "¡Hola!",
+                fontSize = 30.sp,
+                fontWeight = FontWeight.Bold
+            )
+
+            Spacer(
+                modifier = Modifier.height(15.dp)
+            )
+
+            Text(
+                text = "Gracias por ayudar a proteger a\nlos niños, niñas y adolescentes.",
                 textAlign = TextAlign.Left,
                 fontWeight = FontWeight.Bold,
                 fontSize = 20.sp
             )
-            Spacer(modifier = Modifier.height(250.dp))
 
-            Column(modifier = modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(12.dp), horizontalAlignment = Alignment.CenterHorizontally)
-            {
-                ElevatedButton(
-                    onClick = { onNavegarAReporte() }, modifier = modifier.height(50.dp).fillMaxWidth(),
+            Spacer(
+                modifier = Modifier.height(250.dp)
+            )
+
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+
+                ElevatedButton(onClick = { onNavegarAReporte() },
+                    modifier = Modifier.height(50.dp).fillMaxWidth(),
                     shape = RoundedCornerShape(20.dp),
-                    colors = ButtonDefaults.elevatedButtonColors(colorMorado)
+                    colors = ButtonDefaults.elevatedButtonColors(
+                        containerColor = colorMorado
+                    )
                 ) {
-                    Text(text = "Generar un reporte",
+                    Text(
+                        text = "Generar un reporte",
                         color = Color.White,
-                        fontSize = 18.sp, fontWeight = FontWeight.Bold
-                        )
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold
+                    )
                 }
-                ElevatedButton(onClick = { accionBoton() }, modifier = modifier.height(50.dp).fillMaxWidth(),
+
+                ElevatedButton(onClick = { accionBoton() },
+                    modifier = Modifier.height(50.dp).fillMaxWidth(),
                     shape = RoundedCornerShape(20.dp)
                 ) {
-                    Text(text = "¿Qué situaciones debo de reportar ?",
-                        fontSize = 18.sp, color = colorMorado, fontWeight = FontWeight.Bold)
-                }
-                ElevatedButton(onClick = { accionBoton() }, modifier = modifier.height(50.dp).fillMaxWidth(),
-                    shape = RoundedCornerShape(20.dp)) {
-                    Text(text = "Conoce mas de SIPINNA",
-                        fontSize = 18.sp, color = colorMorado, fontWeight = FontWeight.Bold)
-                }
-                ElevatedButton(onClick = {accionBoton()}, modifier = modifier.height(50.dp).fillMaxWidth(),
-                    shape = RoundedCornerShape(20.dp), colors = ButtonDefaults.elevatedButtonColors(colorRojo)) {
-                    Text(text = "EMERGENCIA",
-                        fontSize = 18.sp, color = Color.White, fontWeight = FontWeight.Bold)
+                    Text(
+                        text = "¿Qué situaciones debo de reportar?",
+                        fontSize = 18.sp,
+                        color = colorMorado,
+                        fontWeight = FontWeight.Bold
+                    )
                 }
 
+                ElevatedButton(onClick = { accionBoton() },
+                    modifier = Modifier.height(50.dp).fillMaxWidth(),
+                    shape = RoundedCornerShape(20.dp)
+                ) {
+                    Text(
+                        text = "Conoce más de SIPINNA",
+                        fontSize = 18.sp,
+                        color = colorMorado,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+
+                ElevatedButton(onClick = { accionBoton() },
+                    modifier = Modifier.height(50.dp).fillMaxWidth(),
+                    shape = RoundedCornerShape(20.dp),
+                    colors = ButtonDefaults.elevatedButtonColors(
+                        containerColor = colorRojo
+                    )
+                ) {
+                    Text(
+                        text = "EMERGENCIA",
+                        fontSize = 18.sp,
+                        color = Color.White,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+            }
         }
-
-
-        }
-
     }
-
-
 }
-
 //@Preview (showBackground = true)
 //@Composable
 //fun Pantalla.PantallaInicio

@@ -21,6 +21,10 @@ import com.example.sippina_aplicacion.view.PantallasReporte.Evidencia
 import com.example.sippina_aplicacion.view.PantallasReporte.PrivacidadSeguimiento
 import com.example.sippina_aplicacion.view.PantallasReporte.ReporteGenerado
 import com.example.sippina_aplicacion.view.reportes.Detalles
+import com.example.sippina_aplicacion.view.perfilusuario.Borradores
+import com.example.sippina_aplicacion.view.perfilusuario.RegistroNuevoPerfil
+import com.example.sippina_aplicacion.view.perfilusuario.VistaPerfil1
+import com.example.sippina_aplicacion.view.perfilusuario.VistaPerfil2
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -71,6 +75,71 @@ fun AppNavHost(
             PantallaInicio(
                 onNavegarAReporte = {
                     navController.navigate(Pantalla.DondeOcurrio.ruta)
+                },
+                onNavegarAPerfil = {
+                    navController.navigate(Pantalla.VistaPerfil1.ruta)
+                }
+            )
+        }
+
+        composable(Pantalla.Borradores.ruta) {
+            Borradores(
+                onAtras = {
+                    navController.popBackStack()
+                },
+                onContinuar = {
+                    //Después se conecta con el reporte correspondiente
+                },
+                onEliminar = {
+
+                }
+            )
+        }
+        
+        composable(Pantalla.VistaPerfil1.ruta) {
+            VistaPerfil1(
+                onAtras = {
+                    navController.popBackStack()
+                },
+                onBorradores = {
+                    navController.navigate(Pantalla.Borradores.ruta)
+                },
+                onMisReportes = {
+                    navController.navigate(Pantalla.MisReportes.ruta)
+                },
+                onAvisoPrivacidad = {
+                    navController.navigate(Pantalla.AvisoPrivacidad.ruta)
+                },
+                onCrearCuenta = {
+                    navController.navigate(Pantalla.RegistroNuevoPerfil.ruta)
+                }
+            )
+        }
+
+        composable(Pantalla.RegistroNuevoPerfil.ruta) {
+            RegistroNuevoPerfil(
+                onSiguiente = {
+                    navController.navigate(Pantalla.VistaPerfil2.ruta)
+                }
+            )
+        }
+
+        composable(Pantalla.VistaPerfil2.ruta) {
+            VistaPerfil2(
+                onAtras = {
+                    navController.popBackStack()
+                },
+                onBorradores = {
+                    navController.navigate(Pantalla.Borradores.ruta)
+                },
+                onMisReportes = {
+                    navController.navigate(Pantalla.MisReportes.ruta)
+                },
+                onAvisoPrivacidad = {
+                    navController.navigate(Pantalla.AvisoPrivacidad.ruta)
+                },
+                onEliminarCuenta = {
+                    //La dejo para cuando haga la lógica de esto
                 }
             )
         }
@@ -146,7 +215,6 @@ fun AppNavHost(
         }
     }
 }
-
 
 @Preview(showBackground = true)
 @Composable
