@@ -92,7 +92,7 @@ fun VistaPerfil1(
             Icon(
                 imageVector = Icons.Outlined.AccountCircle,
                 contentDescription = "Usuario",
-                modifier = Modifier.size(150.dp),
+                modifier = Modifier.size(140.dp),
                 tint = Color(0xFF3D27C9)
             )
 
