@@ -1,9 +1,5 @@
 package com.example.sippina_aplicacion.view.reportes
 
-import android.R.attr.id
-import android.R.attr.start
-import android.view.View
-import android.widget.Button
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
