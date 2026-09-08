@@ -218,7 +218,7 @@ fun Detalles(
 
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp))
         {
-            val opciones = listOf("Si", "No", "No sé")
+            val opciones = listOf("Sí", "No", "No sé")
             opciones.forEach { opcion ->
                 val seleccionado = opcionAdulto == opcion
                 OutlinedButton(
