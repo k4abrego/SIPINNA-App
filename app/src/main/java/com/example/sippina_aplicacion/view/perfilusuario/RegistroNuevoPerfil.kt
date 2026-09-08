@@ -1,5 +1,6 @@
 package com.example.sippina_aplicacion.view.perfilusuario
 
+<<<<<<< HEAD
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -175,3 +176,5 @@ fun RegistroNuevoPerfilPreview() {
         RegistroNuevoPerfil()
     }
 }
+=======
+>>>>>>> main
