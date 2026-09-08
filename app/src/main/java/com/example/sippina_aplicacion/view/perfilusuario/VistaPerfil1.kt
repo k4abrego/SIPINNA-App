@@ -73,9 +73,11 @@ fun VistaPerfil1(
             }
 
             Image(
-                painter = painterResource(id = R.drawable.sipinnalogosinfondo),
+                painter = painterResource(
+                    id = R.drawable.imagensippina
+                ),
                 contentDescription = "Logo SIPINNA",
-                modifier = Modifier.size(150.dp)
+                modifier = Modifier.size(120.dp)
             )
 
             Spacer(
@@ -100,7 +102,7 @@ fun VistaPerfil1(
 
             Text(
                 text = "Invitado",
-                fontSize = 27.sp,
+                fontSize = 28.sp,
                 color = Color(0xFF3D27C9),
                 fontWeight = FontWeight.Bold
             )
@@ -121,7 +123,7 @@ fun VistaPerfil1(
             ) {
                 Text(
                     text = "Borradores",
-                    fontSize = 18.sp,
+                    fontSize = 20.sp,
                     fontWeight = FontWeight.SemiBold
                 )
             }
@@ -135,7 +137,7 @@ fun VistaPerfil1(
             ) {
                 Text(
                     text = "Mis reportes",
-                    fontSize = 18.sp,
+                    fontSize = 20.sp,
                     fontWeight = FontWeight.SemiBold
                 )
             }
@@ -149,7 +151,7 @@ fun VistaPerfil1(
                 )
             ) {
                 Text(text = "Aviso de privacidad",
-                    fontSize = 18.sp,
+                    fontSize = 20.sp,
                     fontWeight = FontWeight.SemiBold
                 )
             }
