@@ -76,7 +76,7 @@ fun DondeOcurrio(
             modifier = Modifier.size(120.dp)
         )
         Text(
-            text = "Donde ocurrio?",
+            text = "¿Dónde ocurrió?",
             fontSize = 25.sp, color = Color.Blue, fontWeight = FontWeight.Bold
         )
         Spacer(modifier = modifier.height(12.dp))

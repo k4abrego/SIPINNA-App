@@ -1,9 +1,5 @@
 package com.example.sippina_aplicacion.view.reportes
 
-import android.R.attr.id
-import android.R.attr.start
-import android.view.View
-import android.widget.Button
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -191,7 +187,7 @@ fun Detalles(
                     )
                 }
                 OutlinedButton(
-                    onClick = { if (cantidadMenores > 0) cantidadMenores-- },
+                    onClick = { if (cantidadMenores > 1) cantidadMenores-- },
                     shape = RoundedCornerShape(10.dp),
                     border = BorderStroke(1.5.dp, Color.Blue),
                     modifier = Modifier.size(34.dp)
@@ -222,7 +218,7 @@ fun Detalles(
 
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp))
         {
-            val opciones = listOf("Si", "No", "No sé")
+            val opciones = listOf("Sí", "No", "No sé")
             opciones.forEach { opcion ->
                 val seleccionado = opcionAdulto == opcion
                 OutlinedButton(
