@@ -43,7 +43,7 @@ fun ReporteGenerado(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(FondoMorado)
+            .background(Color.Blue)
             .padding(horizontal = 28.dp, vertical = 24.dp),
         horizontalAlignment = Alignment.CenterHorizontally
 
