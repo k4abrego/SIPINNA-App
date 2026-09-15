@@ -21,10 +21,10 @@ import com.example.sippina_aplicacion.view.PantallasReporte.Evidencia
 import com.example.sippina_aplicacion.view.PantallasReporte.PrivacidadSeguimiento
 import com.example.sippina_aplicacion.view.PantallasReporte.ReporteGenerado
 import com.example.sippina_aplicacion.view.reportes.Detalles
-import com.example.sippina_aplicacion.view.perfilusuario.Borradores
+import com.example.sippina_aplicacion.view.PerfilAutenticado.Borradores
 import com.example.sippina_aplicacion.view.perfilusuario.RegistroNuevoPerfil
-import com.example.sippina_aplicacion.view.perfilusuario.VistaPerfil1
-import com.example.sippina_aplicacion.view.perfilusuario.VistaPerfil2
+import com.example.sippina_aplicacion.view.SinAutenticacion.VistaPerfil1
+import com.example.sippina_aplicacion.view.PerfilAutenticado.VistaPerfil2
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

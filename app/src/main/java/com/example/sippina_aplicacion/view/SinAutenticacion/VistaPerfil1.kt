@@ -1,9 +1,10 @@
-package com.example.sippina_aplicacion.view.perfilusuario
+package com.example.sippina_aplicacion.view.SinAutenticacion
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -57,7 +58,7 @@ fun VistaPerfil1(
                 onClick = onAtras,
                 modifier = Modifier.size(48.dp),
                 shape = CircleShape,
-                contentPadding = androidx.compose.foundation.layout.PaddingValues(0.dp),
+                contentPadding = PaddingValues(0.dp),
                 colors = ButtonDefaults.outlinedButtonColors(contentColor = Color(0xFF3D27C9)
                 )
             ) {

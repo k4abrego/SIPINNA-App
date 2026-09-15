@@ -1,9 +1,10 @@
-package com.example.sippina_aplicacion.view.perfilusuario
+package com.example.sippina_aplicacion.view.PerfilAutenticado
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -29,6 +30,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -59,7 +61,7 @@ fun VistaPerfil2(
                 onClick = onAtras,
                 modifier = Modifier.size(48.dp),
                 shape = CircleShape,
-                contentPadding = androidx.compose.foundation.layout.PaddingValues(0.dp),
+                contentPadding = PaddingValues(0.dp),
                 colors = ButtonDefaults.outlinedButtonColors(contentColor = Color(0xFF3D27C9)
                 )
             ) {
@@ -108,7 +110,7 @@ fun VistaPerfil2(
             fontSize = 28.sp,
             fontWeight = FontWeight.Bold,
             lineHeight = 32.sp,
-            textAlign = androidx.compose.ui.text.style.TextAlign.Center
+            textAlign = TextAlign.Center
         )
 
         Spacer(modifier = Modifier.height(55.dp))

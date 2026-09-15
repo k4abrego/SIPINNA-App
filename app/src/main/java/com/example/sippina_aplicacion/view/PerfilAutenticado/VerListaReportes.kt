@@ -1,4 +1,4 @@
-package com.example.sippina_aplicacion.view.perfilusuario
+package com.example.sippina_aplicacion.view.PerfilAutenticado
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -21,7 +22,6 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Flag
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.SearchOff
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.HorizontalDivider
@@ -39,9 +39,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.R
 import com.example.sippina_aplicacion.ui.theme.SIPPINAAplicacionTheme
 
 
@@ -255,7 +255,7 @@ private fun ItemReporteCard(
     folio: String,
     icono: ImageVector,
     bordeColor: Color,
-    grosorBorde: androidx.compose.ui.unit.Dp = 1.5.dp,
+    grosorBorde: Dp = 1.5.dp,
     onClick: () -> Unit
 ) {
     OutlinedCard(
@@ -285,7 +285,7 @@ private fun ItemReporteCard(
                 contentAlignment = Alignment.Center
             ) {
                 Surface(
-                    shape = androidx.compose.foundation.shape.CircleShape,
+                    shape = CircleShape,
                     color = Color.Blue,
                     modifier = Modifier.fillMaxSize()
                 ) {
@@ -324,7 +324,7 @@ private fun ItemEstadoLeyenda(
         Spacer(modifier = Modifier.height(6.dp))
 
         Surface(
-            shape = androidx.compose.foundation.shape.CircleShape,
+            shape = CircleShape,
             color = colorFondo,
             modifier = Modifier.size(38.dp)
         ) {
