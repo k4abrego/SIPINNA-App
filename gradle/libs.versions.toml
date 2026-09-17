@@ -12,6 +12,10 @@ navigationRuntimeKtx = "2.10.0"
 navigationCompose = "2.10.0"
 uiGraphics = "1.12.0"
 foundationLayout = "1.12.0"
+foundation = "1.12.1"
+
+retrofitVer = "3.0.0"
+gsonVer = "3.0.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -33,6 +37,10 @@ androidx-navigation-compose = { group = "androidx.navigation", name = "navigatio
 androidx-ui-graphics = { group = "androidx.compose.ui", name = "ui-graphics", version.ref = "uiGraphics" }
 androidx-compose-material-icons-extended = { group = "androidx.compose.material", name = "material-icons-extended" }
 androidx-compose-foundation-layout = { group = "androidx.compose.foundation", name = "foundation-layout", version.ref = "foundationLayout" }
+androidx-compose-foundation = { group = "androidx.compose.foundation", name = "foundation", version.ref = "foundation" }
+
+retrofit = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofitVer" }
+gson = { group = "com.squareup.retrofit2", name = "converter-gson", version.ref = "gsonVer" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

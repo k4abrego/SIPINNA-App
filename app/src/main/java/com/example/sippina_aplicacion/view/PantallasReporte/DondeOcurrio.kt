@@ -1,6 +1,7 @@
 package com.example.sippina_aplicacion.view.PantallasReporte
 
 import android.R.attr.id
+import android.annotation.SuppressLint
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -13,6 +14,8 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -36,6 +39,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -54,7 +60,7 @@ import com.example.sippina_aplicacion.ui.theme.SIPPINAAplicacionTheme
 import com.example.sippina_aplicacion.view.PantallasReporte.BarraDePasos
 import com.example.sippina_aplicacion.viewmodel.ReporteVM
 
-
+@SuppressLint("MissingPermission")
 @Composable
 fun DondeOcurrio(
     viewModel: ReporteVM = viewModel(),
@@ -63,93 +69,157 @@ fun DondeOcurrio(
     onAtras: () -> Unit = {}
 ) {
     val state by viewModel.uiState.collectAsState()
+    // Colores para los botones
+    val colorMorado = Color(0xFF381EBD)
+    val colorFondoBotonSiguiente = Color(0xFFD3E4F4)
+    val colorTextoBotonSiguiente = Color(0xFF3B719F)
+    val colorFondoBotonAtras = Color(0xFFE2E2E2)
+    val colorTextoBotonAtras = Color(0xFF5A5A5A)
+
+    // Estado local para seleccionar la opción de ubicación
+    val opcionUbicacionActual = state.opcionUbicacion.ifEmpty { "Seleccionar en el mapa" }
+
+
+
+
+
+
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(horizontal = 24.dp, vertical = 15.dp),
+            .padding(horizontal = 24.dp, vertical = 12.dp)
+            .verticalScroll(rememberScrollState())
+            .imePadding()
+            .navigationBarsPadding(),
         horizontalAlignment = Alignment.CenterHorizontally
-    )
-    {
+    ) {
         Image(
-            painter = painterResource(id = R.drawable.sipinnalogosinfondo),
+            painter = painterResource(id = R.drawable.imagensippina),
             contentDescription = "Logo Sippina",
-            modifier = Modifier.size(120.dp)
+            modifier = Modifier.size(100.dp)
         )
+        Spacer(modifier = Modifier.height(8.dp))
+
         Text(
             text = "¿Dónde ocurrió?",
-            fontSize = 25.sp, color = Color.Blue, fontWeight = FontWeight.Bold
+            color = colorMorado,
+            fontSize = 24.sp,
+            fontWeight = FontWeight.Bold
         )
-        Spacer(modifier = modifier.height(12.dp))
-        BarraDePasos()
-        Spacer(modifier = modifier.height(12.dp))
+
+        Spacer(modifier = Modifier.height(14.dp))
+
+        BarraDePasos(pasoActual = 0)
+
+        Spacer(modifier = Modifier.height(14.dp))
+
         Text(
-            text = "Puedes selccionar en el mapa, al usar ubicación actual o buscar una dirección",
-            fontSize = 15.sp, color = Color.Blue,
-            fontWeight = FontWeight.SemiBold
+            text = "Puedes seleccionar en el mapa, usar tu ubicación actual o buscar una dirección",
+            fontSize = 14.sp,
+            color = colorMorado,
+            fontWeight = FontWeight.SemiBold,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.fillMaxWidth()
         )
-        Spacer(modifier = Modifier.height(10.dp))
+
+        Spacer(modifier = Modifier.height(14.dp))
+
         Card(
-            shape = RoundedCornerShape(8.dp),
+            shape = RoundedCornerShape(12.dp),
             elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
             modifier = Modifier
                 .fillMaxWidth()
-                .height(150.dp)
+                .height(160.dp)
         ) {
-            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                Text(text = "Mapa")
-
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = "Mapa",
+                    color = Color.Gray,
+                    fontWeight = FontWeight.Medium
+                )
             }
         }
-        Spacer(modifier = modifier.height(15.dp))
+
+        Spacer(modifier = Modifier.height(16.dp))
         Column(
             modifier = Modifier.fillMaxWidth(),
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
-            OutlinedButton(
-                onClick = { /* */ },
-                modifier = modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(10.dp)
-            ) { Text(text = "Usar mi ubicacion actual " ) }
+            val opciones = listOf(
+                "Usar mi ubicación actual",
+                "Seleccionar en el mapa",
+                "Buscar dirección"
+            )
 
-            OutlinedButton(onClick = { /* */ },
-                modifier = modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(10.dp))
-            {
-                Text(text ="Seleccionar Mapa")
+            opciones.forEach { opcion ->
+                val seleccionado = opcionUbicacionActual == opcion
 
+                OutlinedButton(
+                    onClick = { viewModel.seleccionarOpcionUbicacion(opcion) },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(46.dp),
+                    shape = CircleShape,
+                    border = if (seleccionado) null else BorderStroke(1.5.dp, colorMorado),
+                    colors = ButtonDefaults.outlinedButtonColors(
+                        containerColor = if (seleccionado) colorMorado else Color.Transparent,
+                        contentColor = if (seleccionado) Color.White else colorMorado
+                    )
+                ) {
+                    Text(
+                        text = opcion,
+                        fontSize = 15.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
             }
-            OutlinedButton(onClick = { /* */ },
-                modifier = modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(10.dp)) {
-                Text(text = "Buscar dirección")
-            }
-
-
-
         }
-        Spacer(modifier = modifier.weight(1f))
+
+        Spacer(modifier = Modifier.height(70.dp))
 
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             Button(
-                onClick = onAtras,
-                shape = RoundedCornerShape(20.dp),
-                modifier = Modifier.width(150.dp)
+                onClick = { onAtras() },
+                shape = CircleShape,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = colorFondoBotonAtras,
+                    contentColor = colorTextoBotonAtras
+                ),
+                modifier = Modifier
+                    .weight(1f)
+                    .height(46.dp)
             ) {
-                Text("Atrás")
+                Text(
+                    text = "Atrás",
+                    fontSize = 15.sp,
+                    fontWeight = FontWeight.Bold
+                )
             }
 
             Button(
-                onClick = onSiguiente,
-                shape = RoundedCornerShape(20.dp),
-                modifier = Modifier.width(150.dp)
+                onClick = { onSiguiente() },
+                shape = CircleShape,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = colorFondoBotonSiguiente,
+                    contentColor = colorTextoBotonSiguiente
+                ),
+                modifier = Modifier
+                    .weight(1f)
+                    .height(46.dp)
             ) {
-                Text("Siguiente")
+                Text(
+                    text = "Siguiente",
+                    fontSize = 15.sp,
+                    fontWeight = FontWeight.Bold
+                )
             }
         }
-
     }
 }
 

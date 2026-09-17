@@ -10,10 +10,14 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AttachFile
 import androidx.compose.material.icons.filled.Image
@@ -27,6 +31,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -49,23 +55,36 @@ fun Evidencia(
     onSiguiente: () -> Unit = { },
     onAtras: () -> Unit = { }
 ) {
+    // Suscripcion al estado centralizado de viewModel
+    val state by viewModel.uiState.collectAsState()
+
+
+    val colorMorado = Color(0xFF381EBD)
+    val colorFondoBotonSiguiente = Color(0xFFD3E4F4)
+    val colorTextoBotonSiguiente = Color(0xFF3B719F)
+    val colorFondoBotonAtras = Color(0xFFE2E2E2)
+    val colorTextoBotonAtras = Color(0xFF5A5A5A)
+
     Column(
         modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 24.dp, vertical = 15.dp),
+            .fillMaxSize()
+            .padding(horizontal = 24.dp, vertical = 12.dp)
+            .verticalScroll(rememberScrollState())
+            .imePadding()
+            .navigationBarsPadding(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Image(
-            painter = painterResource(id = R.drawable.sipinnalogosinfondo),
+            painter = painterResource(id = R.drawable.imagensippina),
             contentDescription = "Logo Sippina",
-            modifier = Modifier.size(120.dp)
+            modifier = Modifier.size(100.dp)
         )
         Spacer(modifier = Modifier.height(8.dp))
         Text(
             text = "Evidencia Personal",
             fontSize = 24.sp,
             fontWeight = FontWeight.Bold,
-            color = Color.Blue
+            color = colorMorado
         )
         Spacer(modifier = Modifier.height(14.dp))
         BarraDePasos(pasoActual = 3)
@@ -113,7 +132,7 @@ fun Evidencia(
 
         OutlinedCard(
             onClick = {}, shape = RoundedCornerShape(15.dp),
-            border = BorderStroke(1.5.dp, Color.Blue),
+            border = BorderStroke(1.5.dp, colorMorado),
             colors = CardDefaults.outlinedCardColors(containerColor = Color.LightGray),
             modifier = Modifier
                 .fillMaxWidth()
@@ -146,15 +165,30 @@ fun Evidencia(
 
         }
 
-        Spacer(modifier = Modifier.height(55.dp))
+        Spacer(modifier = Modifier.height(75.dp))
 
-        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween)
+        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(16.dp))
         {
-            Button(onClick = {onAtras()}, colors = ButtonDefaults.buttonColors(Color.LightGray, Color.Blue), modifier = Modifier.width(150.dp)){
-                Text(text = "Atrás", fontSize = 13.sp, fontWeight = FontWeight.Bold)
+            Button(
+                onClick = { onAtras() },
+                colors = ButtonDefaults.buttonColors(colorFondoBotonAtras, colorTextoBotonAtras),
+                modifier = Modifier
+                    .weight(1f)
+                    .height(46.dp)
+            ) {
+                Text(text = "Atrás", fontSize = 15.sp, fontWeight = FontWeight.Bold)
             }
-            Button(onClick = {onSiguiente()},colors = ButtonDefaults.buttonColors(Color.LightGray, Color.Blue), modifier = Modifier.width(150.dp)){
-                Text(text = "Siguiente ", fontSize = 13.sp, fontWeight = FontWeight.Bold)
+            Button(
+                onClick = { onSiguiente() },
+                colors = ButtonDefaults.buttonColors(
+                    colorFondoBotonSiguiente,
+                    colorTextoBotonSiguiente
+                ),
+                modifier = Modifier
+                    .weight(1f)
+                    .height(46.dp)
+            ) {
+                Text(text = "Siguiente ", fontSize = 15.sp, fontWeight = FontWeight.Bold)
 
 
             }

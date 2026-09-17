@@ -5,12 +5,14 @@ data class EstadoReporte(
 
     // Paso de la ubicación
     val opcionUbicacion :String = "",
-    val direccionText: String = "",
+    val latitud: Double = 19.432608, // ejemplo para probar
+    val longitud: Double = -99.133209,
+    val direccion: String = "",
 
     // Detalles del reporte
     val horarioAprox:String = "12:00",
     val cantidadMenores: Int = 1,
-    val adultoInvolucrados : String = "",
+    val adultoInvolucrados : String = "No",
     val descripcionHechos:String = "",
 
     // Descripcion del menor
@@ -22,7 +24,7 @@ data class EstadoReporte(
     val tipoEvidenciaSeleccionada:String = "",
 
     // Privacidad
-    val esAnonimo: Boolean = true,
+    val esAnonimo: Boolean = false,
     val recibirActualizaciones:Boolean = false
 
 )

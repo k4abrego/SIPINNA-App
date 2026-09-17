@@ -38,6 +38,7 @@ android {
 dependencies {
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.activity.compose)
+    implementation(libs.androidx.compose.foundation)
     implementation(libs.androidx.compose.foundation.layout)
     implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.compose.ui)
@@ -56,4 +57,15 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.test.manifest)
     debugImplementation(libs.androidx.compose.ui.tooling)
     implementation(libs.androidx.compose.material.icons.extended)
+    // Servicio de Retrofit
+    implementation(libs.retrofit)
+    implementation(libs.gson)
+    // Google Maps
+    implementation("com.google.maps.android:maps-compose")
+    implementation("com.google.android.gms:play-services-maps")
+    // Servicios de Ubicación
+    implementation("com.google.android.gms:play-services-location")
+    // Manejo de los permisos en Android
+    implementation("com.google.accompanist:accompanist-permissions")
+
 }

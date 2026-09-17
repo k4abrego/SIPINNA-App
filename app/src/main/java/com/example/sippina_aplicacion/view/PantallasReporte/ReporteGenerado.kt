@@ -8,9 +8,12 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.CheckCircle
@@ -19,6 +22,8 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -29,30 +34,54 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.sippina_aplicacion.R
 import com.example.sippina_aplicacion.ui.theme.SIPPINAAplicacionTheme
+import com.example.sippina_aplicacion.viewmodel.ReporteVM
 
 private val FondoMorado = Color(0xFF381EC9)
 
 @Composable
 fun ReporteGenerado(
+    viewModel: ReporteVM = viewModel(),
+    modifier: Modifier = Modifier,
     folio: String = "ATJ-2026-0823",
     codigoPrivado: String = "KEFD-2P32",
     onVolverInicio: () -> Unit = {}
 ) {
+    // Suscripcion al estado de ViewModel para leer los datos globales
+    val state by viewModel.uiState.collectAsState()
+
+    // Obtención de los datos con valor de respaldo
+    val folioMostrar = folio.ifEmpty { "ATJ-2026-0823" }
+    val codigoMostrar = codigoPrivado.ifEmpty { "KEFD-2P32" }
+
+
+
+
+
+
+    val colorMorado = Color(0xFF381EBD)
+    val colorFondoBotonSiguiente = Color(0xFFD3E4F4)
+    val colorTextoBotonSiguiente = Color(0xFF3B719F)
+    val colorFondoBotonAtras = Color(0xFFE2E2E2)
+    val colorTextoBotonAtras = Color(0xFF5A5A5A)
+
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.Blue)
-            .padding(horizontal = 28.dp, vertical = 24.dp),
+            .background(colorMorado)
+            .padding(horizontal = 28.dp, vertical = 24.dp)
+            .navigationBarsPadding()
+            .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally
 
     )
     {
         Image(
-            painter = painterResource(id = R.drawable.sipinnalogosinfondo),
+            painter = painterResource(id = R.drawable.imagensippina),
             contentDescription = "Logo Sippina",
-            modifier = Modifier.size(120.dp)
+            modifier = Modifier.size(100.dp)
         )
         Spacer(modifier = Modifier.height(15.dp))
         Text(
@@ -95,14 +124,14 @@ fun ReporteGenerado(
                     text = "Folio",
                     fontSize = 15.sp,
                     fontWeight = FontWeight.SemiBold,
-                    color = Color.Blue
+                    color = colorMorado
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
                     text = folio,
                     fontSize = 26.sp,
                     fontWeight = FontWeight.ExtraBold,
-                    color = Color.Blue
+                    color = colorMorado
                 )
 
 
@@ -123,22 +152,21 @@ fun ReporteGenerado(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = "Código Privado",
+                    text = folioMostrar,
                     fontSize = 15.sp,
                     fontWeight = FontWeight.SemiBold,
-                    color = Color.Blue
+                    color = colorMorado
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = codigoPrivado,
+                    text = codigoMostrar,
                     fontSize = 26.sp,
                     fontWeight = FontWeight.ExtraBold,
-                    color = Color.Blue
+                    color = colorMorado
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = "Guarda el código para dar seguimiento de tu reporte",
-                    color = Color.Blue,
+                    text = "Guarda el código para dar seguimiento a tu reporte",                    color = colorMorado,
                     textAlign = TextAlign.Center
                 )
 

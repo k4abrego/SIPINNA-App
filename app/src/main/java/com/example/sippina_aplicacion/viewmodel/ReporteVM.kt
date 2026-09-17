@@ -59,4 +59,17 @@ class ReporteVM : ViewModel() {
     fun enviarReporteFinal() {
 
     }
+
+    fun setUbicacion(lat: Double, lng: Double, direccion: String = "") {
+        _uiState.update {
+            it.copy(
+                latitud = lat,
+                longitud = lng,
+                direccion = direccion
+            )
+        }
+    }
+
+    fun setHorarioAprox(formatearHora: String) {}
+
 }
