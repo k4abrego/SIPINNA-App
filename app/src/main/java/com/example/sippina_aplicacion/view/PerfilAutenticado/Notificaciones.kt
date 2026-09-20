@@ -59,8 +59,7 @@ fun Notificaciones(
         ) {
             Box(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 10.dp),
+                    .fillMaxWidth(),
                 contentAlignment = Alignment.Center
             ) {
                 FilledIconButton(
