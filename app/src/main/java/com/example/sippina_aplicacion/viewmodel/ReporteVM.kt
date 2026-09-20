@@ -1,10 +1,13 @@
 package com.example.sippina_aplicacion.viewmodel
 
+import android.net.Uri
 import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import okhttp3.internal.format
+
 
 class ReporteVM : ViewModel() {
 
@@ -70,6 +73,19 @@ class ReporteVM : ViewModel() {
         }
     }
 
-    fun setHorarioAprox(formatearHora: String) {}
+    fun actualizarEvidenciaUri(uri: Uri?) {
+        _uiState.update { it.copy(evidenciaUri = uri) }
+    }
+
+    fun setHorarioAprox(formatearHora: String) {
+        _uiState.update{it.copy(horarioAprox = formatearHora)}
+    }
+    fun actualizarOpcionPrivacidad(nuevaOpcion: String) {
+        _uiState.update { currentState ->
+            currentState.copy(opcionPrivacidad = nuevaOpcion)
+        }}
+
+
+
 
 }

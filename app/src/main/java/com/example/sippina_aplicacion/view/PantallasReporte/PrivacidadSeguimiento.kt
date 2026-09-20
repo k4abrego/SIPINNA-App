@@ -68,7 +68,7 @@ fun PrivacidadSeguimiento(
 
     var opcionSeleccionada by remember { mutableStateOf("anonimo") }
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .padding(horizontal = 24.dp, vertical = 12.dp)
             .verticalScroll(rememberScrollState())
@@ -80,7 +80,8 @@ fun PrivacidadSeguimiento(
         Image(
             painter = painterResource(id = R.drawable.imagensippina),
             contentDescription = "Logo Sippina",
-            modifier = Modifier.size(100.dp))
+            modifier = Modifier.size(100.dp)
+        )
         Spacer(modifier = Modifier.height(8.dp))
 
         Text(
@@ -117,16 +118,19 @@ fun PrivacidadSeguimiento(
             fontWeight = FontWeight.Bold,
             color = Color.Gray,
             textAlign = TextAlign.Center,
-            modifier = Modifier.padding(horizontal = 12.dp))
+            modifier = Modifier.padding(horizontal = 12.dp)
+        )
         Spacer(modifier = Modifier.height(12.dp))
 
 
         val textoAviso = buildAnnotatedString {
             append("Si quieres saber más, da click ")
-            withStyle(style = SpanStyle(
-                fontWeight = FontWeight.Bold,
-                textDecoration = TextDecoration.Underline
-            )
+            withStyle(
+                style = SpanStyle(
+                    fontWeight = FontWeight.Bold,
+                    textDecoration = TextDecoration.Underline,
+                    color = com.example.sippina_aplicacion.view.colorMorado
+                )
             ) {
                 append("aquí")
             }
@@ -149,14 +153,27 @@ fun PrivacidadSeguimiento(
 
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(16.dp))
         {
-            Button(onClick = {onAtras()}, colors = ButtonDefaults.buttonColors(colorFondoBotonAtras, colorTextoBotonAtras), modifier = Modifier
-                .weight(1f)
-                .height(46.dp)){
+            Button(
+                onClick = { onAtras() },
+                colors = ButtonDefaults.buttonColors(colorFondoBotonAtras, colorTextoBotonAtras),
+                modifier = Modifier
+                    .weight(1f)
+                    .height(46.dp)
+            ) {
                 Text(text = "Atrás", fontSize = 15.sp, fontWeight = FontWeight.Bold)
             }
-            Button(onClick = {onSiguiente()},colors = ButtonDefaults.buttonColors(colorFondoBotonSiguiente, colorTextoBotonSiguiente), modifier = Modifier
-                .weight(1f)
-                .height(46.dp)){
+            Button(
+                onClick = {
+                    viewModel.actualizarOpcionPrivacidad(opcionSeleccionada)
+                    onSiguiente() },
+                colors = ButtonDefaults.buttonColors(
+                    colorFondoBotonSiguiente,
+                    colorTextoBotonSiguiente
+                ),
+                modifier = Modifier
+                    .weight(1f)
+                    .height(46.dp)
+            ) {
                 Text(text = "Siguiente ", fontSize = 15.sp, fontWeight = FontWeight.Bold)
 
 
@@ -165,18 +182,6 @@ fun PrivacidadSeguimiento(
 
         }
         Spacer(modifier = Modifier.height(36.dp))
-
-
-
-
-
-
-
-
-
-
-
-
 
 
     }
@@ -195,7 +200,7 @@ private fun TarjetaOpcionPrivacidad(
     OutlinedCard(
         onClick = onClick,
         shape = RoundedCornerShape(16.dp),
-        border = BorderStroke(1.5.dp, colorMorado ),
+        border = BorderStroke(width = if (seleccionado) 2.dp else 1.dp,color = if (seleccionado) colorMorado else Color.LightGray),
         colors = CardDefaults.outlinedCardColors(
             containerColor = if (seleccionado) Color.LightGray else Color.LightGray
         ),
@@ -230,7 +235,7 @@ private fun TarjetaOpcionPrivacidad(
             Icon(
                 imageVector = icon,
                 contentDescription = titulo,
-                tint = Color.Gray,
+                tint = if (seleccionado) colorMorado else Color.Gray,
                 modifier = Modifier.size(45.dp)
             )
         }

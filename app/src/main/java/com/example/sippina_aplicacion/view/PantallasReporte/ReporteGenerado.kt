@@ -45,21 +45,16 @@ private val FondoMorado = Color(0xFF381EC9)
 fun ReporteGenerado(
     viewModel: ReporteVM = viewModel(),
     modifier: Modifier = Modifier,
-    folio: String = "ATJ-2026-0823",
-    codigoPrivado: String = "KEFD-2P32",
+    folio: String = "",
+    codigoPrivado: String = "",
     onVolverInicio: () -> Unit = {}
 ) {
     // Suscripcion al estado de ViewModel para leer los datos globales
     val state by viewModel.uiState.collectAsState()
 
     // Obtención de los datos con valor de respaldo
-    val folioMostrar = folio.ifEmpty { "ATJ-2026-0823" }
-    val codigoMostrar = codigoPrivado.ifEmpty { "KEFD-2P32" }
-
-
-
-
-
+    val folioMostrar = state.folio.ifEmpty { folio.ifEmpty { "ATJ-2026-0823" } }
+    val codigoMostrar = state.codigoPrivado.ifEmpty { codigoPrivado.ifEmpty { "KEFD-2P32" } }
 
     val colorMorado = Color(0xFF381EBD)
     val colorFondoBotonSiguiente = Color(0xFFD3E4F4)
@@ -128,7 +123,7 @@ fun ReporteGenerado(
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = folio,
+                    text = folioMostrar,
                     fontSize = 26.sp,
                     fontWeight = FontWeight.ExtraBold,
                     color = colorMorado
@@ -166,7 +161,8 @@ fun ReporteGenerado(
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = "Guarda el código para dar seguimiento a tu reporte",                    color = colorMorado,
+                    text = "Guarda el código para dar seguimiento a tu reporte",
+                    color = colorMorado,
                     textAlign = TextAlign.Center
                 )
 
@@ -188,10 +184,7 @@ fun ReporteGenerado(
         )
 
 
-
-
     }
-
 
 
 }

@@ -61,11 +61,11 @@ dependencies {
     implementation(libs.retrofit)
     implementation(libs.gson)
     // Google Maps
-    implementation("com.google.maps.android:maps-compose")
-    implementation("com.google.android.gms:play-services-maps")
+    //implementation("com.google.maps.android:maps-compose")
+   // implementation("com.google.android.gms:play-services-maps")
     // Servicios de Ubicación
-    implementation("com.google.android.gms:play-services-location")
+    //implementation("com.google.android.gms:play-services-location")
     // Manejo de los permisos en Android
-    implementation("com.google.accompanist:accompanist-permissions")
+   // implementation("com.google.accompanist:accompanist-permissions")
 
 }

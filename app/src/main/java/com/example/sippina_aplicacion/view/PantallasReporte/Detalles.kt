@@ -77,7 +77,9 @@ import java.util.Locale
 
 @Composable
 fun Detalles(
-    viewModel: ReporteVM = viewModel(), modifier: Modifier = Modifier, onSiguiente: () -> Unit = {},
+    viewModel: ReporteVM = viewModel(),
+    modifier: Modifier = Modifier,
+    onSiguiente: () -> Unit = {},
     onAtras: () -> Unit = {}
 ) {
 
@@ -94,8 +96,6 @@ fun Detalles(
     // Estado de acuerdo a los campos interactivos
     // Estados locales para los campos interactivos
     var horaSlider by remember { mutableFloatStateOf(12.00f) }
-    var cantidadMenores by remember { mutableIntStateOf(1) }
-    var descripcionText by remember { mutableStateOf("") }
 
     // Variables para la validación para asegurarse que la descripción no este vacia
     var mostrarError by remember { mutableStateOf(false) }
@@ -228,7 +228,7 @@ fun Detalles(
                 }
                 OutlinedButton(
                     onClick = { viewModel.cambiarCantidadMenores(-1) },
-                    enabled = cantidadMenores > 1,
+                    enabled = state.cantidadMenores > 1,
                     shape = RoundedCornerShape(10.dp),
                     border = BorderStroke(1.5.dp, colorMorado),
                     modifier = Modifier.size(34.dp),
@@ -360,7 +360,7 @@ fun Detalles(
             // Lógica para no dejar avanzar al usuario si no lo completa
             Button(
                 onClick = {
-                    if (descripcionText.trim().isNotBlank()) {
+                    if (state.descripcionHechos.trim().isNotBlank()) {
                         onSiguiente()
                     } else {
                         mostrarError = true

@@ -1,5 +1,8 @@
 package com.example.sippina_aplicacion.viewmodel
 
+import android.net.Uri
+import java.net.URI
+
 data class EstadoReporte(
     val pasoActual:Int = 0,
 
@@ -25,6 +28,12 @@ data class EstadoReporte(
 
     // Privacidad
     val esAnonimo: Boolean = false,
-    val recibirActualizaciones:Boolean = false
+    val recibirActualizaciones:Boolean = false,
+
+    val folio: String = "",
+    val codigoPrivado: String = "",
+    val opcionPrivacidad: String = "anonimo",
+    val evidenciaUri : Uri? = null
 
 )
+
