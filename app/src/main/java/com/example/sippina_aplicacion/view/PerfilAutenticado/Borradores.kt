@@ -2,6 +2,7 @@ package com.example.sippina_aplicacion.view.PerfilAutenticado
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -15,14 +16,18 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.outlined.ArrowBack
+import androidx.compose.material.icons.outlined.ArrowCircleLeft
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -47,7 +52,10 @@ fun Borradores(
 ) {
 
     Column(
-        modifier = modifier.fillMaxSize().background(Color(0xFFEAF4FC)).padding(horizontal = 24.dp, vertical = 15.dp),
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color(0xFFEAF4FC))
+            .padding(horizontal = 24.dp, vertical = 20.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
@@ -57,25 +65,26 @@ fun Borradores(
             verticalAlignment = Alignment.CenterVertically
         ) {
 
-            OutlinedButton(
+            FilledIconButton(
                 onClick = onAtras,
-                modifier = Modifier.size(48.dp),
-                shape = CircleShape,
-                contentPadding = PaddingValues(0.dp),
-                colors = ButtonDefaults.outlinedButtonColors(contentColor = Color(0xFF3D27C9)
+                modifier = Modifier
+                    .size(50.dp)
+                    .align(Alignment.CenterStart as Alignment.Vertical),
+                colors = IconButtonDefaults.filledIconButtonColors(
+                    containerColor = Color(0xFFEAF4FC),
+                    contentColor = Color(0xFF3D27C9)
                 )
             ) {
                 Icon(
-                    imageVector = Icons.Outlined.ArrowBack,
-                    contentDescription = "Regresar",
-                    modifier = Modifier.size(30.dp)
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = "Atrás",
+                    modifier = Modifier.size(22.dp)
                 )
             }
 
             Image(
                 painter = painterResource(
-                    id = R.drawable.imagensippina
-                ),
+                    id = R.drawable.imagensippina),
                 contentDescription = "Logo SIPINNA",
                 modifier = Modifier.size(120.dp)
             )
@@ -88,7 +97,7 @@ fun Borradores(
         Text(
             text = "Continuar reporte",
             color = Color(0xFF3D20C9),
-            fontSize = 38.sp,
+            fontSize = 35.sp,
             fontWeight = FontWeight.Bold
         )
 

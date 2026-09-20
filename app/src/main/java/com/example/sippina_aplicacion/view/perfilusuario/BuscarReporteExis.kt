@@ -84,7 +84,7 @@ fun BuscarReporteExistente(onAtras: () -> Unit = {}, onVerDetalleReporte: (Strin
                     )
                 }
                 Image(
-                    painter = painterResource(id = com.example.sippina_aplicacion.R.drawable.sipinnalogosinfondo),
+                    painter = painterResource(id = com.example.sippina_aplicacion.R.drawable.imagensippina),
                     contentDescription = "LogoSippina",
                     modifier = Modifier.size(120.dp)
                 )

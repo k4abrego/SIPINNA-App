@@ -2,6 +2,7 @@ package com.example.sippina_aplicacion.view.PerfilAutenticado
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -56,6 +57,7 @@ fun VerListaReportes(
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .background(Color(0xFFEAF4FC))
                 .padding(24.dp, 20.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -69,11 +71,11 @@ fun VerListaReportes(
                 FilledIconButton(
                     onClick = onAtras,
                     modifier = Modifier
-                        .size(40.dp)
+                        .size(50.dp)
                         .align(Alignment.CenterStart),
                     colors = IconButtonDefaults.filledIconButtonColors(
-                        containerColor = Color.Blue,
-                        contentColor = Color.White
+                        containerColor = Color(0xFFEAF4FC),
+                        contentColor = Color(0xFF3D27C9)
                     )
                 )
                 {
@@ -86,8 +88,9 @@ fun VerListaReportes(
 
                 }
                 Image(
-                    painter = painterResource(id = com.example.sippina_aplicacion.R.drawable.sipinnalogosinfondo),
-                    contentDescription = "LogoSippina",
+                    painter = painterResource(
+                        id = com.example.sippina_aplicacion.R.drawable.imagensippina),
+                    contentDescription = "Logo SIPINNA",
                     modifier = Modifier.size(120.dp)
                 )
 
@@ -96,9 +99,9 @@ fun VerListaReportes(
 
             Text(
                 text = "Reportes ",
-                fontSize = 26.sp,
+                fontSize = 35.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color.Blue
+                color = Color(0xFF3D27C9)
             )
 
             Spacer(modifier = Modifier.height(20.dp))

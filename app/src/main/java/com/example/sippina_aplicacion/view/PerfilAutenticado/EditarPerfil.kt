@@ -93,7 +93,7 @@ fun EditarPerfil(onAtras: () -> Unit = {}) {
 
                 }
                 Image(
-                    painter = painterResource(id = R.drawable.sipinnalogosinfondo),
+                    painter = painterResource(id = R.drawable.imagensippina),
                     contentDescription = "LogoSippina",
                     modifier = Modifier.size(120.dp)
                 )

@@ -95,7 +95,7 @@ fun DetalleReporte(
 
                 }
                 Image(
-                    painter = painterResource(id = R.drawable.sipinnalogosinfondo),
+                    painter = painterResource(id = R.drawable.imagensippina),
                     contentDescription = "Logo Sippina",
                     modifier = Modifier.size(120.dp)
                 )

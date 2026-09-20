@@ -216,10 +216,14 @@ fun AppNavHost(
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun AppPrincipalPreview() {
-    SIPPINAAplicacionTheme {
-        AppPrincipal()
-    }
-}
+//@Preview(
+//    showBackground = true,
+//    showSystemUi = true,
+//    name = "App Principal"
+//)
+//@Composable
+//fun AppPrincipalPreview() {
+//    SIPPINAAplicacionTheme {
+//        AppPrincipal()
+//    }
+//}
