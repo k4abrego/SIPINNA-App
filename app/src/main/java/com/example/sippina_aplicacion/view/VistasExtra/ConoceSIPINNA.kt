@@ -99,7 +99,7 @@ fun ConoceSIPINNA (
                 fontWeight = FontWeight.Bold,
                 color = Color(0xFF3D27C9)
             )
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(15.dp))
 
             Text(
                 text = "SIPINNA es el Sistema de Protección Integral de Niñas, Niños y Adolescentes a efecto de que el Estado, en sus tres órdenes de gobierno, cumpla con su responsabilidad de garantizar los derechos de niñez y adolescencia.",
@@ -159,7 +159,7 @@ fun ConoceSIPINNA (
                 color = Color.DarkGray,
                 modifier = Modifier.fillMaxWidth()
             )
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(25.dp))
 
             Button(
                 onClick = { mostrarInformacion = true },
