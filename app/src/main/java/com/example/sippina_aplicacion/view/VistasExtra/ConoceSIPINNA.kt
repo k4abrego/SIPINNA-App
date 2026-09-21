@@ -102,8 +102,8 @@ fun ConoceSIPINNA (
             Spacer(modifier = Modifier.height(20.dp))
 
             Text(
-                text = "Es el sistema nacional de protección de niñas, niños y adolescentes que coordina esfuerzos entre gobierno, sociedad y familias.",
-                fontSize = 20.sp,
+                text = "SIPINNA es el Sistema de Protección Integral de Niñas, Niños y Adolescentes a efecto de que el Estado, en sus tres órdenes de gobierno, cumpla con su responsabilidad de garantizar los derechos de niñez y adolescencia.",
+                fontSize = 15.sp,
                 lineHeight = 20.sp,
                 fontWeight = FontWeight.SemiBold,
                 color = Color.DarkGray,
@@ -122,15 +122,15 @@ fun ConoceSIPINNA (
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                text = "SIPINNA es el Sistema de Protección Integral de Niñas, Niños y Adolescentes que fue mandatado por la Ley General de Derechos de Niñas, Niños y Adolescentes a efecto de que el Estado, en sus tres órdenes de gobierno, cumpla con su responsabilidad de garantizar los derechos de niñez y adolescencia.",
-                fontSize = 20.sp,
+                text = "Garantizar la protección integral promoviendo el respeto de sus derechos, previniendo situaciones de riesgo y coordinando acciones entre instituciones, familias y sociedad para asegurar su bienestar y desarrollo en un entorno seguro.",
+                fontSize = 17.sp,
                 lineHeight = 20.sp,
                 fontWeight = FontWeight.SemiBold,
                 color = Color.DarkGray,
                 modifier = Modifier.fillMaxWidth(),
                 textAlign = TextAlign.End
             )
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
             Image(
                 painter = painterResource(id = R.drawable.gobatizapan),
@@ -140,7 +140,7 @@ fun ConoceSIPINNA (
                     .fillMaxWidth()
                     .height(100.dp)
             )
-            Spacer(modifier = Modifier.height(15.dp))
+            Spacer(modifier = Modifier.height(10.dp))
 
             Text(
                 text = "¿Cómo ayudamos?",
@@ -153,13 +153,13 @@ fun ConoceSIPINNA (
 
             Text(
                 text = "Brinda orientación, facilita el reporte de situaciones de riesgo, promueve la prevención y da seguimiento a los casos para asegurar su atención.",
-                fontSize = 20.sp,
+                fontSize = 17.sp,
                 lineHeight = 20.sp,
                 fontWeight = FontWeight.SemiBold,
                 color = Color.DarkGray,
                 modifier = Modifier.fillMaxWidth()
             )
-            Spacer(modifier = Modifier.height(40.dp))
+            Spacer(modifier = Modifier.height(20.dp))
 
             Button(
                 onClick = { mostrarInformacion = true },
@@ -176,7 +176,7 @@ fun ConoceSIPINNA (
                     color = Color.White
                 )
             }
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(15.dp))
         }
         if (mostrarInformacion) {
             AlertDialog(onDismissRequest = {
