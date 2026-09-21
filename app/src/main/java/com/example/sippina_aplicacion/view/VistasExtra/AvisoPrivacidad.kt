@@ -1,5 +1,6 @@
 package com.example.sippina_aplicacion.view.VistasExtra
 
+import android.media.Image
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -19,13 +20,16 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.outlined.EscalatorWarning
-import androidx.compose.material.icons.outlined.Home
-import androidx.compose.material.icons.outlined.Report
-import androidx.compose.material.icons.outlined.Warning
+import androidx.compose.material.icons.outlined.Groups
+import androidx.compose.material.icons.outlined.Lock
+import androidx.compose.material.icons.outlined.Refresh
+import androidx.compose.material.icons.outlined.VisibilityOff
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButtonColors
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
@@ -40,11 +44,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.sippina_aplicacion.ui.theme.SIPPINAAplicacionTheme
+import com.example.sippina_aplicacion.view.Pantalla
 
 @Composable
-fun QueSituacionesReportar(
-    onAtras: () -> Unit = {}
-) {
+fun AvisoPrivacidad(
+    onAtras:() -> Unit = {},
+    onEntendido:() -> Unit = onAtras
+){
     Box(modifier = Modifier.fillMaxSize())
     {
         Column(
@@ -56,10 +62,9 @@ fun QueSituacionesReportar(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Box(
-                modifier = Modifier
-                    .fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth(),
                 contentAlignment = Alignment.Center
-            ) {
+            ){
                 FilledIconButton(
                     onClick = onAtras,
                     modifier = Modifier.size(50.dp)
@@ -81,21 +86,18 @@ fun QueSituacionesReportar(
                     modifier = Modifier.size(120.dp)
                 )
             }
-
-
             Text(
-                text = "¿Qué situaciones debo reportar?",
+                text = "Aviso Privacidad",
                 fontSize = 35.sp,
                 fontWeight = FontWeight.Bold,
                 color = Color(0xFF3D27C9),
                 textAlign = TextAlign.Center,
                 lineHeight = 38.sp
             )
-
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(26.dp))
 
             Text(
-                text = "Si observas alguna situación que pueda poner en riesgo a un niño, niña o adolescente puedes hacer un reporte.",
+                text = "La información proprocionadoa será utilizada únicamente para la atención y seguimiento del reporte.",
                 fontSize = 15.sp,
                 lineHeight = 17.sp,
                 color = Color.DarkGray,
@@ -107,39 +109,38 @@ fun QueSituacionesReportar(
                 shape = RoundedCornerShape(16.dp),
                 border = BorderStroke(1.5.dp, Color(0xFF3D27C9)),
                 colors = CardDefaults.outlinedCardColors(containerColor = Color.White),
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(95.dp)
             ) {
                 Row(
                     modifier = Modifier
-                        .fillMaxWidth()
+                        .fillMaxSize()
                         .padding(horizontal = 16.dp, vertical = 12.dp),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.Start
-                ) {
+                ){
                     Icon(
-                        imageVector = Icons.Outlined.EscalatorWarning,
-                        contentDescription = "Menores de edad solos",
+                        imageVector = Icons.Outlined.Lock,
+                        contentDescription = "Tus datos y tu privacidad",
                         tint = Color(0xFF3D27C9),
                         modifier = Modifier.size(32.dp)
                     )
-
                     Spacer(modifier = Modifier.width(12.dp))
 
                     Column(
                         modifier = Modifier.weight(1f)
                     ) {
-
                         Text(
-                            text = "Menores de edad solos",
+                            text = "Tus datos y tu privacidad",
                             fontSize = 16.sp,
                             fontWeight = FontWeight.Bold,
                             color = Color.DarkGray
                         )
-
                         Spacer(modifier = Modifier.height(4.dp))
 
                         Text(
-                            text = "En vía pública, transporte o espacios públicos sin compañía de una persona adulta.",
+                            text = "La información proporcionada será utilizada únicamente para la atención y seguimiento del reporte.",
                             fontSize = 13.sp,
                             lineHeight = 15.sp,
                             color = Color.DarkGray
@@ -153,115 +154,20 @@ fun QueSituacionesReportar(
                 shape = RoundedCornerShape(16.dp),
                 border = BorderStroke(1.5.dp, Color(0xFF3D27C9)),
                 colors = CardDefaults.outlinedCardColors(containerColor = Color.White),
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 12.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Start
-                ) {
-                    Icon(
-                        imageVector = Icons.Outlined.Report,
-                        contentDescription = "Posible situación de violencia",
-                        tint = Color(0xFF3D27C9),
-                        modifier = Modifier.size(32.dp)
-                    )
-                    Spacer(modifier = Modifier.width(12.dp))
-
-                    Column(
-                        modifier = Modifier.weight(1f)
-                    ) {
-                        Text(
-                            text = "Posible situación de violencia",
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Color.DarkGray
-                        )
-
-                        Spacer(modifier = Modifier.height(4.dp))
-
-                        Text(
-                            text = "Maltrato físico, psicológico, verbal o sexual.",
-                            fontSize = 13.sp,
-                            lineHeight = 15.sp,
-                            color = Color.DarkGray
-                        )
-                    }
-                }
-            }
-            Spacer(modifier = Modifier.height(16.dp))
-
-            OutlinedCard(
-                shape = RoundedCornerShape(16.dp),
-                border = BorderStroke(1.5.dp, Color(0xFF3D27C9)),
-                colors = CardDefaults.outlinedCardColors(containerColor = Color.White),
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 12.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Start
-                ) {
-                    Icon(
-                        imageVector = Icons.Outlined.Home,
-                        contentDescription = "Posible situación de abandono",
-                        tint = Color(0xFF3D27C9),
-                        modifier = Modifier.size(32.dp)
-                    )
-
-                    Spacer(modifier = Modifier.width(12.dp))
-
-                    Column(
-                        modifier = Modifier.weight(1f)
-                    ) {
-                        Text(
-                            text = "Posible situación de abandono",
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Color.DarkGray
-                        )
-
-                        Spacer(modifier = Modifier.height(4.dp))
-
-                        Text(
-                            text = "Sin cuidados básicos o sin una persona responsable.",
-                            fontSize = 13.sp,
-                            lineHeight = 15.sp,
-                            color = Color.DarkGray
-                        )
-                    }
-                }
-            }
-            Spacer(modifier = Modifier.height(16.dp))
-
-            OutlinedCard(
-                shape = RoundedCornerShape(16.dp),
-
-                border = BorderStroke(
-                    1.5.dp,
-                    Color(0xFF3D27C9)
-                ),
-
-                colors = CardDefaults.outlinedCardColors(
-                    containerColor = Color.White
-                ),
-
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(95.dp)
             ){
                 Row(
                     modifier = Modifier
-                        .fillMaxWidth()
+                        .fillMaxSize()
                         .padding(horizontal = 16.dp, vertical = 12.dp),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.Start
                 ) {
                     Icon(
-                        imageVector = Icons.Outlined.Warning,
-                        contentDescription = "Riesgo a su integridad",
+                        imageVector = Icons.Outlined.Groups,
+                        contentDescription = "¿Quién puede ver mi información?",
                         tint = Color(0xFF3D27C9),
                         modifier = Modifier.size(32.dp)
                     )
@@ -271,7 +177,7 @@ fun QueSituacionesReportar(
                         modifier = Modifier.weight(1f)
                     ) {
                         Text(
-                            text = "Riesgo a su integridad",
+                            text = "¿Quién puede ver mi información?",
                             fontSize = 16.sp,
                             fontWeight = FontWeight.Bold,
                             color = Color.DarkGray
@@ -279,7 +185,7 @@ fun QueSituacionesReportar(
                         Spacer(modifier = Modifier.height(4.dp))
 
                         Text(
-                            text = "Peligro, explotación, trabajo infantil o trata.",
+                            text = "Únicamente el personal autorizado encargado de atender el reporte.",
                             fontSize = 13.sp,
                             lineHeight = 15.sp,
                             color = Color.DarkGray
@@ -287,20 +193,117 @@ fun QueSituacionesReportar(
                     }
                 }
             }
-            Spacer(modifier = Modifier.height(35.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
-            Text(
-                text = "Cualquier hecho que vulnere sus derechos o seguridad.",
-                fontSize = 15.sp,
-                lineHeight = 17.sp,
-                color = Color.DarkGray,
-                textAlign = TextAlign.Center
-            )
-            Spacer(modifier = Modifier.height(10.dp))
+            OutlinedCard(
+                shape = RoundedCornerShape(16.dp),
+                border = BorderStroke(1.5.dp, Color(0xFF3D27C9)),
+                colors = CardDefaults.outlinedCardColors(containerColor = Color.White),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(95.dp)
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(horizontal = 16.dp, vertical = 12.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Start
+                ){
+                    Icon(
+                        imageVector = Icons.Outlined.VisibilityOff,
+                        contentDescription = "Reportes anónimos",
+                        tint = Color(0xFF3D27C9),
+                        modifier = Modifier.size(32.dp)
+                    )
+                    Spacer(modifier = Modifier.width(12.dp))
+
+                    Column(
+                        modifier = Modifier.weight(1f)
+                    ){
+                        Text(
+                            text = "Reportes anónimos",
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.DarkGray
+                        )
+                        Spacer(modifier = Modifier.height(4.dp))
+
+                        Text(
+                            text = "Si eliges realizar un reporte anónimo, no se guardarán tus datos personales.",
+                            fontSize = 13.sp,
+                            lineHeight = 15.sp,
+                            color = Color.DarkGray
+                        )
+                    }
+                }
+            }
+            Spacer(modifier = Modifier.height(16.dp))
+
+            OutlinedCard(
+                shape = RoundedCornerShape(16.dp),
+                border = BorderStroke(1.5.dp, Color(0xFF3D27C9)),
+                colors = CardDefaults.outlinedCardColors(containerColor = Color.White),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(95.dp)
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(horizontal = 16.dp, vertical = 12.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Start
+                ) {
+                    Icon(
+                        imageVector = Icons.Outlined.Refresh,
+                        contentDescription = "Seguimiento",
+                        tint = Color(0xFF3D27C9),
+                        modifier = Modifier.size(32.dp)
+                    )
+                    Spacer(modifier = Modifier.width(12.dp))
+
+                    Column(
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Text(
+                            text = "Seguimiento",
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.DarkGray
+                        )
+                        Spacer(modifier = Modifier.height(4.dp))
+
+                        Text(
+                            text = "Podrás consultar el estado de tu reporte mediante tu folio y código de seguridad.",
+                            fontSize = 13.sp,
+                            lineHeight = 15.sp,
+                            color = Color.DarkGray
+                        )
+                    }
+                }
+            }
+            Spacer(modifier = Modifier.height(25.dp))
+
+            Button(
+                onClick = onEntendido,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(52.dp),
+                shape = RoundedCornerShape(15.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF3D27C9))
+            ) {
+                Text(
+                    text = "Entendido",
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White
+                )
+            }
+            Spacer(modifier = Modifier.height(20.dp))
         }
     }
 }
-
 
 @Preview(
     showBackground = true,
@@ -308,8 +311,8 @@ fun QueSituacionesReportar(
 )
 
 @Composable
-fun QueSituacionesReportarPreview(){
-    SIPPINAAplicacionTheme {
-        QueSituacionesReportar()
+fun AvisoPreview(){
+    SIPPINAAplicacionTheme{
+        AvisoPrivacidad()
     }
 }
