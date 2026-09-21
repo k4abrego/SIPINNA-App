@@ -72,7 +72,7 @@ fun QueSituacionesReportar(
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                         contentDescription = "Botón atrás",
-                        modifier = Modifier.size(22.dp)
+                        modifier = Modifier.size(25.dp)
                     )
                 }
                 Image(
