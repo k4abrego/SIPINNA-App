@@ -92,7 +92,7 @@ fun Detalles2(
         Column(
             modifier = Modifier
                 .weight(1f)
-                .fillMaxWidth()
+                .fillMaxSize()
                 .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -107,7 +107,7 @@ fun Detalles2(
             Text(
                 text = "Descripción del menor",
                 color = colorMorado,
-                fontSize = 24.sp,
+                fontSize = 30.sp,
                 fontWeight = FontWeight.Bold
             )
 
@@ -115,25 +115,25 @@ fun Detalles2(
 
             BarraDePasos(pasoActual = 2)
 
-            Spacer(modifier = Modifier.height(18.dp))
+            Spacer(modifier = Modifier.height(20.dp))
 
             Text(
                 text = "Descripción : Menor 1",
                 fontWeight = FontWeight.Bold,
                 color = colorMorado,
-                fontSize = 18.sp,
+                fontSize = 20.sp,
                 modifier = Modifier.fillMaxWidth(),
                 textAlign = TextAlign.Start
             )
 
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(25.dp))
 
             Column(modifier = Modifier.fillMaxWidth()) {
                 Text(
-                    text = "Edad aprox",
+                    text = "Edad aprox.",
                     color = colorMorado,
                     fontWeight = FontWeight.Bold,
-                    fontSize = 16.sp
+                    fontSize = 18.sp
                 )
                 Spacer(modifier = Modifier.height(10.dp))
 
@@ -162,7 +162,7 @@ fun Detalles2(
                 }
             }
 
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(25.dp))
 
             // GÉNERO
             Column(modifier = Modifier.fillMaxWidth()) {
@@ -170,7 +170,7 @@ fun Detalles2(
                     text = "Género",
                     color = colorMorado,
                     fontWeight = FontWeight.Bold,
-                    fontSize = 16.sp
+                    fontSize = 18.sp
                 )
                 Spacer(modifier = Modifier.height(10.dp))
 
@@ -199,7 +199,7 @@ fun Detalles2(
                 }
             }
 
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(25.dp))
 
             // DESCRIPCIÓN FÍSICA
             Column(modifier = Modifier.fillMaxWidth()) {
@@ -207,9 +207,9 @@ fun Detalles2(
                     text = "Descripción Física",
                     color = if (tieneError) Color.Red else colorMorado,
                     fontWeight = FontWeight.Bold,
-                    fontSize = 16.sp
+                    fontSize = 18.sp
                 )
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(10.dp))
 
                 OutlinedTextField(
                     value = state.descripcionFisica,
@@ -221,7 +221,7 @@ fun Detalles2(
                     shape = RoundedCornerShape(12.dp),
                     modifier = Modifier
                         .fillMaxWidth()
-                        .heightIn(min = 110.dp),
+                        .heightIn(min = 160.dp),
                     placeholder = { Text("Escribe aquí la descripción física") },
                     trailingIcon = {
                         if (tieneError) {

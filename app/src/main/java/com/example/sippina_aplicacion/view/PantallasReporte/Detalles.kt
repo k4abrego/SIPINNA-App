@@ -85,12 +85,12 @@ fun Detalles(
     val state by viewModel.uiState.collectAsState()
 
     // Color para los bordes y botones
-    val colorMorado = Color(0xFF381EBD)
+    val colorMorado = Color(0xFF3D27C9)
     val colorFondoBotonSiguiente = Color(0xFFD3E4F4)
     val colorTextoBotonSiguiente = Color(0xFF3B719F)
     val colorFondoBotonAtras = Color(0xFFE2E2E2)
     val colorTextoBotonAtras = Color(0xFF5A5A5A)
-
+    val colorBarra = Color(0xFF3C8DC6)
     // Estado de acuerdo a los campos interactivos
     // Estados locales para los campos interactivos
     var horaSlider by remember { mutableFloatStateOf(12.00f) }
@@ -117,12 +117,12 @@ fun Detalles(
         Image(
             painter = painterResource(id = R.drawable.imagensippina),
             contentDescription = "Logo Sippina",
-            modifier = Modifier.size(100.dp)
+            modifier = Modifier.size(120.dp)
         )
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(5.dp))
 
         Text(
-            text = "Cuentanos qué pasó?", color = colorMorado, fontSize = 24.sp,
+            text = "Cuéntanos ¿qué pasó?", color = colorMorado, fontSize = 30.sp,
             fontWeight = FontWeight.Bold
         )
 
@@ -139,7 +139,7 @@ fun Detalles(
                 verticalAlignment = Alignment.CenterVertically
             )
             {
-                Text(text = "Horario aprox", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                Text(text = "Horario aprox.", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = colorBarra)
                 Box(
                     modifier = Modifier
                         .background(colorMorado, shape = RoundedCornerShape(6.dp))
@@ -165,7 +165,7 @@ fun Detalles(
                 valueRange = 0f..24f,
                 colors = SliderDefaults.colors(
                     thumbColor = colorMorado,
-                    activeTrackColor = colorMorado,
+                    activeTrackColor = colorBarra,
                     inactiveTrackColor = colorMorado
                 )
             )
@@ -182,7 +182,7 @@ fun Detalles(
         Column(modifier = modifier.fillMaxWidth()) {
             Text(
                 text = "Cantidad de menores involucrados",
-                fontSize = 16.sp,
+                fontSize = 18.sp,
                 fontWeight = FontWeight.Bold,
                 color = colorMorado
             )
@@ -196,7 +196,7 @@ fun Detalles(
                 OutlinedCard(
                     shape = RoundedCornerShape(10.dp),
                     border = BorderStroke(1.5.dp, color = colorMorado),
-                    colors = CardDefaults.outlinedCardColors(colorMorado),
+                    colors = CardDefaults.outlinedCardColors(White),
                     modifier = Modifier
                         .weight(1f)
                         .height(34.dp)
@@ -207,7 +207,7 @@ fun Detalles(
                             text = state.cantidadMenores.toString(),
                             fontSize = 15.sp,
                             fontWeight = FontWeight.SemiBold,
-                            color = Color.White,
+                            color = colorMorado,
                             modifier = Modifier.padding(start = 16.dp)
                         )
                     }
@@ -248,12 +248,12 @@ fun Detalles(
 
         }
 
-        Spacer(modifier = Modifier.height(20.dp))
+        Spacer(modifier = Modifier.height(25.dp))
 
         Column(modifier = Modifier.fillMaxWidth())
         {
             Text(
-                text = "Estaba algún adulto involucrado?", fontSize = 16.sp,
+                text = "Estaba algún adulto involucrado?", fontSize = 18.sp,
                 fontWeight = FontWeight.Bold, color = colorMorado
             )
 
@@ -283,17 +283,17 @@ fun Detalles(
 
 
         }
-        Spacer(modifier = Modifier.height(20.dp))
+        Spacer(modifier = Modifier.height(25.dp))
 
         Column(modifier = Modifier.fillMaxWidth())
         {
             Text(
-                text = "Describe lo que viste", fontSize = 16.sp,
+                text = "Describe lo que viste", fontSize = 18.sp,
                 fontWeight = FontWeight.Bold,
                 color = if (tieneError) Color.Red else colorMorado
             )
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(10.dp))
 
             OutlinedTextField(
                 value = state.descripcionHechos,
@@ -341,7 +341,7 @@ fun Detalles(
 
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(20.dp))
 
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -354,7 +354,7 @@ fun Detalles(
                     .weight(1f)
                     .height(46.dp)
             ) {
-                Text(text = "Atrás", fontSize = 13.sp, fontWeight = FontWeight.Bold)
+                Text(text = "Atrás", fontSize = 15.sp, fontWeight = FontWeight.Bold)
 
             }
             // Lógica para no dejar avanzar al usuario si no lo completa
@@ -374,7 +374,7 @@ fun Detalles(
                     .weight(1f)
                     .height(46.dp)
             ) {
-                Text(text = "Siguiente", fontSize = 13.sp, fontWeight = FontWeight.Bold)
+                Text(text = "Siguiente", fontSize = 15.sp, fontWeight = FontWeight.Bold)
             }
         }
 
