@@ -79,31 +79,27 @@ fun DondeOcurrio(
     // Estado local para seleccionar la opción de ubicación
     val opcionUbicacionActual = state.opcionUbicacion.ifEmpty { "Seleccionar en el mapa" }
 
-
-
-
-
-
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(horizontal = 24.dp, vertical = 12.dp)
+            .padding(horizontal = 24.dp, vertical = 15.dp)
             .verticalScroll(rememberScrollState())
             .imePadding()
+            .background(Color(0xFFEAF4FC))
             .navigationBarsPadding(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Image(
             painter = painterResource(id = R.drawable.imagensippina),
             contentDescription = "Logo Sippina",
-            modifier = Modifier.size(100.dp)
+            modifier = Modifier.size(120.dp)
         )
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(5.dp))
 
         Text(
             text = "¿Dónde ocurrió?",
             color = colorMorado,
-            fontSize = 24.sp,
+            fontSize = 30.sp,
             fontWeight = FontWeight.Bold
         )
 
@@ -115,21 +111,21 @@ fun DondeOcurrio(
 
         Text(
             text = "Puedes seleccionar en el mapa, usar tu ubicación actual o buscar una dirección",
-            fontSize = 14.sp,
+            fontSize = 18.sp,
             color = colorMorado,
             fontWeight = FontWeight.SemiBold,
             textAlign = TextAlign.Center,
             modifier = Modifier.fillMaxWidth()
         )
 
-        Spacer(modifier = Modifier.height(14.dp))
+        Spacer(modifier = Modifier.height(25.dp))
 
         Card(
             shape = RoundedCornerShape(12.dp),
             elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
             modifier = Modifier
                 .fillMaxWidth()
-                .height(160.dp)
+                .height(180.dp)
         ) {
             Box(
                 modifier = Modifier.fillMaxSize(),
@@ -143,10 +139,10 @@ fun DondeOcurrio(
             }
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(25.dp))
         Column(
             modifier = Modifier.fillMaxWidth(),
-            verticalArrangement = Arrangement.spacedBy(10.dp)
+            verticalArrangement = Arrangement.spacedBy(18.dp)
         ) {
             val opciones = listOf(
                 "Usar mi ubicación actual",
@@ -171,14 +167,14 @@ fun DondeOcurrio(
                 ) {
                     Text(
                         text = opcion,
-                        fontSize = 15.sp,
+                        fontSize = 18.sp,
                         fontWeight = FontWeight.Bold
                     )
                 }
             }
         }
 
-        Spacer(modifier = Modifier.height(70.dp))
+        Spacer(modifier = Modifier.height(35.dp))
 
         Row(
             modifier = Modifier.fillMaxWidth(),

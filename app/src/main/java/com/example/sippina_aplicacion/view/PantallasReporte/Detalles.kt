@@ -106,10 +106,10 @@ fun Detalles(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(horizontal = 24.dp, vertical = 12.dp)
-            .verticalScroll(rememberScrollState())
+            .padding(horizontal = 24.dp, vertical = 15.dp)
+            .background(Color(0xFFEAF4FC))
             .imePadding()
-            .navigationBarsPadding(),
+            .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally,
 
         )
@@ -122,7 +122,9 @@ fun Detalles(
         Spacer(modifier = Modifier.height(5.dp))
 
         Text(
-            text = "Cuéntanos ¿qué pasó?", color = colorMorado, fontSize = 30.sp,
+            text = "Cuéntanos ¿qué pasó?",
+            color = colorMorado,
+            fontSize = 30.sp,
             fontWeight = FontWeight.Bold
         )
 
@@ -139,7 +141,7 @@ fun Detalles(
                 verticalAlignment = Alignment.CenterVertically
             )
             {
-                Text(text = "Horario aprox.", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = colorBarra)
+                Text(text = "Horario aprox.", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = colorMorado)
                 Box(
                     modifier = Modifier
                         .background(colorMorado, shape = RoundedCornerShape(6.dp))

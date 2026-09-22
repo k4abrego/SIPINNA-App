@@ -1,5 +1,6 @@
 package com.example.sippina_aplicacion.view.PantallasReporte
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -39,7 +40,7 @@ import com.example.sippina_aplicacion.R
 import com.example.sippina_aplicacion.ui.theme.SIPPINAAplicacionTheme
 import com.example.sippina_aplicacion.viewmodel.ReporteVM
 
-private val FondoMorado = Color(0xFF381EC9)
+private val FondoMorado = Color(0xFF381DC3)
 
 @Composable
 fun ReporteGenerado(
@@ -55,23 +56,18 @@ fun ReporteGenerado(
     // Obtención de los datos con valor de respaldo
     val folioMostrar = folio.ifEmpty { "ATJ-2026-0823" }
     val codigoMostrar = codigoPrivado.ifEmpty { "KEFD-2P32" }
-
-
-
-
-
-
     val colorMorado = Color(0xFF381EBD)
     val colorFondoBotonSiguiente = Color(0xFFD3E4F4)
     val colorTextoBotonSiguiente = Color(0xFF3B719F)
     val colorFondoBotonAtras = Color(0xFFE2E2E2)
     val colorTextoBotonAtras = Color(0xFF5A5A5A)
+    val moradoClaro = Color(0xFFD0BCFF)
 
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(colorMorado)
-            .padding(horizontal = 28.dp, vertical = 24.dp)
+            .padding(horizontal = 24.dp, vertical = 24.dp)
             .navigationBarsPadding()
             .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally
@@ -81,19 +77,19 @@ fun ReporteGenerado(
         Image(
             painter = painterResource(id = R.drawable.imagensippina),
             contentDescription = "Logo Sippina",
-            modifier = Modifier.size(100.dp)
+            modifier = Modifier.size(120.dp)
         )
         Spacer(modifier = Modifier.height(15.dp))
         Text(
             text = "¡Gracias!",
-            fontSize = 32.sp,
+            fontSize = 50.sp,
             fontWeight = FontWeight.Bold,
             color = Color.White
         )
-        Spacer(modifier = Modifier.height(15.dp))
+        Spacer(modifier = Modifier.height(20.dp))
         Text(
             text = "¡Tu reporte ha sido registrado con\néxito!",
-            fontSize = 18.sp,
+            fontSize = 20.sp,
             fontWeight = FontWeight.Bold,
             color = Color.White,
             textAlign = TextAlign.Center
@@ -104,14 +100,14 @@ fun ReporteGenerado(
             imageVector = Icons.Default.CheckCircle,
             contentDescription = "Éxito",
             tint = Color.White,
-            modifier = Modifier.size(72.dp)
+            modifier = Modifier.size(80.dp)
         )
 
         Spacer(modifier = Modifier.height(25.dp))
 
         Card(
             shape = RoundedCornerShape(20.dp),
-            colors = CardDefaults.cardColors(containerColor = Color.LightGray),
+            colors = CardDefaults.cardColors(containerColor = moradoClaro),
             modifier = Modifier.fillMaxWidth()
         ) {
             Column(
@@ -142,7 +138,8 @@ fun ReporteGenerado(
         Spacer(modifier = Modifier.height(24.dp))
         Card(
             shape = RoundedCornerShape(20.dp),
-            colors = CardDefaults.cardColors(containerColor = Color.LightGray),
+            colors = CardDefaults.cardColors(containerColor = moradoClaro),
+            border = BorderStroke(1.5.dp, moradoClaro),
             modifier = Modifier.fillMaxWidth()
         ) {
             Column(
@@ -152,7 +149,7 @@ fun ReporteGenerado(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = folioMostrar,
+                    text = "Código privado",
                     fontSize = 15.sp,
                     fontWeight = FontWeight.SemiBold,
                     color = colorMorado
@@ -164,10 +161,11 @@ fun ReporteGenerado(
                     fontWeight = FontWeight.ExtraBold,
                     color = colorMorado
                 )
-                Spacer(modifier = Modifier.height(4.dp))
+                Spacer(modifier = Modifier.height(6.dp))
                 Text(
                     text = "Guarda el código para dar seguimiento a tu reporte",                    color = colorMorado,
-                    textAlign = TextAlign.Center
+                    textAlign = TextAlign.Center,
+                    fontWeight = FontWeight.ExtraBold
                 )
 
 
@@ -175,10 +173,10 @@ fun ReporteGenerado(
 
 
         }
-        Spacer(modifier = Modifier.height(36.dp))
+        Spacer(modifier = Modifier.height(50.dp))
         Text(
             text = "Página de inicio",
-            fontSize = 18.sp,
+            fontSize = 20.sp,
             fontWeight = FontWeight.Bold,
             color = Color.White,
             textDecoration = TextDecoration.Underline,

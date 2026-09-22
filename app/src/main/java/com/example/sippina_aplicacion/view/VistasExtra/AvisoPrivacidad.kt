@@ -58,7 +58,7 @@ fun AvisoPrivacidad(
                 .fillMaxSize()
                 .background(Color(0xFFEAF4FC))
                 .verticalScroll(rememberScrollState())
-                .padding(horizontal = 24.dp, vertical = 20.dp),
+                .padding(horizontal = 24.dp, vertical = 15.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Box(

@@ -2,6 +2,7 @@ package com.example.sippina_aplicacion.view.PantallasReporte
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -68,27 +69,30 @@ fun Evidencia(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(horizontal = 24.dp, vertical = 12.dp)
+            .padding(horizontal = 24.dp, vertical = 15.dp)
             .verticalScroll(rememberScrollState())
             .imePadding()
+            .background(Color(0xFFEDF7FF))
             .navigationBarsPadding(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Image(
             painter = painterResource(id = R.drawable.imagensippina),
             contentDescription = "Logo Sippina",
-            modifier = Modifier.size(100.dp)
+            modifier = Modifier.size(120.dp)
         )
         Spacer(modifier = Modifier.height(8.dp))
         Text(
-            text = "Evidencia Personal",
-            fontSize = 24.sp,
+            text = "Evidencia",
+            fontSize = 30.sp,
             fontWeight = FontWeight.Bold,
             color = colorMorado
         )
-        Spacer(modifier = Modifier.height(14.dp))
+        Spacer(modifier = Modifier.height(10.dp))
+
         BarraDePasos(pasoActual = 3)
-        Spacer(modifier = Modifier.height(24.dp))
+
+        Spacer(modifier = Modifier.height(35.dp))
 
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -108,7 +112,7 @@ fun Evidencia(
                 })
 
         }
-        Spacer(modifier = Modifier.height(15.dp))
+        Spacer(modifier = Modifier.height(25.dp))
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(16.dp)
@@ -128,12 +132,12 @@ fun Evidencia(
 
         }
 
-        Spacer(modifier = Modifier.height(15.dp))
+        Spacer(modifier = Modifier.height(25.dp))
 
         OutlinedCard(
             onClick = {}, shape = RoundedCornerShape(15.dp),
             border = BorderStroke(1.5.dp, colorMorado),
-            colors = CardDefaults.outlinedCardColors(containerColor = Color.LightGray),
+            //colors = CardDefaults.outlinedCardColors(containerColor = Color.LightGray),
             modifier = Modifier
                 .fillMaxWidth()
                 .height(105.dp)
@@ -165,7 +169,7 @@ fun Evidencia(
 
         }
 
-        Spacer(modifier = Modifier.height(75.dp))
+        Spacer(modifier = Modifier.height(83.dp))
 
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(16.dp))
         {
@@ -188,16 +192,10 @@ fun Evidencia(
                     .weight(1f)
                     .height(46.dp)
             ) {
-                Text(text = "Siguiente ", fontSize = 15.sp, fontWeight = FontWeight.Bold)
-
-
+                Text(text = "Siguiente", fontSize = 15.sp, fontWeight = FontWeight.Bold)
             }
         }
-
-
     }
-
-
 }
 
 @Composable
@@ -210,8 +208,8 @@ private fun TarjetaOpcionMedia(
     OutlinedCard(
         onClick = onClick,
         shape = RoundedCornerShape(16.dp),
-        border = BorderStroke(1.5.dp, Color.Blue),
-        colors = CardDefaults.outlinedCardColors(containerColor = Color.LightGray),
+        border = BorderStroke(1.5.dp, Color(0xFF381EBD)),
+        //colors = CardDefaults.outlinedCardColors(containerColor = Color.LightGray),
         modifier = modifier.height(115.dp)
     ) {
         Box(

@@ -2,6 +2,7 @@ package com.example.sippina_aplicacion.view.PantallasReporte
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -60,38 +61,41 @@ fun PrivacidadSeguimiento(
     onAtras: () -> Unit = { }
 ) {
     // Colores para los botones
-    val colorMorado = Color(0xFF381EBD)
+    val colorMorado = Color(0xFF3D27C9)
     val colorFondoBotonSiguiente = Color(0xFFD3E4F4)
     val colorTextoBotonSiguiente = Color(0xFF3B719F)
     val colorFondoBotonAtras = Color(0xFFE2E2E2)
     val colorTextoBotonAtras = Color(0xFF5A5A5A)
+    val colorFondo = Color(0xFFEAF4FC)
 
     var opcionSeleccionada by remember { mutableStateOf("anonimo") }
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(horizontal = 24.dp, vertical = 12.dp)
+            .padding(horizontal = 24.dp, vertical = 15.dp)
             .verticalScroll(rememberScrollState())
             .imePadding()
-            .navigationBarsPadding(),
+            .navigationBarsPadding()
+            .background(Color(0xFFEAF4FC)),
         horizontalAlignment = Alignment.CenterHorizontally
     )
     {
         Image(
             painter = painterResource(id = R.drawable.imagensippina),
             contentDescription = "Logo Sippina",
-            modifier = Modifier.size(100.dp))
-        Spacer(modifier = Modifier.height(8.dp))
+            modifier = Modifier.size(120.dp))
+
+        Spacer(modifier = Modifier.height(7.dp))
 
         Text(
             text = "Privacidad y Seguimiento",
-            fontSize = 24.sp,
+            fontSize = 28.sp,
             fontWeight = FontWeight.Bold,
             color = colorMorado
         )
-        Spacer(modifier = Modifier.height(14.dp))
+        Spacer(modifier = Modifier.height(12.dp))
         BarraDePasos(pasoActual = 4)
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(35.dp))
 
         TarjetaOpcionPrivacidad(
             titulo = "Reporte anónimo",
@@ -101,24 +105,24 @@ fun PrivacidadSeguimiento(
             onClick = { opcionSeleccionada = "anonimo" }
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(25.dp))
 
         TarjetaOpcionPrivacidad(
             titulo = "Me interesa recibir actualizaciones",
-            descripcion = "Te pediremos tu número para enviarte el seguimiento y actualizaciones.",
+            descripcion = "Te pediremos tu correo para enviarte el seguimiento y actualizaciones.",
             icon = Icons.Default.Email,
             seleccionado = opcionSeleccionada == "actualizaciones",
             onClick = { opcionSeleccionada = "actualizaciones" }
         )
-        Spacer(modifier = Modifier.height(15.dp))
+        Spacer(modifier = Modifier.height(35.dp))
         Text(
             text = "Tus datos están protegidos y solo el equipo autorizado podrá verlos",
-            fontSize = 15.sp,
+            fontSize = 18.sp,
             fontWeight = FontWeight.Bold,
             color = Color.Gray,
             textAlign = TextAlign.Center,
-            modifier = Modifier.padding(horizontal = 12.dp))
-        Spacer(modifier = Modifier.height(12.dp))
+            modifier = Modifier.padding(horizontal = 15.dp))
+        Spacer(modifier = Modifier.height(10.dp))
 
 
         val textoAviso = buildAnnotatedString {
@@ -133,10 +137,11 @@ fun PrivacidadSeguimiento(
             append(" para nuestro aviso de privacidad")
         }
         Spacer(modifier = Modifier.width(100.dp))
+        Spacer(modifier = Modifier.height(15.dp))
 
         Text(
             text = textoAviso,
-            fontSize = 12.sp,
+            fontSize = 13.sp,
             color = Color.Gray,
             textAlign = TextAlign.Center,
             modifier = Modifier
@@ -145,7 +150,7 @@ fun PrivacidadSeguimiento(
             fontWeight = FontWeight.Bold
         )
 
-        Spacer(modifier = Modifier.height(80.dp))
+        Spacer(modifier = Modifier.height(59.dp))
 
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(16.dp))
         {
@@ -157,31 +162,11 @@ fun PrivacidadSeguimiento(
             Button(onClick = {onSiguiente()},colors = ButtonDefaults.buttonColors(colorFondoBotonSiguiente, colorTextoBotonSiguiente), modifier = Modifier
                 .weight(1f)
                 .height(46.dp)){
-                Text(text = "Siguiente ", fontSize = 15.sp, fontWeight = FontWeight.Bold)
-
-
+                Text(text = "Siguiente", fontSize = 15.sp, fontWeight = FontWeight.Bold)
             }
-
-
         }
         Spacer(modifier = Modifier.height(36.dp))
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     }
-
-
 }
 
 @Composable
@@ -197,7 +182,7 @@ private fun TarjetaOpcionPrivacidad(
         shape = RoundedCornerShape(16.dp),
         border = BorderStroke(1.5.dp, colorMorado ),
         colors = CardDefaults.outlinedCardColors(
-            containerColor = if (seleccionado) Color.LightGray else Color.LightGray
+            containerColor = if (seleccionado) Color.White else Color.White
         ),
         modifier = Modifier.fillMaxWidth()
     ) {
@@ -212,14 +197,14 @@ private fun TarjetaOpcionPrivacidad(
             ) {
                 Text(
                     text = titulo,
-                    fontSize = 16.sp,
+                    fontSize = 18.sp,
                     fontWeight = FontWeight.Bold,
                     color = colorMorado
                 )
                 Spacer(modifier = Modifier.height(6.dp))
                 Text(
                     text = descripcion,
-                    fontSize = 12.sp,
+                    fontSize = 14.sp,
                     color = Color.Gray,
                     lineHeight = 16.sp
                 )

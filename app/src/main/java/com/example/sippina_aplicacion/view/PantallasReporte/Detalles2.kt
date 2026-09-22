@@ -1,8 +1,10 @@
 package com.example.sippina_aplicacion.view.PantallasReporte
 
 import android.R.attr.padding
+import android.text.style.UnderlineSpan
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -44,6 +46,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -84,9 +87,9 @@ fun Detalles2(
         modifier = Modifier
             .fillMaxSize()
             .padding(horizontal = 24.dp)
-            .padding(top = 12.dp, bottom = 16.dp)
+            .padding(top = 15.dp, bottom = 43.dp)
             .imePadding()
-            .navigationBarsPadding(),
+            .background(Color(0xFFEAF4FC)),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Column(
@@ -99,7 +102,7 @@ fun Detalles2(
             Image(
                 painter = painterResource(id = R.drawable.imagensippina),
                 contentDescription = "Logo Sippina",
-                modifier = Modifier.size(100.dp)
+                modifier = Modifier.size(120.dp)
             )
 
             Spacer(modifier = Modifier.height(8.dp))
@@ -111,7 +114,7 @@ fun Detalles2(
                 fontWeight = FontWeight.Bold
             )
 
-            Spacer(modifier = Modifier.height(14.dp))
+            Spacer(modifier = Modifier.height(10.dp))
 
             BarraDePasos(pasoActual = 2)
 
@@ -120,6 +123,7 @@ fun Detalles2(
             Text(
                 text = "Descripción : Menor 1",
                 fontWeight = FontWeight.Bold,
+                textDecoration = TextDecoration.Underline,
                 color = colorMorado,
                 fontSize = 20.sp,
                 modifier = Modifier.fillMaxWidth(),
@@ -135,7 +139,7 @@ fun Detalles2(
                     fontWeight = FontWeight.Bold,
                     fontSize = 18.sp
                 )
-                Spacer(modifier = Modifier.height(10.dp))
+                Spacer(modifier = Modifier.height(20.dp))
 
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -151,12 +155,12 @@ fun Detalles2(
                                 containerColor = if (seleccionado) colorMorado else Color.Transparent,
                                 contentColor = if (seleccionado) Color.White else colorMorado
                             ),
-                            contentPadding = PaddingValues(horizontal = 2.dp),
+                            contentPadding = PaddingValues(horizontal = 4.dp),
                             modifier = Modifier
                                 .weight(1f)
                                 .height(34.dp)
                         ) {
-                            Text(text = rango, fontSize = 14.sp, fontWeight = FontWeight.Bold)
+                            Text(text = rango, fontSize = 16.sp, fontWeight = FontWeight.Bold)
                         }
                     }
                 }
@@ -188,12 +192,12 @@ fun Detalles2(
                                 containerColor = if (seleccionado) colorMorado else Color.Transparent,
                                 contentColor = if (seleccionado) Color.White else colorMorado
                             ),
-                            contentPadding = PaddingValues(horizontal = 2.dp),
+                            contentPadding = PaddingValues(horizontal = 4.dp),
                             modifier = Modifier
                                 .weight(1f)
                                 .height(34.dp)
                         ) {
-                            Text(text = genero, fontSize = 13.sp, fontWeight = FontWeight.Bold)
+                            Text(text = genero, fontSize = 16.sp, fontWeight = FontWeight.Bold)
                         }
                     }
                 }
@@ -255,7 +259,7 @@ fun Detalles2(
         }
 
         // MARGEN FIJO CON RESPECTO A LOS BOTONES
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(10.dp))
 
         // --- 2. BOTONES FIJOS EN EL BORDE INFERIOR ---
         Row(
