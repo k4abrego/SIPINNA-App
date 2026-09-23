@@ -1,13 +1,11 @@
 package com.example.sippina_aplicacion.view.perfilusuario
 
-import android.R.attr.id
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -16,18 +14,18 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.automirrored.filled.Article
-import androidx.compose.material.icons.automirrored.filled.InsertDriveFile
-import androidx.compose.material.icons.filled.Article
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Flag
 import androidx.compose.material.icons.filled.History
-import androidx.compose.material.icons.filled.InsertDriveFile
 import androidx.compose.material.icons.filled.MyLocation
+import androidx.compose.material.icons.outlined.Description
+import androidx.compose.material.icons.outlined.LocationOn
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.HorizontalDivider
@@ -36,15 +34,11 @@ import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Outline
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -54,361 +48,300 @@ import androidx.compose.ui.unit.sp
 import com.example.sippina_aplicacion.R
 import com.example.sippina_aplicacion.ui.theme.SIPPINAAplicacionTheme
 
+
 @Composable
 fun DetalleReporte(
     folio: String = "REP-1234-1234",
-    fechaEnvio: String = "24/08/2026, 10:59:00am",
-    onAtras: () -> Unit = {},
-    onVerTodasEvidencias: () -> Unit = {}
+    fechaEnvio: String = "24/08/2026, 10:59:00 am",
+
+    // 0 = Recibido
+    // 1 = En revisión
+    // 2 = En atención
+    // 3 = Cerrado
+    estadoActual: Int = 0,
+
+    descripcion: String = "Menor de edad encontrado solo en la vía pública, sin la supervisión de una persona adulta.",
+
+    direccion: String = "Calle Flop, Av. Ware s/n, Col. Papu, C.P. 6767",
+
+    onAtras: () -> Unit = {}
 ) {
-    Box(modifier = Modifier.fillMaxSize()) {
+
+    val morado = Color(0xFF381DC3)
+    val fondo = Color(0xFFEAF4FC)
+    val gris = Color(0xFF777777)
+    val mensajeEstado = when (estadoActual) {
+        0 -> "Su caso fue recibido, estamos revisando el reporte"
+        1 -> "Su reporte se encuentra en revisión"
+        2 -> "Su reporte se encuentra en atención"
+        3 -> "Su reporte ha sido cerrado"
+        else -> "Consulta el estado de tu reporte"
+    }
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(fondo)
+    ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(20.dp, 16.dp),
+                .verticalScroll(rememberScrollState())
+                .padding(horizontal = 24.dp, vertical = 20.dp),
             horizontalAlignment = Alignment.CenterHorizontally
-        )
-        {
+        ) {
             Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 10.dp),
+                modifier = Modifier.fillMaxWidth(),
                 contentAlignment = Alignment.Center
-            )
-            {
+            ) {
                 FilledIconButton(
                     onClick = onAtras,
                     modifier = Modifier
-                        .size(40.dp)
+                        .size(50.dp)
                         .align(Alignment.CenterStart),
                     colors = IconButtonDefaults.filledIconButtonColors(
-                        containerColor = Color.Blue,
-                        contentColor = Color.White
+                        containerColor = fondo,
+                        contentColor = Color(0xFF3D27C9)
                     )
-                )
-                {
+                ) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = "Atrás",
+                        contentDescription = "Botón atrás",
                         modifier = Modifier.size(22.dp)
                     )
-
                 }
                 Image(
                     painter = painterResource(id = R.drawable.imagensippina),
-                    contentDescription = "Logo Sippina",
+                    contentDescription = "Logo SIPINNA",
                     modifier = Modifier.size(120.dp)
                 )
-
             }
-            Spacer(modifier = Modifier.height(1.dp))
-            Text(
-                text = "Reporte",
-                fontSize = 18.sp,
-                fontWeight = FontWeight.SemiBold,
-                color = Color.Gray
-            )
+
+            Spacer(modifier = Modifier.height(5.dp))
+
+            Column(
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(
+                    text = "Reporte",
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = gris
+                )
+
+                Spacer(modifier = Modifier.height(2.dp))
+
+                Text(
+                    text = folio,
+                    fontSize = 28.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = morado
+                )
+
+                Spacer(modifier = Modifier.height(4.dp))
+
+                Text(
+                    text = "Enviado: $fechaEnvio",
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = gris
+                )
+            }
+
+            Spacer(modifier = Modifier.height(22.dp))
+
+            BarraEstadoReporte(estadoActual = estadoActual)
+
+            Spacer(modifier = Modifier.height(22.dp))
 
             Text(
-                text = folio,
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color.Blue
-            )
-
-            Text(
-                text = "Enviado: $fechaEnvio",
-                fontSize = 13.sp,
-                color = Color.Gray
-            )
-
-            Spacer(modifier = Modifier.height(20.dp))
-            BarraEstadoReporte()
-            Spacer(modifier = Modifier.height(20.dp))
-
-            Text(
-                text = "Su caso fue recibido, estamos revisando\nel reporte",
+                text = mensajeEstado,
                 fontSize = 15.sp,
                 fontWeight = FontWeight.Bold,
-                textAlign = TextAlign.Center,
-                lineHeight = 20.sp
+                lineHeight = 20.sp,
+                color = Color.DarkGray,
+                textAlign = TextAlign.Start,
+                modifier = Modifier.fillMaxWidth()
             )
+
             Spacer(modifier = Modifier.height(20.dp))
 
             OutlinedCard(
                 shape = RoundedCornerShape(14.dp),
-                border = BorderStroke(1.5.dp, Color.Blue),
-                colors = CardDefaults.outlinedCardColors(containerColor = Color.White),
+                border = BorderStroke(width = 1.5.dp, color = morado),
+                colors = CardDefaults.outlinedCardColors(containerColor = fondo),
                 modifier = Modifier.fillMaxWidth()
-            )
-            {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Surface(
-                            color = Color.Blue,
-                            shape = RoundedCornerShape(4.dp),
-                            modifier = Modifier.size(24.dp)
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(14.dp)
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            imageVector = Icons.Outlined.Description,
+                            contentDescription = null,
+                            tint = morado,
+                            modifier = Modifier.size(22.dp)
                         )
-                        {
-                            Box(contentAlignment = Alignment.Center) {
-                                Icon(
-                                    imageVector = Icons.Default.Article,
-                                    contentDescription = "Articulo",
-                                    tint = Color.White,
-                                    modifier = Modifier.size(16.dp)
-                                )
 
-                            }
+                        Spacer(modifier = Modifier.width(10.dp))
 
-
-                        }
-                        Spacer(modifier = Modifier.width(8.dp))
                         Text(
                             text = "Descripción del incidente",
                             fontSize = 16.sp,
                             fontWeight = FontWeight.Bold,
-                            color = Color.Blue
-
+                            color = Color.DarkGray
                         )
-
                     }
-                    Spacer(modifier = Modifier.width(8.dp))
+
+                    Spacer(modifier = Modifier.height(6.dp))
+
                     Text(
-                        text = "Flop y flop y flop Flop y flop y flopFlop y flop y flopFlop y flop y flopFlop y flop y flopFlop y flop y flop",
-                        fontSize = 12.sp,
-                        color = Color.Gray,
-                        lineHeight = 16.sp
+                        text = descripcion,
+                        fontSize = 13.sp,
+                        lineHeight = 17.sp,
+                        color = gris,
+                        modifier = Modifier.padding(start = 32.dp)
                     )
 
+                    Spacer(modifier = Modifier.height(10.dp))
                 }
-
             }
-            Spacer(modifier = Modifier.height(14.dp))
+
+            Spacer(modifier = Modifier.height(22.dp))
 
             OutlinedCard(
                 shape = RoundedCornerShape(14.dp),
-                border = BorderStroke(1.5.dp, Color.Blue),
-                colors = CardDefaults.outlinedCardColors(containerColor = Color.White),
+                border = BorderStroke(width = 1.5.dp, color = morado),
+                colors = CardDefaults.outlinedCardColors(containerColor = fondo),
                 modifier = Modifier.fillMaxWidth()
-            )
-            {
-                Row(
+            ) {
+                Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(14.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                )
-                {
-                    Column(modifier = Modifier.weight(1f))
-                    {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(
-                                imageVector = Icons.Default.MyLocation,
-                                contentDescription = "Ubicacion",
-                                tint = Color.Blue,
-                                modifier = Modifier.size(22.dp)
-                            )
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Text(
-                                text = "Ubicación",
-                                fontSize = 16.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = Color.Blue
-
-                            )
-
-                        }
-                        Spacer(modifier = Modifier.height(6.dp))
-                        Text(
-                            text = "Calle Flop, Av. Ware s/n, Col. Papu, C.P 6767",
-                            fontSize = 12.sp,
-                            color = Color.Gray,
-                            lineHeight = 16.sp
-                        )
-
-
-                    }
-
-                    Spacer(modifier = Modifier.width(10.dp))
-
-                    Image(
-                        painter = painterResource(id = R.drawable.ic_launcher_background), // Reemplazar con imagen/mapa real
-                        contentDescription = "Mapa de ubicación",
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier
-                            .size(width = 110.dp, height = 65.dp)
-                            .clip(RoundedCornerShape(8.dp))
-                            .background(Color.LightGray)
-                    )
-
-                }
-
-            }
-            Spacer(modifier = Modifier.height(10.dp))
-
-            OutlinedCard(
-                shape = RoundedCornerShape(14.dp),
-                border = BorderStroke(1.5.dp, Color.Blue),
-                colors = CardDefaults.outlinedCardColors(containerColor = Color.White),
-                modifier = Modifier.fillMaxWidth()
-            )
-            {
-                Column(modifier = Modifier.padding(14.dp))
-                {
+                        .padding(14.dp)
+                ) {
                     Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
-                    )
-                    {
-                        Row(verticalAlignment = Alignment.CenterVertically)
-                        {
-                            Surface(
-                                color = Color.Blue,
-                                shape = RoundedCornerShape(4.dp),
-                                modifier = Modifier.size(16.dp)
-                            )
-                            {
-                                Box(contentAlignment = Alignment.Center) {
-                                    Icon(
-                                        imageVector = Icons.Default.InsertDriveFile,
-                                        contentDescription = "Icono",
-                                        tint = Color.White,
-                                        modifier = Modifier.size(16.dp)
-                                    )
-
-                                }
-
-                            }
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Text(
-                                text = "Evidencias (2)",
-                                fontSize = 16.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = Color.Blue
-                            )
-
-                        }
-                        TextButton(
-                            onClick = onVerTodasEvidencias,
-                            contentPadding = PaddingValues(0.dp)
-                        )
-                        {
-                            Text(
-                                text = "Ver todas",
-                                fontSize = 12.sp,
-                                color = Color.Gray
-                            )
-
-                        }
-
-
-                    }
-                    Spacer(modifier = Modifier.height(10.dp))
-                    Row(horizontalArrangement = Arrangement.spacedBy(12.dp))
-                    {
-                        Image(
-                            painter = painterResource(id = R.drawable.ic_launcher_background), // Reemplazar con foto real
-                            contentDescription = "Evidencia 1",
-                            contentScale = ContentScale.Crop,
-                            modifier = Modifier
-                                .size(width = 90.dp, height = 55.dp)
-                                .clip(RoundedCornerShape(6.dp))
-                                .background(Color.Gray)
-                        )
-                        Image(
-                            painter = painterResource(id = R.drawable.ic_launcher_background), // Reemplazar con foto real
-                            contentDescription = "Evidencia 2",
-                            contentScale = ContentScale.Crop,
-                            modifier = Modifier
-                                .size(width = 100.dp, height = 55.dp)
-                                .clip(RoundedCornerShape(6.dp))
-                                .background(Color.Gray)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.MyLocation,
+                            contentDescription = null,
+                            tint = morado,
+                            modifier = Modifier.size(22.dp)
                         )
 
+                        Spacer(modifier = Modifier.width(10.dp))
 
+                        Text(
+                            text = "Ubicación",
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.DarkGray
+                        )
                     }
 
+                    Spacer(modifier = Modifier.height(8.dp))
 
-                }
-
-
-            }
-            Spacer(modifier = Modifier.height(14.dp))
-            OutlinedCard(
-                shape = RoundedCornerShape(14.dp),
-                border = BorderStroke(1.5.dp, Color.Blue),
-                colors = CardDefaults.outlinedCardColors(containerColor = Color.White),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(60.dp)
-            )
-            {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(horizontal = 16.dp),
-                    contentAlignment = Alignment.CenterStart
-                )
-                {
                     Text(
-                        text = "Etiquetas",
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.Blue
+                        text = direccion,
+                        fontSize = 13.sp,
+                        lineHeight = 17.sp,
+                        color = gris,
+                        modifier = Modifier.padding(start = 32.dp)
                     )
 
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(150.dp)
+                            .background(color = Color(0xFFDDE9F2), shape = RoundedCornerShape(10.dp)),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Icon(
+                                imageVector = Icons.Outlined.LocationOn,
+                                contentDescription = "Ubicación del reporte",
+                                tint = morado,
+                                modifier = Modifier.size(32.dp)
+                            )
+                            Spacer(modifier = Modifier.height(8.dp))
+
+                            Text(
+                                text = "Mapa de ubicación",
+                                fontSize = 13.sp,
+                                color = gris,
+                                textAlign = TextAlign.Center
+                            )
+                        }
+                    }
                 }
-
-
             }
 
-
+            Spacer(modifier = Modifier.height(25.dp))
         }
-
     }
-
-
 }
 
 @Composable
-fun BarraEstadoReporte() {
+fun BarraEstadoReporte(
+    estadoActual: Int = 0
+) {
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 8.dp),
+        modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.Top,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         PasoEstado(
             etiqueta = "Recibido",
             icono = Icons.Default.Check,
-            activo = true,
+            activo = estadoActual >= 0,
             modifier = Modifier.weight(1f)
         )
-        LineaEstado(activa = false, modifier = Modifier.weight(0.8f))
+        LineaEstado(
+            activa = estadoActual >= 1,
+            modifier = Modifier.weight(0.35f)
+        )
+
         PasoEstado(
             etiqueta = "En\nrevisión",
             icono = Icons.Default.History,
-            activo = false,
+            activo = estadoActual >= 1,
             modifier = Modifier.weight(1f)
         )
-        LineaEstado(activa = false, modifier = Modifier.weight(0.8f))
+
+        LineaEstado(
+            activa = estadoActual >= 2,
+            modifier = Modifier.weight(0.35f)
+        )
+
         PasoEstado(
             etiqueta = "En\natención",
             icono = Icons.Default.Flag,
-            activo = false,
+            activo = estadoActual >= 2,
             modifier = Modifier.weight(1f)
         )
-        LineaEstado(activa = false, modifier = Modifier.weight(0.8f))
+
+        LineaEstado(
+            activa = estadoActual >= 3,
+            modifier = Modifier.weight(0.35f)
+        )
+
         PasoEstado(
             etiqueta = "Cerrado",
             icono = Icons.Default.Flag,
-            activo = false,
+            activo = estadoActual >= 3,
             modifier = Modifier.weight(1f)
         )
     }
 }
+
 
 @Composable
 private fun PasoEstado(
@@ -417,34 +350,50 @@ private fun PasoEstado(
     activo: Boolean,
     modifier: Modifier = Modifier
 ) {
+    val morado = Color(0xFF381DC3)
+
     Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = modifier
+        modifier = modifier,
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Surface(
             shape = CircleShape,
-            color = if (activo) Color.Blue else Color.LightGray,
-            modifier = Modifier.size(34.dp)
+            color = if (activo) {
+                morado
+            } else {
+                Color(0xFFE0E0E0)
+            },
+            modifier = Modifier.size(38.dp)
         ) {
-            Box(contentAlignment = Alignment.Center) {
+            Box(
+                contentAlignment = Alignment.Center
+            ) {
                 Icon(
                     imageVector = icono,
-                    contentDescription = null,
-                    tint = if (activo) Color.White else Color.LightGray,
-                    modifier = Modifier.size(20.dp)
+                    contentDescription = etiqueta.replace("\n", " "),
+                    tint = if (activo) {
+                        Color.White
+                    } else {
+                        morado
+                    },
+                    modifier = Modifier.size(23.dp)
                 )
             }
         }
 
-        Spacer(modifier = Modifier.height(6.dp))
+        Spacer(modifier = Modifier.height(7.dp))
 
         Text(
             text = etiqueta,
-            fontSize = 10.sp,
+            fontSize = 11.sp,
             fontWeight = FontWeight.SemiBold,
-            color = if (activo) Color.Black else Color.LightGray,
+            color = if (activo) {
+                Color.DarkGray
+            } else {
+                Color.Gray
+            },
             textAlign = TextAlign.Center,
-            lineHeight = 12.sp
+            lineHeight = 13.sp
         )
     }
 }
@@ -455,13 +404,16 @@ private fun LineaEstado(
     modifier: Modifier = Modifier
 ) {
     Box(
-        modifier = modifier
-            .padding(top = 16.dp),
+        modifier = modifier.height(38.dp),
         contentAlignment = Alignment.Center
     ) {
         HorizontalDivider(
-            thickness = 2.dp,
-            color = if (activa) Color.Blue else Color.LightGray
+            thickness = 1.5.dp,
+            color = if (activa) {
+                Color(0xFF381DC3)
+            } else {
+                Color.Gray
+            }
         )
     }
 }
@@ -469,11 +421,74 @@ private fun LineaEstado(
 @Preview(
     showBackground = true,
     showSystemUi = true,
-    name = "Ver Detalle Reporte - Material 3"
+    name = "Detalle de reporte - Recibido"
 )
 @Composable
 fun DetalleReportePreview() {
+
     SIPPINAAplicacionTheme {
-        DetalleReporte()
+
+        DetalleReporte(
+            estadoActual = 0
+        )
     }
 }
+
+
+
+
+//// PREVIEW: REPORTE EN REVISIÓN
+//
+//@Preview(
+//    showBackground = true,
+//    showSystemUi = true,
+//    name = "Detalle de reporte - En revisión"
+//)
+//@Composable
+//fun DetalleReporteRevisionPreview() {
+//
+//    SIPPINAAplicacionTheme {
+//
+//        DetalleReporte(
+//            estadoActual = 1
+//        )
+//    }
+//}
+
+
+// PREVIEW: REPORTE EN ATENCIÓN
+
+@Preview(
+    showBackground = true,
+    showSystemUi = true,
+    name = "Detalle de reporte - En atención"
+)
+@Composable
+fun DetalleReporteAtencionPreview() {
+
+    SIPPINAAplicacionTheme {
+
+        DetalleReporte(
+            estadoActual = 2
+        )
+    }
+}
+
+
+//// PREVIEW: REPORTE CERRADO
+//
+//@Preview(
+//    showBackground = true,
+//    showSystemUi = true,
+//    name = "Detalle de reporte - Cerrado"
+//)
+//@Composable
+//fun DetalleReporteCerradoPreview() {
+//
+//    SIPPINAAplicacionTheme {
+//
+//        DetalleReporte(
+//            estadoActual = 3
+//        )
+//    }
+//}
