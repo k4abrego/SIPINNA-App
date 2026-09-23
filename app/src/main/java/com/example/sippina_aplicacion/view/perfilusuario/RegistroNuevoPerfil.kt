@@ -34,11 +34,18 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.sippina_aplicacion.R
 import com.example.sippina_aplicacion.ui.theme.SIPPINAAplicacionTheme
+import androidx.compose.foundation.layout.Box
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.FilledIconButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButtonDefaults
 
 @Composable
 fun RegistroNuevoPerfil(
     modifier: Modifier = Modifier,
     onSiguiente: () -> Unit = {},
+    onAtras: () -> Unit = {},
 ) {
 
     var nombre by remember { mutableStateOf("") }
@@ -53,20 +60,38 @@ fun RegistroNuevoPerfil(
             Color(0xFFBCA7E8)
         )
     )
-
     Column(
         modifier = modifier.fillMaxSize().background(fondoDegradado).padding(horizontal = 20.dp, vertical = 20.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Spacer(modifier = Modifier.weight(0.5f))
+        Box(
+            modifier = Modifier.fillMaxWidth(),
+            contentAlignment = Alignment.Center
+        ) {
+            FilledIconButton(
+                onClick = onAtras,
+                modifier = Modifier
+                    .size(50.dp)
+                    .align(Alignment.CenterStart),
+                colors = IconButtonDefaults.filledIconButtonColors(
+                    containerColor = Color(0xFFEAF4FC),
+                    contentColor = Color(0xFF3D27C9)
+                )
+            ) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = "Botón atrás",
+                    modifier = Modifier.size(22.dp)
+                )
+            }
+            Image(
+                painter = painterResource(id = R.drawable.imagensippina),
+                contentDescription = "Logo SIPINNA",
+                modifier = Modifier.size(200.dp)
+            )
+        }
 
-        Image(
-            painter = painterResource(id = R.drawable.sipinnalogosinfondo),
-            contentDescription = "Logo SIPINNA",
-            modifier = Modifier.size(200.dp)
-        )
-
-        Spacer(modifier = Modifier.height(10.dp))
+        Spacer(modifier = Modifier.height(40.dp))
 
         CampoRegistro(
             valor = nombre,

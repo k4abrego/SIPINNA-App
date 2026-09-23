@@ -28,58 +28,52 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
+//import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.sippina_aplicacion.R
-import com.example.sippina_aplicacion.viewmodel.ReporteVM
+import com.example.sippina_aplicacion.ui.theme.SIPPINAAplicacionTheme
+//import com.example.sippina_aplicacion.viewmodel.ReporteVM
 
 // Paleta de colores usados
-val colorMorado = Color(0xFF381EBD)
-val colorAzul = Color(0xFFD3E2F4)
+val colorMorado = Color(0xFF381DC3)
 val colorRojo = Color(0xFFA00000)
 
 @Composable
 fun PantallaInicio(
     modifier: Modifier = Modifier,
-    viewModel: ReporteVM = viewModel(),
+    //viewModel: ReporteVM = viewModel(),
     accionBoton: () -> Unit = {},
     onNavegarAReporte: () -> Unit = {},
-    onNavegarAPerfil: () -> Unit = {}
+    onNavegarAPerfil: () -> Unit = {},
+    onNavegarANotificaciones: () -> Unit = {},
+    onQueSituacionesReportar: () -> Unit = {},
+    onConoceSIPINNA: () -> Unit = {}
 ) {
-
     Box(
-        modifier = modifier.background(Color.White).fillMaxSize()
+        modifier = modifier.background(Color(0xFFDDEEFB)).fillMaxSize()
     ) {
-
         Column(
             modifier = Modifier.fillMaxSize().padding(
                     horizontal = 24.dp,
                     vertical = 15.dp)
         ) {
-
             Row(
-                modifier = Modifier.fillMaxWidth().padding(
-                        top = 15.dp,
-                        bottom = 23.dp
-                    ),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 15.dp, bottom = 23.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-
                 Image(
-                    painter = painterResource(
-                        id = R.drawable.imagensippina
-                    ),
+                    painter = painterResource(id = R.drawable.imagensippina),
                     contentDescription = "Logo Sippinna",
-                    modifier = Modifier.size(100.dp)
+                    modifier = Modifier.size(120.dp)
                 )
-
                 Row {
 
-                    IconButton(onClick = { // Acción de notificaciones
-                        }
-                    ) {
+                    IconButton(onClick = onNavegarANotificaciones) {
                         Icon(
                             imageVector = Icons.Outlined.Notifications,
                             contentDescription = "Notificaciones",
@@ -105,9 +99,7 @@ fun PantallaInicio(
                 fontWeight = FontWeight.Bold
             )
 
-            Spacer(
-                modifier = Modifier.height(15.dp)
-            )
+            Spacer(modifier = Modifier.height(15.dp))
 
             Text(
                 text = "Gracias por ayudar a proteger a\nlos niños, niñas y adolescentes.",
@@ -116,9 +108,7 @@ fun PantallaInicio(
                 fontSize = 20.sp
             )
 
-            Spacer(
-                modifier = Modifier.height(250.dp)
-            )
+            Spacer(modifier = Modifier.height(250.dp))
 
             Column(
                 modifier = Modifier.fillMaxWidth(),
@@ -141,7 +131,7 @@ fun PantallaInicio(
                     )
                 }
 
-                ElevatedButton(onClick = { accionBoton() },
+                ElevatedButton(onClick = onQueSituacionesReportar ,
                     modifier = Modifier.height(50.dp).fillMaxWidth(),
                     shape = RoundedCornerShape(20.dp)
                 ) {
@@ -153,7 +143,7 @@ fun PantallaInicio(
                     )
                 }
 
-                ElevatedButton(onClick = { accionBoton() },
+                ElevatedButton(onClick = onConoceSIPINNA,
                     modifier = Modifier.height(50.dp).fillMaxWidth(),
                     shape = RoundedCornerShape(20.dp)
                 ) {
@@ -184,3 +174,14 @@ fun PantallaInicio(
     }
 }
 
+@Preview (
+    showBackground = true,
+    showSystemUi = true
+)
+
+@Composable
+fun PantallaPreview () {
+    SIPPINAAplicacionTheme {
+        PantallaInicio()
+    }
+}

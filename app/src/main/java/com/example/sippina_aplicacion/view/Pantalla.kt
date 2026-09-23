@@ -1,6 +1,7 @@
 package com.example.sippina_aplicacion.view
 
 import androidx.compose.ui.graphics.vector.ImageVector
+import com.example.sippina_aplicacion.view.PerfilAutenticado.EditarPerfil
 
 
 sealed class Pantalla(
@@ -23,7 +24,15 @@ sealed class Pantalla(
             VistaPerfil1,
             RegistroNuevoPerfil,
             VistaPerfil2,
-            Borradores
+            Borradores,
+            MisReportes,
+            AvisoPrivacidad,
+            EditarPerfil,
+            Notificaciones,
+            BuscarReporte,
+            DetalleReporte,
+            ConoceSIPINNA,
+            QueSituacionesReportar
         )
         const val  RUTA_PANTALLA_CARGA = "PantallaCarga"
         const val  RUTA_PANTALLA_INICIO = "PantallaInicio"
@@ -39,24 +48,33 @@ sealed class Pantalla(
         const val RUTA_BORRADORES = "Borradores"
         const val RUTA_MIS_REPORTES = "MisReportes"
         const val RUTA_AVISO_PRIVACIDAD = "AvisoPrivacidad"
-
+        const val RUTA_EDITAR_PERFIL = "EditarPerfil"
+        const val RUTA_NOTIFICACIONES = "Notificaciones"
+        const val RUTA_BUSCAR_REPORTE = "BuscarReporte"
+        const val RUTA_DETALLE_REPORTE = "DetalleReporte"
+        const val RUTA_CONOCE_SIPINNA = "ConoceSIPINNA"
+        const val RUTA_QUE_SITUACIONES_REPORTAR = "QueSituacionesReportar"
     }
+
     data object PantallaCarga: Pantalla(RUTA_PANTALLA_CARGA,"Carga")
     data object PantallaInicio: Pantalla(RUTA_PANTALLA_INICIO, "Inicio")
-    // Flujo completo de reporte
     data object DondeOcurrio : Pantalla(RUTA_DONDE_OCURRIO, "Ubicación")
     data object Detalles : Pantalla(RUTA_DETALLES, "Detalles 1")
     data object Detalles2 : Pantalla(RUTA_DETALLES2, "Detalles 2")
     data object Evidencia : Pantalla(RUTA_EVIDENCIA, "Evidencia")
     data object PrivacidadSeguimiento : Pantalla(RUTA_PRIVACIDAD_SEGUIMIENTO, "Privacidad")
     data object ReporteGenerado : Pantalla(RUTA_REPORTE_GENERADO, "Éxito")
-
-    //Perfil del ususario:
     data object VistaPerfil1 : Pantalla(RUTA_VISTA_PERFIL1, "Perfil")
     data object RegistroNuevoPerfil : Pantalla(RUTA_REGISTRO_NUEVO_PERFIL, "Crear cuenta")
     data object VistaPerfil2 : Pantalla(RUTA_VISTA_PERFIL2, "Perfil")
     data object Borradores : Pantalla(RUTA_BORRADORES, "Borradores")
     data object MisReportes : Pantalla(RUTA_MIS_REPORTES,"Mis reportes")
     data object AvisoPrivacidad : Pantalla(RUTA_AVISO_PRIVACIDAD,"Aviso de privacidad")
+    data object Notificaciones : Pantalla(RUTA_NOTIFICACIONES, "Notificaciones")
+    data object BuscarReporte : Pantalla(RUTA_BUSCAR_REPORTE, "Buscar reporte")
+    data object DetalleReporte : Pantalla(RUTA_DETALLE_REPORTE, "Detalle del reporte")
+    data object ConoceSIPINNA : Pantalla(RUTA_CONOCE_SIPINNA, "Conoce SIPINNA")
+    data object QueSituacionesReportar : Pantalla(RUTA_QUE_SITUACIONES_REPORTAR, "Qué situaciones reportar")
+    data object EditarPerfil : Pantalla(RUTA_EDITAR_PERFIL, "EditarPerfil")
 
 }

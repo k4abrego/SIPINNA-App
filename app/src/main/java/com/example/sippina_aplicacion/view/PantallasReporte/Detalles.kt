@@ -70,7 +70,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.sippina_aplicacion.R
 import com.example.sippina_aplicacion.ui.theme.SIPPINAAplicacionTheme
 import com.example.sippina_aplicacion.view.PantallasReporte.BarraDePasos
-import com.example.sippina_aplicacion.view.colorAzul
 import com.example.sippina_aplicacion.viewmodel.ReporteVM
 import java.util.Locale
 
