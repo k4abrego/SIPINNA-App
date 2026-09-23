@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -25,6 +24,7 @@ import com.example.sippina_aplicacion.view.PerfilAutenticado.Borradores
 import com.example.sippina_aplicacion.view.perfilusuario.RegistroNuevoPerfil
 import com.example.sippina_aplicacion.view.SinAutenticacion.VistaPerfil1
 import com.example.sippina_aplicacion.view.PerfilAutenticado.VistaPerfil2
+import com.example.sippina_aplicacion.view.VistasExtra.AvisoPrivacidad
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -215,15 +215,3 @@ fun AppNavHost(
         }
     }
 }
-
-//@Preview(
-//    showBackground = true,
-//    showSystemUi = true,
-//    name = "App Principal"
-//)
-//@Composable
-//fun AppPrincipalPreview() {
-//    SIPPINAAplicacionTheme {
-//        AppPrincipal()
-//    }
-//}
