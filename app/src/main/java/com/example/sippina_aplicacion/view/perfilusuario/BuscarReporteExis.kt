@@ -1,6 +1,11 @@
 package com.example.sippina_aplicacion.view.perfilusuario
 
 import android.graphics.fonts.Font
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -14,7 +19,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Send
@@ -36,6 +43,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -48,33 +56,58 @@ import androidx.core.R
 import com.example.sippina_aplicacion.ui.theme.SIPPINAAplicacionTheme
 
 @Composable
-fun BuscarReporteExistente(onAtras: () -> Unit = {}, onVerDetalleReporte: (String) -> Unit = {}) {
-    var folio by remember { mutableStateOf("REP-1234-1234") }
-    var codigoSeguridad by remember { mutableStateOf("KEFD-2P32") }
+fun BuscarReporteExistente(
+    onAtras: () -> Unit = {},
+    onVerDetalleReporte: (String) -> Unit = {},
+    folioInicial: String = "",
+    codigoInicial: String = ""
+) {
+    val morado = Color(0xFF381DC3)
+    val fondo = Color(0xFFEAF4FC)
+    val gris = Color(0xFF777777)
 
-    Box(modifier = Modifier.fillMaxSize()) {
+    var folioEjemplo = "REP-1234-1234"
+    var codigoEjemplo = "KEFD-2P32"
+
+    var folio by remember(folioInicial) { mutableStateOf(folioInicial) }
+    var codigoSeguridad by remember (codigoInicial){ mutableStateOf(codigoInicial) }
+
+    val datosCompletos =
+        folio.isNotBlank() && codigoSeguridad.isNotBlank()
+
+    val reporteEncontrado = folio.trim().equals(
+        folioEjemplo,
+            ignoreCase = true
+        ) &&
+                codigoSeguridad.trim().equals(
+                    codigoEjemplo,
+                    ignoreCase = true
+                )
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(fondo)
+    ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .verticalScroll(rememberScrollState())
                 .padding(horizontal = 24.dp, vertical = 20.dp),
             horizontalAlignment = Alignment.CenterHorizontally
-        )
-        {
+        ) {
             Box(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 10.dp),
+                    .fillMaxWidth(),
                 contentAlignment = Alignment.Center
-            )
-            {
+            ) {
                 FilledIconButton(
                     onClick = onAtras,
                     modifier = Modifier
                         .size(40.dp)
                         .align(Alignment.CenterStart),
                     colors = IconButtonDefaults.filledIconButtonColors(
-                        containerColor = Color.Blue,
-                        contentColor = Color.White
+                        containerColor = fondo,
+                        contentColor = Color(0xFF3D27C9)
                     )
                 ) {
                     Icon(
@@ -93,21 +126,23 @@ fun BuscarReporteExistente(onAtras: () -> Unit = {}, onVerDetalleReporte: (Strin
 
             Text(
                 text = "Reportes",
-                fontSize = 26.sp,
+                fontSize = 30.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color.Blue
+                color = morado,
+                textAlign = TextAlign.Center
             )
 
             Spacer(modifier = Modifier.height(12.dp))
 
             Text(
-                text = "Ingrese el folio y código de\nSeguridad para dar seguimiento\ny detalles de tú reporte",
-                fontSize = 15.sp,
+                text = "Ingrese el folio y código de deguridad para dar seguimiento y detalles de tú reporte",
+                fontSize = 18.sp,
+                lineHeight = 20.sp,
                 fontWeight = FontWeight.SemiBold,
-                color = Color.Gray,
+                color = gris,
                 textAlign = TextAlign.Center,
-                lineHeight = 20.sp
             )
+
             Spacer(modifier = Modifier.height(28.dp))
 
             CampoFormularioBusqueda(
@@ -124,64 +159,102 @@ fun BuscarReporteExistente(onAtras: () -> Unit = {}, onVerDetalleReporte: (Strin
                 onValorChange = { codigoSeguridad = it }
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
-            Column(modifier = Modifier.fillMaxWidth())
-            {
-                Text(
-                    text = "Resultados:",
-                    fontSize = 13.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    color = Color.Gray,
-                    modifier = Modifier.padding(start = 4.dp, bottom = 8.dp)
-                )
-                OutlinedCard(
-                    shape = RoundedCornerShape(16.dp),
-                    border = BorderStroke(1.5.dp, Color.Blue),
-                    colors = CardDefaults.outlinedCardColors(
-                        containerColor = Color.LightGray
-                    ),
-                    modifier = Modifier.fillMaxWidth()
+            Spacer(modifier = Modifier.height(25.dp))
 
-                )
+            AnimatedVisibility(
+                visible = datosCompletos,
+                enter = fadeIn() + expandVertically(),
+                exit = fadeOut() + shrinkVertically()
+            ) {
+                Column(modifier = Modifier.fillMaxWidth())
                 {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 16.dp, vertical = 10.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween
+                    Text(
+                        text = "Resultados:",
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        color = gris,
+                        modifier = Modifier.padding(start = 4.dp, bottom = 8.dp)
                     )
-                    {
-                        Text(
-                            text = folio.ifEmpty { "REP-1234-1234" },
-                            fontSize = 18.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Color.Blue,
-                            modifier = Modifier.padding(start = 12.dp)
+                    if (reporteEncontrado) {
+                        OutlinedCard(
+                            onClick = {
+                                onVerDetalleReporte(folioEjemplo)
+                            },
+                            shape = RoundedCornerShape(16.dp),
+                            border = BorderStroke(1.5.dp, color = morado),
+                            colors = CardDefaults.outlinedCardColors(
+                                containerColor = fondo
+                            ),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(60.dp)
                         )
+                        {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .padding(horizontal = 16.dp, vertical = 10.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                Text(
+                                    text = folioEjemplo,
+                                    fontSize = 18.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = morado,
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .padding(start = 12.dp),
+                                    textAlign = TextAlign.Center
+                                )
 
-                        FilledIconButton(
-                            onClick = { onVerDetalleReporte(folio) },
-                            modifier = Modifier.size(40.dp),
-                            colors = IconButtonDefaults.filledIconButtonColors(
-                                containerColor = Color.Blue,
-                                contentColor = Color.White)) {
-                            Icon(
-                                imageVector = Icons.AutoMirrored.Filled.Send,
-                                contentDescription = "Ver detalles del reporte",
-                                modifier = Modifier.size(18.dp)
-                            )
-
-
+                                Box(
+                                    modifier = Modifier
+                                        .size(40.dp)
+                                        .background(
+                                            color = morado,
+                                            shape = RoundedCornerShape(50)
+                                        ),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.AutoMirrored.Filled.Send,
+                                        contentDescription = "Ver detalles del reporte",
+                                        tint = Color.White,
+                                        modifier = Modifier.size(18.dp)
+                                    )
+                                }
+                            }
                         }
-
+                    } else {
+                        OutlinedCard(
+                            shape = RoundedCornerShape(16.dp),
+                            border = BorderStroke(width = 1.5.dp, color = morado),
+                            colors = CardDefaults.outlinedCardColors(
+                                contentColor = fondo
+                            ),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(60.dp)
+                        ) {
+                            Box(
+                                modifier = Modifier.fillMaxSize(),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    text = "Sin reportes",
+                                    fontSize = 19.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = morado,
+                                    textAlign = TextAlign.Center
+                                )
+                            }
+                        }
                     }
-
-
                 }
-
             }
             Spacer(modifier = Modifier.height(44.dp))
+
             val textoPie = buildAnnotatedString {
                 append("Recuerda que el folio y el código de seguridad es único para cada caso. Cualquier aclaración contactar a las autoridades de ")
                 withStyle(
@@ -195,23 +268,17 @@ fun BuscarReporteExistente(onAtras: () -> Unit = {}, onVerDetalleReporte: (Strin
             }
             Text(
                 text = textoPie,
-                fontSize = 12.sp,
-                color = Color.Gray,
-                textAlign = TextAlign.Center,
+                fontSize = 16.sp,
                 lineHeight = 16.sp,
+                fontWeight = FontWeight.SemiBold,
+                color = gris,
+                textAlign = TextAlign.Center,
                 modifier = Modifier.padding(horizontal = 12.dp)
             )
 
             Spacer(modifier = Modifier.height(28.dp))
-
-
-
-
         }
-
     }
-
-
 }
 
 
@@ -221,13 +288,15 @@ private fun CampoFormularioBusqueda(
     valor: String,
     onValorChange: (String) -> Unit
 ) {
+    val morado = Color(0xFF381DC3)
+
     Column(
         modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
             text = etiqueta,
-            fontSize = 13.sp,
+            fontSize = 16.sp,
             fontWeight = FontWeight.SemiBold,
             color = Color.Gray,
             modifier = Modifier.padding(bottom = 6.dp)
@@ -238,13 +307,19 @@ private fun CampoFormularioBusqueda(
             onValueChange = onValorChange,
             singleLine = true,
             shape = RoundedCornerShape(16.dp),
+            textStyle = TextStyle(
+                fontSize = 18.sp,
+                fontWeight = FontWeight.SemiBold,
+                color = Color.DarkGray,
+                textAlign = TextAlign.Center
+            ),
             colors = OutlinedTextFieldDefaults.colors(
                 focusedContainerColor = Color.White,
                 unfocusedContainerColor = Color.White,
-                focusedBorderColor = Color.Blue,
+                focusedBorderColor = morado,
                 unfocusedBorderColor = Color.Gray,
-                focusedTextColor = Color.Blue,
-                unfocusedTextColor = Color.Blue
+                focusedTextColor =morado,
+                unfocusedTextColor = morado
             ),
             modifier = Modifier
                 .fillMaxWidth(0.88f)
@@ -254,14 +329,50 @@ private fun CampoFormularioBusqueda(
 }
 
 
+//@Preview(
+//    showBackground = true,
+//    showSystemUi = true,
+//    name = "Buscar reporte - Inicial"
+//)
+//@Composable
+//fun BuscarReportePreview() {
+//
+//    SIPPINAAplicacionTheme {
+//        BuscarReporteExistente()
+//    }
+//}
+
+
 @Preview(
     showBackground = true,
     showSystemUi = true,
-    name = "Buscar Reporte Existente - Material 3"
+    name = "Buscar reporte - Encontrado"
 )
 @Composable
-fun BuscarReportePreview() {
+fun BuscarReporteEncontradoPreview() {
+
     SIPPINAAplicacionTheme {
-        BuscarReporteExistente()
+        BuscarReporteExistente(
+            folioInicial = "REP-1234-1234",
+            codigoInicial = "KEFD-2P32"
+        )
     }
 }
+
+
+
+//@Preview(
+//    showBackground = true,
+//    showSystemUi = true,
+//    name = "Buscar reporte - Sin resultados"
+//)
+//@Composable
+//fun BuscarReporteSinResultadosPreview() {
+//
+//    SIPPINAAplicacionTheme {
+//        BuscarReporteExistente(
+//            folioInicial = "REP-1234-1235",
+//            codigoInicial = "KEFD-2P32"
+//        )
+//    }
+//}

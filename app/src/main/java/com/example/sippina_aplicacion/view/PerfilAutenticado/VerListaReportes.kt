@@ -1,5 +1,7 @@
 package com.example.sippina_aplicacion.view.PerfilAutenticado
 
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -14,6 +16,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -32,6 +36,10 @@ import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -43,6 +51,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.sippina_aplicacion.R
 import com.example.sippina_aplicacion.ui.theme.SIPPINAAplicacionTheme
 
 
@@ -52,19 +61,21 @@ fun VerListaReportes(
     onBuscarClick: () -> Unit = {},
     onReporteClick: (String) -> Unit = {}
 ) {
+    val morado = Color(0xFF381DC3)
+    val fondo = Color(0xFFEAF4FC)
+
     Box(modifier = Modifier.fillMaxSize())
     {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color(0xFFEAF4FC))
+                .background(fondo)
                 .padding(24.dp, 20.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Box(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 10.dp),
+                    .fillMaxWidth(),
                 contentAlignment = Alignment.Center
             )
             {
@@ -74,7 +85,7 @@ fun VerListaReportes(
                         .size(50.dp)
                         .align(Alignment.CenterStart),
                     colors = IconButtonDefaults.filledIconButtonColors(
-                        containerColor = Color(0xFFEAF4FC),
+                        containerColor = fondo,
                         contentColor = Color(0xFF3D27C9)
                     )
                 )
@@ -95,13 +106,14 @@ fun VerListaReportes(
                 )
 
             }
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(10.dp))
 
             Text(
                 text = "Reportes ",
                 fontSize = 35.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color(0xFF3D27C9)
+                color = morado,
+                textAlign = TextAlign.Center
             )
 
             Spacer(modifier = Modifier.height(20.dp))
@@ -109,43 +121,42 @@ fun VerListaReportes(
             OutlinedCard(
                 onClick = onBuscarClick,
                 shape = RoundedCornerShape(16.dp),
-                border = BorderStroke(1.5.dp, Color.Blue),
-                colors = CardDefaults.outlinedCardColors(containerColor = Color.White),
-                modifier = Modifier.fillMaxWidth()
+                border = BorderStroke(width = 1.5.dp, color = morado),
+                colors = CardDefaults.outlinedCardColors(containerColor = fondo),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(45.dp)
             ) {
                 Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 12.dp),
+                    modifier = Modifier.fillMaxSize(),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.Center
                 ) {
                     Icon(
                         imageVector = Icons.Default.Search,
                         contentDescription = "Buscar",
-                        tint = Color.Blue,
+                        tint = morado,
                         modifier = Modifier.size(20.dp)
                     )
                     Spacer(modifier = Modifier.width(8.dp))
+
                     Text(
                         text = "Buscar por folio y código",
                         fontSize = 15.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color.Blue
-
+                        color = morado
                     )
-
-
                 }
-
-
             }
+
             Spacer(modifier = Modifier.height(20.dp))
 
-            Column(modifier = Modifier.fillMaxWidth()){
+            Column(
+                modifier = Modifier.fillMaxWidth()
+            ) {
                 Text(
                     text = "Hoy",
-                    fontSize = 13.sp,
+                    fontSize = 15.sp,
                     fontWeight = FontWeight.SemiBold,
                     color = Color.Gray,
                     modifier = Modifier.padding(start = 4.dp, bottom = 6.dp)
@@ -154,7 +165,8 @@ fun VerListaReportes(
                 ItemReporteCard(
                     folio = "REP-1234-1234",
                     icono = Icons.AutoMirrored.Filled.Send,
-                    bordeColor = Color.Blue,
+                    colorIcono = Color(0xFF9D91D7),
+                    bordeColor = morado,
                     grosorBorde = 2.5.dp,
                     onClick = { onReporteClick("REP-1234-1234") }
                 )
@@ -165,7 +177,7 @@ fun VerListaReportes(
             Column(modifier = Modifier.fillMaxWidth()){
                 Text(
                     text = "Anteriores",
-                    fontSize = 13.sp,
+                    fontSize = 15.sp,
                     fontWeight = FontWeight.SemiBold,
                     color = Color.Gray,
                     modifier = Modifier.padding(start = 4.dp, bottom = 6.dp)
@@ -174,7 +186,8 @@ fun VerListaReportes(
                 ItemReporteCard(
                     folio = "REP-1234-1235",
                     icono = Icons.Default.History,
-                    bordeColor = Color.Blue,
+                    colorIcono = Color(0xFF7A65E0),
+                    bordeColor = morado,
                     onClick = { onReporteClick("REP-1234-1235") })
 
                 Spacer(modifier = Modifier.height(12.dp))
@@ -182,36 +195,40 @@ fun VerListaReportes(
                 ItemReporteCard(
                     folio = "REP-1234-1236",
                     icono = Icons.Default.History,
-                    bordeColor = Color.Blue,
+                    colorIcono = Color(0xFF7A65E0),
+                    bordeColor = morado,
                     onClick = { onReporteClick("REP-1234-1236") }
                 )
 
                 Spacer(modifier = Modifier.height(12.dp))
+
                 ItemReporteCard(
                     folio = "REP-1234-1235",
                     icono = Icons.Default.Flag,
-                    bordeColor = Color.Blue,
+                    colorIcono = Color(0xFF5F43E4),
+                    bordeColor = morado,
                     onClick = { onReporteClick("REP-1234-1235") }
                 )
-
-
             }
-            Spacer(modifier = Modifier.height(28.dp))
+
+            Spacer(modifier = Modifier.height(45.dp))
 
             HorizontalDivider(
                 thickness = 1.dp,
-                color = Color.Blue.copy(alpha = 0.5f)
+                color = morado.copy(alpha = 0.5f)
             )
 
             Spacer(modifier = Modifier.height(20.dp))
 
             Text(
                 text = "Estado de tu reporte",
-                fontSize = 14.sp,
+                fontSize = 18.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color.Gray
+                color = Color.Gray,
+                textAlign = TextAlign.Center
             )
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(20.dp))
+
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceAround,
@@ -220,57 +237,69 @@ fun VerListaReportes(
                 ItemEstadoLeyenda(
                     etiqueta = "Enviado",
                     icono = Icons.AutoMirrored.Filled.Send,
-                    colorFondo = Color.Blue
+                    colorFondo = Color(0xFF9D91D7)
                 )
                 ItemEstadoLeyenda(
                     etiqueta = "En proceso",
                     icono = Icons.Default.History,
-                    colorFondo = Color.Blue
+                    colorFondo = Color(0xFF7A65E0)
                 )
                 ItemEstadoLeyenda(
                     etiqueta = "En revisión",
                     icono = Icons.Default.Flag,
-                    colorFondo = Color.Blue
+                    colorFondo = Color(0xFF5F43E4)
                 )
                 ItemEstadoLeyenda(
                     etiqueta = "Cerrado",
                     icono = Icons.Default.Check,
-                    colorFondo = Color.Blue
+                    colorFondo = Color(0xFF381DC3)
                 )
             }
+
             Spacer(modifier = Modifier.height(16.dp))
-
-
-
-
-
-
-
         }
-
     }
-
-
 }
 
 @Composable
 private fun ItemReporteCard(
     folio: String,
     icono: ImageVector,
+    colorIcono: Color,
     bordeColor: Color,
     grosorBorde: Dp = 1.5.dp,
     onClick: () -> Unit
 ) {
+    var seleccionado by remember {
+        mutableStateOf(false)
+    }
+
+    val colorFondo by animateColorAsState(
+        targetValue = if (seleccionado) { Color(0xFFE0DBFA) }
+        else {
+            Color(0xFFEAF4FC)
+        },
+        animationSpec = tween(
+            durationMillis = 250
+        ),
+        label = "AnimacionTarjetaReporte"
+    )
+
     OutlinedCard(
-        onClick = onClick,
+        onClick = {
+            seleccionado = true
+            onClick()
+        },
         shape = RoundedCornerShape(16.dp),
         border = BorderStroke(grosorBorde, bordeColor),
-        colors = CardDefaults.outlinedCardColors(containerColor = Color.Gray),
-        modifier = Modifier.fillMaxWidth()
+        colors = CardDefaults.outlinedCardColors(containerColor = colorFondo),
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(58.dp)
     ) {
         Row(
             modifier = Modifier
-                .fillMaxWidth()
+                .fillMaxSize()
                 .padding(horizontal = 16.dp, vertical = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
@@ -279,33 +308,30 @@ private fun ItemReporteCard(
                 text = folio,
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color.Blue,
-                modifier = Modifier.padding(start = 12.dp)
+                color = Color(0xFF381DC3),
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(start = 12.dp)
             )
-
-            Box(
-                modifier = Modifier.size(40.dp),
-                contentAlignment = Alignment.Center
+            Surface(
+                shape = CircleShape,
+                color = colorIcono,
+                modifier = Modifier.size(42.dp)
             ) {
-                Surface(
-                    shape = CircleShape,
-                    color = Color.Blue,
-                    modifier = Modifier.fillMaxSize()
+                Box(
+                    contentAlignment = Alignment.Center
                 ) {
-                    Box(contentAlignment = Alignment.Center) {
-                        Icon(
-                            imageVector = icono,
-                            contentDescription = null,
-                            tint = Color.White,
-                            modifier = Modifier.size(20.dp)
-                        )
-                    }
+                    Icon(
+                        imageVector = icono,
+                        contentDescription = null,
+                        tint = Color.White,
+                        modifier = Modifier.size(20.dp)
+                    )
                 }
             }
         }
     }
 }
-
 
 @Composable
 private fun ItemEstadoLeyenda(
@@ -318,9 +344,9 @@ private fun ItemEstadoLeyenda(
     ) {
         Text(
             text = etiqueta,
-            fontSize = 11.sp,
+            fontSize = 15.sp,
             fontWeight = FontWeight.Bold,
-            color = Color.Gray,
+            color = Color.DarkGray,
             textAlign = TextAlign.Center
         )
 
@@ -331,7 +357,9 @@ private fun ItemEstadoLeyenda(
             color = colorFondo,
             modifier = Modifier.size(38.dp)
         ) {
-            Box(contentAlignment = Alignment.Center) {
+            Box(
+                contentAlignment = Alignment.Center
+            ) {
                 Icon(
                     imageVector = icono,
                     contentDescription = etiqueta,
