@@ -3,6 +3,7 @@ package com.example.sippina_aplicacion.view.PerfilAutenticado
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -12,6 +13,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -44,118 +47,153 @@ import androidx.compose.ui.unit.sp
 import com.example.sippina_aplicacion.R
 import com.example.sippina_aplicacion.ui.theme.SIPPINAAplicacionTheme
 
-
 @Composable
-fun EditarPerfil(onAtras: () -> Unit = {}) {
-    var nombreCompleto by remember { mutableStateOf("Roberto Martínez Román") }
-    var correoElectronico by remember { mutableStateOf("roberto.martinezm@flopware.com") }
-    var telefono by remember { mutableStateOf("55 1234 5678") }
-    var contrasena by remember { mutableStateOf("1234567") }
-    var confirmarContrasena by remember { mutableStateOf("1234567") }
+fun EditarPerfil(
+    onAtras: () -> Unit = {}
+) {
 
+    val morado = Color(0xFF381DC3)
+    val fondo = Color(0xFFEAF4FC)
+
+    // Datos de ejemplo para la vista previa.
+    var nombreCompleto by remember {
+        mutableStateOf("Roberto Martínez Román")
+    }
+
+    var correoElectronico by remember {
+        mutableStateOf("roberto.martinezm@flopware.com")
+    }
+
+    var telefono by remember {
+        mutableStateOf("55 1234 5678")
+    }
+
+    var contrasena by remember {
+        mutableStateOf("1234567")
+    }
+
+    var confirmarContrasena by remember {
+        mutableStateOf("1234567")
+    }
 
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.White)
-    )
-    {
+            .background(fondo)
+    ) {
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .verticalScroll(rememberScrollState())
                 .padding(horizontal = 24.dp, vertical = 20.dp),
+
             horizontalAlignment = Alignment.CenterHorizontally
-        )
-        {
+        ) {
+
+            // ENCABEZADO
+
             Box(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 10.dp),
+                    .fillMaxWidth(),
                 contentAlignment = Alignment.Center
-            )
-            {
+            ) {
+
                 FilledIconButton(
                     onClick = onAtras,
                     modifier = Modifier
-                        .size(40.dp)
-                        .align(Alignment.TopStart),
+                        .size(50.dp)
+                        .align(Alignment.CenterStart),
                     colors = IconButtonDefaults.filledIconButtonColors(
-                        containerColor = Color.Blue,
-                        contentColor = Color.White
+                        containerColor = Color(0xFFEAF4FC),
+                        contentColor = Color(0xFF3D27C9)
                     )
                 ) {
+
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = "Descripción",
+                        contentDescription = "Botón atrás",
                         modifier = Modifier.size(22.dp)
                     )
-
-
                 }
+
                 Image(
                     painter = painterResource(id = R.drawable.imagensippina),
-                    contentDescription = "LogoSippina",
+                    contentDescription = "Logo SIPINNA",
                     modifier = Modifier.size(120.dp)
                 )
-
             }
-            Spacer(modifier = Modifier.height(28.dp))
-            Box(modifier = Modifier.size(130.dp), contentAlignment = Alignment.Center)
-            {
+
+            Box(
+                modifier = Modifier.size(150.dp),
+                contentAlignment = Alignment.Center
+            ) {
+
                 Box(
                     modifier = Modifier
-                        .size(120.dp)
-                        .border(3.dp, Color.Blue, CircleShape)
-                        .background(Color.Transparent, CircleShape),
+                        .size(135.dp)
+                        .border(width = 3.dp, color = morado, shape = CircleShape)
+                        .background(color = Color.Transparent, shape = CircleShape),
                     contentAlignment = Alignment.Center
-                )
-                {
+                ) {
+
                     Icon(
                         imageVector = Icons.Default.Person,
-                        contentDescription = "Avatar de Usuario",
-                        tint = Color.Blue,
-                        modifier = Modifier.size(65.dp)
+                        contentDescription = "Avatar de usuario",
+                        tint = morado,
+                        modifier = Modifier.size(78.dp)
                     )
-
                 }
+
+                // BOTÓN EDITAR FOTO
+
                 IconButton(
-                    onClick = { /* TODO: Cambiar foto */ },
-                    modifier = Modifier
-                        .size(36.dp)
+                    onClick = {
+                        // TODO: Implementar selección de foto de perfil.
+                    },
+
+                    modifier = Modifier.size(38.dp)
                         .align(Alignment.TopEnd)
-                        .offset(x = (-4).dp, y = 4.dp)
-                )
-                {
+                        .offset(x = (-2).dp, y = 4.dp)
+                ) {
+
                     Icon(
                         imageVector = Icons.Default.Edit,
-                        contentDescription = "Editar Foto",
-                        tint = Color.Blue,
-                        modifier = Modifier.size(24.dp)
+                        contentDescription = "Editar foto de perfil",
+                        tint = morado,
+                        modifier = Modifier.size(28.dp)
                     )
                 }
-
             }
-            Spacer(modifier = Modifier.height(32.dp))
+
+            Spacer(modifier = Modifier.height(10.dp))
+
             CampoPerfil(
                 etiqueta = "Nombre completo",
                 valor = nombreCompleto,
-                onValorChange = { nombreCompleto = it }
+                onValorChange = {
+                    nombreCompleto = it
+                }
             )
 
             Spacer(modifier = Modifier.height(14.dp))
+
             CampoPerfil(
                 etiqueta = "Correo electrónico",
                 valor = correoElectronico,
-                onValorChange = { correoElectronico = it })
-
+                onValorChange = {
+                    correoElectronico = it
+                }
+            )
 
             Spacer(modifier = Modifier.height(14.dp))
-
 
             CampoPerfil(
                 etiqueta = "Teléfono",
                 valor = telefono,
-                onValorChange = { telefono = it }
+                onValorChange = {
+                    telefono = it
+                }
             )
 
             Spacer(modifier = Modifier.height(14.dp))
@@ -163,25 +201,25 @@ fun EditarPerfil(onAtras: () -> Unit = {}) {
             CampoPerfil(
                 etiqueta = "Contraseña",
                 valor = contrasena,
-                onValorChange = { contrasena = it },
+                onValorChange = {
+                    contrasena = it
+                },
                 esContrasena = true
             )
+
             Spacer(modifier = Modifier.height(14.dp))
 
             CampoPerfil(
                 etiqueta = "Confirmar contraseña",
                 valor = confirmarContrasena,
-                onValorChange = { confirmarContrasena = it },
+                onValorChange = {
+                    confirmarContrasena = it
+                },
                 esContrasena = true
             )
-            Spacer(modifier = Modifier.height(14.dp))
-
-
+            Spacer(modifier = Modifier.height(24.dp))
         }
-
-
     }
-
 }
 
 @Composable
@@ -191,14 +229,24 @@ private fun CampoPerfil(
     onValorChange: (String) -> Unit,
     esContrasena: Boolean = false
 ) {
-    var mostrarContrasena by remember { mutableStateOf(false) }
 
-    Column(modifier = Modifier.fillMaxWidth()) {
+    var mostrarContrasena by remember {
+        mutableStateOf(false)
+    }
+
+    Column(
+        modifier = Modifier.fillMaxWidth()
+    ) {
+
         Text(
             text = etiqueta,
             fontSize = 12.sp,
             color = Color.Gray,
-            modifier = Modifier.padding(start = 4.dp, bottom = 4.dp)
+
+            modifier = Modifier.padding(
+                start = 2.dp,
+                bottom = 2.dp
+            )
         )
 
         OutlinedTextField(
@@ -206,42 +254,60 @@ private fun CampoPerfil(
             onValueChange = onValorChange,
             singleLine = true,
             shape = RoundedCornerShape(14.dp),
-            visualTransformation = if (esContrasena && !mostrarContrasena) PasswordVisualTransformation() else VisualTransformation.None,
+            visualTransformation = if (
+                esContrasena && !mostrarContrasena
+            ) {
+                PasswordVisualTransformation()
+            } else {
+                VisualTransformation.None
+            },
             trailingIcon = if (esContrasena) {
                 {
-                    IconButton(onClick = { mostrarContrasena = !mostrarContrasena }) {
-                        val AzulMorado = null
+                    IconButton(
+                        onClick = {
+                            mostrarContrasena = !mostrarContrasena
+                        }
+                    ) {
+
                         Icon(
-                            imageVector = if (mostrarContrasena) Icons.Default.Visibility else Icons.Default.VisibilityOff,
-                            contentDescription = "Alternar visibilidad de contraseña",
-                            tint = Color.Blue
+                            imageVector = if (mostrarContrasena) { Icons.Default.Visibility
+                            } else {
+                                Icons.Default.VisibilityOff
+                            },
+
+                            contentDescription = if (mostrarContrasena) { "Ocultar contraseña"
+                            } else {
+                                "Mostrar contraseña"
+                            }, tint = Color(0xFF381DC3)
                         )
                     }
                 }
-            } else null,
+            } else {
+                null
+            },
             colors = OutlinedTextFieldDefaults.colors(
                 focusedContainerColor = Color.White,
                 unfocusedContainerColor = Color.White,
-                focusedBorderColor = Color.Blue,
+                focusedBorderColor = Color(0xFF381DC3),
                 unfocusedBorderColor = Color.LightGray,
                 focusedTextColor = Color.Black,
                 unfocusedTextColor = Color.Black
             ),
             modifier = Modifier
                 .fillMaxWidth()
-                .height(52.dp)
+                .height(56.dp)
         )
     }
 }
 
-
 @Preview(
     showBackground = true,
     showSystemUi = true,
-    name = "Perfil de Usuario - Diseño Exacto"
+    name = "Editar perfil"
 )
 @Composable
-fun PerfilUsuarioPreview() {
+fun EditarPerfilPreview() {
+
     SIPPINAAplicacionTheme {
         EditarPerfil()
     }

@@ -105,7 +105,7 @@ fun PrivacidadSeguimiento(
             onClick = { opcionSeleccionada = "anonimo" }
         )
 
-        Spacer(modifier = Modifier.height(25.dp))
+        Spacer(modifier = Modifier.height(35.dp))
 
         TarjetaOpcionPrivacidad(
             titulo = "Me interesa recibir actualizaciones",
@@ -150,7 +150,7 @@ fun PrivacidadSeguimiento(
             fontWeight = FontWeight.Bold
         )
 
-        Spacer(modifier = Modifier.height(59.dp))
+        Spacer(modifier = Modifier.height(49.dp))
 
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(16.dp))
         {
