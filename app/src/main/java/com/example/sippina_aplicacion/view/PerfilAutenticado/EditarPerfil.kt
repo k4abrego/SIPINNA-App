@@ -1,4 +1,3 @@
-
 package com.example.sippina_aplicacion.view.PerfilAutenticado
 
 import androidx.compose.foundation.Image
@@ -54,6 +53,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.sippina_aplicacion.R
 import com.example.sippina_aplicacion.ui.theme.SIPPINAAplicacionTheme
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.defaultMinSize
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.graphics.SolidColor
 
 // Datos editables del perfil.
 // No incluye la contraseña para evitar almacenarla como parte
@@ -112,9 +117,7 @@ fun EditarPerfil(
     }
 
     fun validarDatos(): Boolean {
-
         mensajeError = when {
-
             nombreCompleto.isBlank() ->
                 "Por favor, ingresa tu nombre completo."
 
@@ -139,21 +142,15 @@ fun EditarPerfil(
         }
         return mensajeError == null
     }
-
     Box(
         modifier = Modifier.fillMaxSize()
             .background(fondo)
     ) {
-
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
-                .padding(
-                    horizontal = 24.dp,
-                    vertical = 10.dp
-                ),
-
+                .padding(horizontal = 24.dp, vertical = 10.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Box(
@@ -182,15 +179,13 @@ fun EditarPerfil(
                     modifier = Modifier.size(120.dp)
                 )
             }
-
             Box(
                 modifier = Modifier.size(145.dp),
                 contentAlignment = Alignment.Center
             ) {
                 Box(
                     modifier = Modifier.size(130.dp)
-                        .border(
-                            width = 3.dp, color = morado, shape = CircleShape),
+                        .border(width = 3.dp, color = morado, shape = CircleShape),
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
@@ -200,7 +195,6 @@ fun EditarPerfil(
                         modifier = Modifier.size(75.dp)
                     )
                 }
-
                 IconButton(
                     onClick = {
                         // TODO: Seleccionar foto de perfil.
@@ -307,9 +301,7 @@ fun EditarPerfil(
                     .fillMaxWidth()
                     .height(52.dp),
                 shape = RoundedCornerShape(15.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = morado
-                )
+                colors = ButtonDefaults.buttonColors(containerColor = morado)
             ) {
                 Text(
                     text = "Guardar cambios",
@@ -353,8 +345,7 @@ fun EditarPerfil(
                                     contrasena.takeIf {
                                         it.isNotEmpty()
                                     }
-                                // Envía los datos a la capa encargada
-                                // de guardarlos.
+                                // Envía los datos a la capa encargada de guardarlos
                                 onGuardar(
                                     datosActualizados,
                                     nuevaContrasena
@@ -422,6 +413,7 @@ fun EditarPerfil(
     }
 }
 
+
 @Composable
 private fun CampoPerfil(
     etiqueta: String,
@@ -430,9 +422,12 @@ private fun CampoPerfil(
     esContrasena: Boolean = false,
     tipoTeclado: KeyboardType = KeyboardType.Text
 ) {
+
     var mostrarContrasena by remember {
         mutableStateOf(false)
     }
+
+    val morado = Color(0xFF381DC3)
 
     Column(
         modifier = Modifier.fillMaxWidth()
@@ -441,36 +436,51 @@ private fun CampoPerfil(
             text = etiqueta,
             fontSize = 12.sp,
             color = Color.Gray,
-            modifier = Modifier.padding(start = 4.dp, bottom = 4.dp
+            modifier = Modifier.padding(
+                start = 4.dp,
+                bottom = 4.dp
             )
         )
-
-        OutlinedTextField(
-            value = valor,
-            onValueChange = onValorChange,
-            singleLine = true,
-            shape = RoundedCornerShape(14.dp),
-            textStyle = androidx.compose.ui.text.TextStyle(fontSize = 15.sp),
-            keyboardOptions = KeyboardOptions(
-                keyboardType = if (esContrasena) {
-                    KeyboardType.Password
-                } else {
-                    tipoTeclado
-                }
-            ),
-
-            visualTransformation = if (
-                esContrasena && !mostrarContrasena
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(45.dp)
+                .border(width = 1.dp, color = Color.LightGray, shape = RoundedCornerShape(14.dp))
+                .background(color = Color.White, shape = RoundedCornerShape(14.dp))
+                .padding(start = 16.dp, end = 8.dp),
+            contentAlignment = Alignment.CenterStart
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                PasswordVisualTransformation()
-            } else {
-                VisualTransformation.None
-            },
+                BasicTextField(
+                    value = valor,
+                    onValueChange = onValorChange,
+                    singleLine = true,
+                    textStyle = TextStyle(fontSize = 15.sp, color = Color.Black),
+                    cursorBrush = SolidColor(morado),
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = if (esContrasena) {
+                            KeyboardType.Password
+                        } else {
+                            tipoTeclado
+                        }
+                    ),
+                    visualTransformation = if (
+                        esContrasena && !mostrarContrasena
+                    ) {
+                        PasswordVisualTransformation()
+                    } else {
+                        VisualTransformation.None
+                    },
 
-            trailingIcon = if (esContrasena) {
-                @Composable {
+                    modifier = Modifier.weight(1f)
+                )
+                if (esContrasena) {
                     IconButton(
-                        onClick = { mostrarContrasena = !mostrarContrasena }
+                        onClick = { mostrarContrasena = !mostrarContrasena },
+                        modifier = Modifier.size(40.dp)
                     ) {
                         Icon(
                             imageVector = if (mostrarContrasena) {
@@ -483,34 +493,22 @@ private fun CampoPerfil(
                             } else {
                                 "Mostrar contraseña"
                             },
-                            tint = Color(0xFF381DC3)
+                            tint = morado,
+                            modifier = Modifier.size(22.dp)
                         )
                     }
                 }
-            } else {
-                null
-            },
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedContainerColor = Color.White,
-                unfocusedContainerColor = Color.White,
-                focusedBorderColor = Color(0xFF381DC3),
-                unfocusedBorderColor = Color.LightGray,
-                focusedTextColor = Color.Black,
-                unfocusedTextColor = Color.Black
-            ),
-            modifier = Modifier.fillMaxWidth().height(45.dp)
-        )
+            }
+        }
     }
 }
 
 @Preview(
     showBackground = true,
     showSystemUi = true,
-    name = "Editar perfil"
 )
 @Composable
 fun EditarPerfilPreview() {
-
     SIPPINAAplicacionTheme {
         EditarPerfil()
     }
