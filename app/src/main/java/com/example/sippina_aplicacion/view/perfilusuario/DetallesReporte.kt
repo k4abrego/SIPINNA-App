@@ -437,23 +437,23 @@ fun DetalleReportePreview() {
 
 
 
-//// PREVIEW: REPORTE EN REVISIÓN
-//
-//@Preview(
-//    showBackground = true,
-//    showSystemUi = true,
-//    name = "Detalle de reporte - En revisión"
-//)
-//@Composable
-//fun DetalleReporteRevisionPreview() {
-//
-//    SIPPINAAplicacionTheme {
-//
-//        DetalleReporte(
-//            estadoActual = 1
-//        )
-//    }
-//}
+// PREVIEW: REPORTE EN REVISIÓN
+
+@Preview(
+    showBackground = true,
+    showSystemUi = true,
+    name = "Detalle de reporte - En revisión"
+)
+@Composable
+fun DetalleReporteRevisionPreview() {
+
+    SIPPINAAplicacionTheme {
+
+        DetalleReporte(
+            estadoActual = 1
+        )
+    }
+}
 
 
 // PREVIEW: REPORTE EN ATENCIÓN
@@ -475,20 +475,20 @@ fun DetalleReporteAtencionPreview() {
 }
 
 
-//// PREVIEW: REPORTE CERRADO
-//
-//@Preview(
-//    showBackground = true,
-//    showSystemUi = true,
-//    name = "Detalle de reporte - Cerrado"
-//)
-//@Composable
-//fun DetalleReporteCerradoPreview() {
-//
-//    SIPPINAAplicacionTheme {
-//
-//        DetalleReporte(
-//            estadoActual = 3
-//        )
-//    }
-//}
+// PREVIEW: REPORTE CERRADO
+
+@Preview(
+    showBackground = true,
+    showSystemUi = true,
+    name = "Detalle de reporte - Cerrado"
+)
+@Composable
+fun DetalleReporteCerradoPreview() {
+
+    SIPPINAAplicacionTheme {
+
+        DetalleReporte(
+            estadoActual = 3
+        )
+    }
+}
