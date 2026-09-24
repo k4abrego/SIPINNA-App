@@ -1,8 +1,10 @@
 package com.example.sippina_aplicacion.view.PantallasReporte
 
 import android.R.attr.padding
+import android.text.style.UnderlineSpan
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -44,6 +46,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -83,23 +86,23 @@ fun Detalles2(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(horizontal = 24.dp)
-            .padding(top = 12.dp, bottom = 16.dp)
             .imePadding()
-            .navigationBarsPadding(),
+            .background(Color(0xFFEAF4FC))
+            .padding(horizontal = 24.dp)
+            .padding(top = 15.dp, bottom = 43.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Column(
             modifier = Modifier
                 .weight(1f)
-                .fillMaxWidth()
+                .fillMaxSize()
                 .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Image(
                 painter = painterResource(id = R.drawable.imagensippina),
                 contentDescription = "Logo Sippina",
-                modifier = Modifier.size(100.dp)
+                modifier = Modifier.size(120.dp)
             )
 
             Spacer(modifier = Modifier.height(8.dp))
@@ -107,35 +110,36 @@ fun Detalles2(
             Text(
                 text = "Descripción del menor",
                 color = colorMorado,
-                fontSize = 24.sp,
+                fontSize = 30.sp,
                 fontWeight = FontWeight.Bold
             )
 
-            Spacer(modifier = Modifier.height(14.dp))
+            Spacer(modifier = Modifier.height(10.dp))
 
             BarraDePasos(pasoActual = 2)
 
-            Spacer(modifier = Modifier.height(18.dp))
+            Spacer(modifier = Modifier.height(20.dp))
 
             Text(
                 text = "Descripción : Menor 1",
                 fontWeight = FontWeight.Bold,
+                textDecoration = TextDecoration.Underline,
                 color = colorMorado,
-                fontSize = 18.sp,
+                fontSize = 20.sp,
                 modifier = Modifier.fillMaxWidth(),
                 textAlign = TextAlign.Start
             )
 
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(25.dp))
 
             Column(modifier = Modifier.fillMaxWidth()) {
                 Text(
-                    text = "Edad aprox",
+                    text = "Edad aprox.",
                     color = colorMorado,
                     fontWeight = FontWeight.Bold,
-                    fontSize = 16.sp
+                    fontSize = 18.sp
                 )
-                Spacer(modifier = Modifier.height(10.dp))
+                Spacer(modifier = Modifier.height(20.dp))
 
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -151,18 +155,18 @@ fun Detalles2(
                                 containerColor = if (seleccionado) colorMorado else Color.Transparent,
                                 contentColor = if (seleccionado) Color.White else colorMorado
                             ),
-                            contentPadding = PaddingValues(horizontal = 2.dp),
+                            contentPadding = PaddingValues(horizontal = 4.dp),
                             modifier = Modifier
                                 .weight(1f)
                                 .height(34.dp)
                         ) {
-                            Text(text = rango, fontSize = 14.sp, fontWeight = FontWeight.Bold)
+                            Text(text = rango, fontSize = 16.sp, fontWeight = FontWeight.Bold)
                         }
                     }
                 }
             }
 
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(25.dp))
 
             // GÉNERO
             Column(modifier = Modifier.fillMaxWidth()) {
@@ -170,7 +174,7 @@ fun Detalles2(
                     text = "Género",
                     color = colorMorado,
                     fontWeight = FontWeight.Bold,
-                    fontSize = 16.sp
+                    fontSize = 18.sp
                 )
                 Spacer(modifier = Modifier.height(10.dp))
 
@@ -188,18 +192,18 @@ fun Detalles2(
                                 containerColor = if (seleccionado) colorMorado else Color.Transparent,
                                 contentColor = if (seleccionado) Color.White else colorMorado
                             ),
-                            contentPadding = PaddingValues(horizontal = 2.dp),
+                            contentPadding = PaddingValues(horizontal = 4.dp),
                             modifier = Modifier
                                 .weight(1f)
                                 .height(34.dp)
                         ) {
-                            Text(text = genero, fontSize = 13.sp, fontWeight = FontWeight.Bold)
+                            Text(text = genero, fontSize = 16.sp, fontWeight = FontWeight.Bold)
                         }
                     }
                 }
             }
 
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(25.dp))
 
             // DESCRIPCIÓN FÍSICA
             Column(modifier = Modifier.fillMaxWidth()) {
@@ -207,9 +211,9 @@ fun Detalles2(
                     text = "Descripción Física",
                     color = if (tieneError) Color.Red else colorMorado,
                     fontWeight = FontWeight.Bold,
-                    fontSize = 16.sp
+                    fontSize = 18.sp
                 )
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(10.dp))
 
                 OutlinedTextField(
                     value = state.descripcionFisica,
@@ -221,7 +225,7 @@ fun Detalles2(
                     shape = RoundedCornerShape(12.dp),
                     modifier = Modifier
                         .fillMaxWidth()
-                        .heightIn(min = 110.dp),
+                        .heightIn(min = 160.dp),
                     placeholder = { Text("Escribe aquí la descripción física") },
                     trailingIcon = {
                         if (tieneError) {
@@ -255,7 +259,7 @@ fun Detalles2(
         }
 
         // MARGEN FIJO CON RESPECTO A LOS BOTONES
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(10.dp))
 
         // --- 2. BOTONES FIJOS EN EL BORDE INFERIOR ---
         Row(

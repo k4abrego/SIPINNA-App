@@ -16,6 +16,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material.icons.outlined.Person
+import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.Icon
@@ -28,63 +29,73 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
+//import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.sippina_aplicacion.R
-import com.example.sippina_aplicacion.viewmodel.ReporteVM
-
-// Paleta de colores usados
-val colorMorado = Color(0xFF381EBD)
-val colorAzul = Color(0xFFD3E2F4)
-val colorRojo = Color(0xFFA00000)
+import com.example.sippina_aplicacion.ui.theme.SIPPINAAplicacionTheme
+//import com.example.sippina_aplicacion.viewmodel.ReporteVM
+val colorMorado = Color(0xFF381DC3)
 
 @Composable
 fun PantallaInicio(
     modifier: Modifier = Modifier,
-    viewModel: ReporteVM = viewModel(),
+    mostrarNotificaciones: Boolean = false,
+    //viewModel: ReporteVM = viewModel(),
     accionBoton: () -> Unit = {},
     onNavegarAReporte: () -> Unit = {},
-    onNavegarAPerfil: () -> Unit = {}
+    onNavegarAPerfil: () -> Unit = {},
+    onNavegarANotificaciones: () -> Unit = {},
+    onQueSituacionesReportar: () -> Unit = {},
+    onConoceSIPINNA: () -> Unit = {},
+    onBuscarReporte: () -> Unit = {}
 ) {
-
     Box(
-        modifier = modifier.background(Color.White).fillMaxSize()
+        modifier = modifier
+            .background(Color(0xFFDDEEFB))
+            .fillMaxSize()
     ) {
-
         Column(
-            modifier = Modifier.fillMaxSize().padding(
-                    horizontal = 24.dp,
-                    vertical = 15.dp)
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 24.dp, vertical = 15.dp)
         ) {
-
             Row(
-                modifier = Modifier.fillMaxWidth().padding(
-                        top = 15.dp,
-                        bottom = 23.dp
-                    ),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 15.dp, bottom = 23.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-
                 Image(
-                    painter = painterResource(
-                        id = R.drawable.imagensippina
-                    ),
+                    painter = painterResource(id = R.drawable.imagensippina),
                     contentDescription = "Logo Sippinna",
-                    modifier = Modifier.size(100.dp)
+                    modifier = Modifier.size(130.dp)
                 )
 
-                Row {
-
-                    IconButton(onClick = { // Acción de notificaciones
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    if (mostrarNotificaciones) {
+                        IconButton(
+                            onClick = onNavegarANotificaciones
+                        ) {
+                            Icon(
+                                imageVector = Icons.Outlined.Notifications,
+                                contentDescription = "Notificaciones",
+                                tint = colorMorado,
+                                modifier = Modifier.size(40.dp)
+                            )
                         }
-                    ) {
+                    }
+
+                    IconButton(onClick = onBuscarReporte) {
                         Icon(
-                            imageVector = Icons.Outlined.Notifications,
-                            contentDescription = "Notificaciones",
+                            imageVector = Icons.Outlined.Search,
+                            contentDescription = "Buscar reporte",
                             tint = colorMorado,
-                            modifier = Modifier.size(40.dp)
+                            modifier = Modifier.size(38.dp)
                         )
                     }
 
@@ -105,9 +116,7 @@ fun PantallaInicio(
                 fontWeight = FontWeight.Bold
             )
 
-            Spacer(
-                modifier = Modifier.height(15.dp)
-            )
+            Spacer(modifier = Modifier.height(15.dp))
 
             Text(
                 text = "Gracias por ayudar a proteger a\nlos niños, niñas y adolescentes.",
@@ -116,9 +125,7 @@ fun PantallaInicio(
                 fontSize = 20.sp
             )
 
-            Spacer(
-                modifier = Modifier.height(250.dp)
-            )
+            Spacer(modifier = Modifier.height(250.dp))
 
             Column(
                 modifier = Modifier.fillMaxWidth(),
@@ -141,9 +148,11 @@ fun PantallaInicio(
                     )
                 }
 
-                ElevatedButton(onClick = { accionBoton() },
+                ElevatedButton(onClick = onQueSituacionesReportar ,
                     modifier = Modifier.height(50.dp).fillMaxWidth(),
-                    shape = RoundedCornerShape(20.dp)
+                    shape = RoundedCornerShape(20.dp),
+                    colors = ButtonDefaults.elevatedButtonColors(
+                        containerColor = Color(0xCCDDE9))
                 ) {
                     Text(
                         text = "¿Qué situaciones debo de reportar?",
@@ -153,9 +162,11 @@ fun PantallaInicio(
                     )
                 }
 
-                ElevatedButton(onClick = { accionBoton() },
+                ElevatedButton(onClick = onConoceSIPINNA,
                     modifier = Modifier.height(50.dp).fillMaxWidth(),
-                    shape = RoundedCornerShape(20.dp)
+                    shape = RoundedCornerShape(20.dp),
+                    colors = ButtonDefaults.elevatedButtonColors(
+                        containerColor = Color(0xCCDDE9))
                 ) {
                     Text(
                         text = "Conoce más de SIPINNA",
@@ -169,13 +180,13 @@ fun PantallaInicio(
                     modifier = Modifier.height(50.dp).fillMaxWidth(),
                     shape = RoundedCornerShape(20.dp),
                     colors = ButtonDefaults.elevatedButtonColors(
-                        containerColor = colorRojo
+                        containerColor = Color(0xFFC01B1E)
                     )
                 ) {
                     Text(
                         text = "EMERGENCIA",
                         fontSize = 18.sp,
-                        color = Color.White,
+                        color = Color(0xFFDDEEFB),
                         fontWeight = FontWeight.Bold
                     )
                 }
@@ -184,3 +195,14 @@ fun PantallaInicio(
     }
 }
 
+@Preview (
+    showBackground = true,
+    showSystemUi = true
+)
+
+@Composable
+fun PantallaPreview () {
+    SIPPINAAplicacionTheme {
+        PantallaInicio()
+    }
+}

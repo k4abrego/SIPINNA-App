@@ -1,5 +1,6 @@
 package com.example.sippina_aplicacion.view
 
+import android.net.Uri
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -9,11 +10,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.example.sippina_aplicacion.ui.theme.SIPPINAAplicacionTheme
 import com.example.sippina_aplicacion.view.PantallasReporte.Detalles2
 import com.example.sippina_aplicacion.view.PantallasReporte.DondeOcurrio
@@ -25,6 +27,19 @@ import com.example.sippina_aplicacion.view.PerfilAutenticado.Borradores
 import com.example.sippina_aplicacion.view.perfilusuario.RegistroNuevoPerfil
 import com.example.sippina_aplicacion.view.SinAutenticacion.VistaPerfil1
 import com.example.sippina_aplicacion.view.PerfilAutenticado.VistaPerfil2
+import com.example.sippina_aplicacion.view.PerfilAutenticado.EditarPerfil
+import com.example.sippina_aplicacion.view.PerfilAutenticado.VerListaReportes
+import com.example.sippina_aplicacion.view.PerfilAutenticado.Notificaciones
+import com.example.sippina_aplicacion.view.perfilusuario.BuscarReporteExistente
+import com.example.sippina_aplicacion.view.perfilusuario.DetalleReporte
+import com.example.sippina_aplicacion.view.VistasExtra.AvisoPrivacidad
+import com.example.sippina_aplicacion.view.VistasExtra.ConoceSIPINNA
+import com.example.sippina_aplicacion.view.VistasExtra.QueSituacionesReportar
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.lifecycle.viewmodel.compose.viewModel
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -39,10 +54,15 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun AppPrincipal(modifier: Modifier = Modifier) {
+fun AppPrincipal(
+    modifier: Modifier = Modifier
+) {
     val navController = rememberNavController()
 
-    Scaffold(modifier = modifier.fillMaxSize()) { innerPadding ->
+    Scaffold(
+        modifier = modifier.fillMaxSize()
+    ) { innerPadding ->
+
         AppNavHost(
             navController = navController,
             modifier = Modifier.padding(innerPadding)
@@ -55,6 +75,18 @@ fun AppNavHost(
     navController: NavHostController,
     modifier: Modifier = Modifier
 ) {
+
+    //estado temporal hasta implementar la autenticación.
+    var cuentaCreadaDemo by rememberSaveable {
+        mutableStateOf(false)
+    }
+    fun abrirDetalleReporte(folio: String) {
+
+        navController.navigate(
+            "${Pantalla.DetalleReporte.ruta}/${Uri.encode(folio)}"
+        )
+    }
+
     NavHost(
         navController = navController,
         startDestination = Pantalla.PantallaCarga.ruta,
@@ -71,13 +103,178 @@ fun AppNavHost(
             )
         }
 
-        composable(Pantalla.PantallaInicio.ruta) {
+        composable(route = Pantalla.PantallaInicio.ruta) {
             PantallaInicio(
+                mostrarNotificaciones = cuentaCreadaDemo,
                 onNavegarAReporte = {
-                    navController.navigate(Pantalla.DondeOcurrio.ruta)
+                    navController.navigate(
+                        route = Pantalla.DondeOcurrio.ruta
+                    )
                 },
+
+
                 onNavegarAPerfil = {
-                    navController.navigate(Pantalla.VistaPerfil1.ruta)
+                    if (cuentaCreadaDemo) {
+                        navController.navigate(
+                            Pantalla.VistaPerfil2.ruta
+                        )
+                    } else {
+                        navController.navigate(
+                            Pantalla.VistaPerfil1.ruta
+                        )
+                    }
+                },
+
+                onNavegarANotificaciones = {
+                    if (cuentaCreadaDemo) {
+                        navController.navigate(
+                            Pantalla.Notificaciones.ruta
+                        )
+                    }
+                },
+
+                onQueSituacionesReportar = {
+                    navController.navigate(
+                        Pantalla.QueSituacionesReportar.ruta
+                    )
+                },
+
+                onConoceSIPINNA = {
+                    navController.navigate(
+                        Pantalla.ConoceSIPINNA.ruta
+                    )
+                }
+                //callback del botón de EMERGENCIA
+            )
+        }
+        composable(Pantalla.QueSituacionesReportar.ruta) {
+            QueSituacionesReportar(
+                onAtras = {
+                    navController.popBackStack()
+                }
+            )
+        }
+
+        composable(Pantalla.ConoceSIPINNA.ruta) {
+            ConoceSIPINNA(
+                onAtras = {
+                    navController.popBackStack()
+                }
+            )
+        }
+
+        composable(Pantalla.AvisoPrivacidad.ruta) {
+            AvisoPrivacidad(
+                onAtras = {
+                    navController.popBackStack()
+                },
+                onEntendido = {
+                    navController.popBackStack()
+                }
+            )
+        }
+
+        composable(Pantalla.VistaPerfil1.ruta) {
+            VistaPerfil1(
+                onAtras = {
+                    navController.popBackStack()
+                },
+                onBorradores = {
+                    navController.navigate(
+                        Pantalla.Borradores.ruta
+                    )
+                },
+
+                onMisReportes = {
+                    navController.navigate(
+                        Pantalla.MisReportes.ruta
+                    )
+                },
+
+                onAvisoPrivacidad = {
+                    navController.navigate(
+                        Pantalla.AvisoPrivacidad.ruta
+                    )
+                },
+
+                onCrearCuenta = {
+                    navController.navigate(
+                        Pantalla.RegistroNuevoPerfil.ruta
+                    )
+                }
+            )
+        }
+        composable(Pantalla.RegistroNuevoPerfil.ruta) {
+            RegistroNuevoPerfil(
+                onAtras = {
+                    navController.popBackStack()
+                },
+
+                onSiguiente = {
+                    //simula una cuenta creada para probar las vistas
+                    cuentaCreadaDemo = true
+                    navController.navigate(Pantalla.VistaPerfil2.ruta
+                    ) {
+                        popUpTo(Pantalla.RegistroNuevoPerfil.ruta
+                        ) {
+                            inclusive = true
+                        }
+                        launchSingleTop = true
+                    }
+                }
+            )
+        }
+
+        composable(route = Pantalla.VistaPerfil2.ruta) {
+            VistaPerfil2(
+                onAtras = {
+                    navController.navigate(
+                        route = Pantalla.PantallaInicio.ruta
+                    ) {
+                        popUpTo(
+                            route = Pantalla.PantallaInicio.ruta
+                        ) {
+                            inclusive = false
+                        }
+                        launchSingleTop = true
+                    }
+                },
+                onBorradores = {
+                    navController.navigate(
+                        Pantalla.Borradores.ruta
+                    )
+                },
+                onMisReportes = {
+                    navController.navigate(
+                        Pantalla.MisReportes.ruta
+                    )
+                },
+
+                onAvisoPrivacidad = {
+                    navController.navigate(
+                        Pantalla.AvisoPrivacidad.ruta
+                    )
+                },
+
+                onEditarPerfil = {
+                    navController.navigate(
+                        Pantalla.EditarPerfil.ruta
+                    )
+                },
+
+                onEliminarCuenta = {
+                    //pendiente
+                }
+            )
+        }
+
+        composable(Pantalla.EditarPerfil.ruta) {
+            EditarPerfil(
+                onAtras = {
+                    navController.popBackStack()
+                },
+                onGuardar = { datosActualizados, nuevaContrasena ->
+                    //pendiente: conectarlos con Model/ViewModel.
                 }
             )
         }
@@ -88,67 +285,81 @@ fun AppNavHost(
                     navController.popBackStack()
                 },
                 onContinuar = {
-                    //Después se conecta con el reporte correspondiente
+                    //pendiente: identificar qué borrador se eligió
                 },
+
                 onEliminar = {
-
+                    // pendiente identificar el borrador elegido
                 }
             )
         }
-        
-        composable(Pantalla.VistaPerfil1.ruta) {
-            VistaPerfil1(
+
+        composable(Pantalla.MisReportes.ruta) {
+            VerListaReportes(
                 onAtras = {
                     navController.popBackStack()
                 },
-                onBorradores = {
-                    navController.navigate(Pantalla.Borradores.ruta)
+                onBuscarClick = {
+                    navController.navigate(
+                        Pantalla.BuscarReporte.ruta
+                    )
                 },
-                onMisReportes = {
-                    navController.navigate(Pantalla.MisReportes.ruta)
-                },
-                onAvisoPrivacidad = {
-                    navController.navigate(Pantalla.AvisoPrivacidad.ruta)
-                },
-                onCrearCuenta = {
-                    navController.navigate(Pantalla.RegistroNuevoPerfil.ruta)
+                onReporteClick = { folio ->
+                    abrirDetalleReporte(folio)
                 }
             )
         }
 
-        composable(Pantalla.RegistroNuevoPerfil.ruta) {
-            RegistroNuevoPerfil(
-                onSiguiente = {
-                    navController.navigate(Pantalla.VistaPerfil2.ruta)
-                }
-            )
-        }
-
-        composable(Pantalla.VistaPerfil2.ruta) {
-            VistaPerfil2(
+        composable(Pantalla.BuscarReporte.ruta) {
+            BuscarReporteExistente(
                 onAtras = {
                     navController.popBackStack()
                 },
-                onBorradores = {
-                    navController.navigate(Pantalla.Borradores.ruta)
-                },
-                onMisReportes = {
-                    navController.navigate(Pantalla.MisReportes.ruta)
-                },
-                onAvisoPrivacidad = {
-                    navController.navigate(Pantalla.AvisoPrivacidad.ruta)
-                },
-                onEliminarCuenta = {
-                    //La dejo para cuando haga la lógica de esto
+                onVerDetalleReporte = { folio ->
+                    abrirDetalleReporte(folio)
                 }
             )
         }
 
+        composable(
+            route = "${Pantalla.DetalleReporte.ruta}/{folio}",
+            arguments = listOf(
+                navArgument("folio") {
+                    type = NavType.StringType
+                }
+            )
+        ) { backStackEntry ->
+
+            val folioSeleccionado =
+                backStackEntry.arguments
+                    ?.getString("folio")
+                    .orEmpty()
+
+            DetalleReporte(
+                folio = folioSeleccionado,
+                onAtras = {
+                    navController.popBackStack()
+                }
+            )
+        }
+
+        composable(Pantalla.Notificaciones.ruta) {
+            Notificaciones(
+                onAtras = {
+                    navController.popBackStack()
+                },
+                onAbrirReporte = { folio ->
+                    abrirDetalleReporte(folio)
+                }
+            )
+        }
 
         composable(Pantalla.DondeOcurrio.ruta) {
             DondeOcurrio(
                 onSiguiente = {
-                    navController.navigate(Pantalla.Detalles.ruta)
+                    navController.navigate(
+                        Pantalla.Detalles.ruta
+                    )
                 },
                 onAtras = {
                     navController.popBackStack()
@@ -156,11 +367,12 @@ fun AppNavHost(
             )
         }
 
-
         composable(Pantalla.Detalles.ruta) {
             Detalles(
                 onSiguiente = {
-                    navController.navigate(Pantalla.Detalles2.ruta)
+                    navController.navigate(
+                        Pantalla.Detalles2.ruta
+                    )
                 },
                 onAtras = {
                     navController.popBackStack()
@@ -172,7 +384,9 @@ fun AppNavHost(
         composable(Pantalla.Detalles2.ruta) {
             Detalles2(
                 onSiguiente = {
-                    navController.navigate(Pantalla.Evidencia.ruta)
+                    navController.navigate(
+                        Pantalla.Evidencia.ruta
+                    )
                 },
                 onAtras = {
                     navController.popBackStack()
@@ -184,7 +398,9 @@ fun AppNavHost(
         composable(Pantalla.Evidencia.ruta) {
             Evidencia(
                 onSiguiente = {
-                    navController.navigate(Pantalla.PrivacidadSeguimiento.ruta)
+                    navController.navigate(
+                        Pantalla.PrivacidadSeguimiento.ruta
+                    )
                 },
                 onAtras = {
                     navController.popBackStack()
@@ -192,34 +408,32 @@ fun AppNavHost(
             )
         }
 
-        composable(Pantalla.PrivacidadSeguimiento.ruta) {
+        composable(route = Pantalla.PrivacidadSeguimiento.ruta) {
             PrivacidadSeguimiento(
-                onSiguiente = {
-                    navController.navigate(Pantalla.ReporteGenerado.ruta)
-                },
                 onAtras = {
-                    navController.popBackStack()
-                }
+                    navController.popBackStack() },
+                onSiguiente = {
+                    navController.navigate(Pantalla.ReporteGenerado.ruta) },
+                onAvisoPrivacidad = {
+                    navController.navigate(Pantalla.AvisoPrivacidad.ruta) }
             )
         }
-
 
         composable(Pantalla.ReporteGenerado.ruta) {
             ReporteGenerado(
                 onVolverInicio = {
-                    navController.navigate(Pantalla.PantallaInicio.ruta) {
-                        popUpTo(Pantalla.PantallaInicio.ruta) { inclusive = true }
+                    navController.navigate(
+                        Pantalla.PantallaInicio.ruta
+                    ) {
+                        popUpTo(
+                            Pantalla.PantallaInicio.ruta
+                        ) {
+                            inclusive = false
+                        }
+                        launchSingleTop = true
                     }
                 }
             )
         }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun AppPrincipalPreview() {
-    SIPPINAAplicacionTheme {
-        AppPrincipal()
     }
 }

@@ -14,6 +14,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Description
 import androidx.compose.material.icons.outlined.Face
+import androidx.compose.material.icons.outlined.FileUpload
 import androidx.compose.material.icons.outlined.Image
 import androidx.compose.material.icons.outlined.LocationOn
 import androidx.compose.material.icons.outlined.Shield
@@ -25,10 +26,11 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.sippina_aplicacion.ui.theme.SIPPINAAplicacionTheme
 
 // Estos son colores que se van a usar
-val ColorMoradoBarra = Color(0xFF381EBD)
-val ColorGrisBarra = Color(0xFFD0D0D0)
+val ColorMoradoBarra = Color(0xFF3D27C9)
+val ColorGrisBarra = Color(0xFF9c9c9c)
 
 // Funcion principal para la barra de los pasos a realizar en la aplicacion
 @Composable
@@ -40,14 +42,14 @@ fun BarraDePasos(
         Icons.Outlined.LocationOn,
         Icons.Outlined.Description,
         Icons.Outlined.Face,
-        Icons.Outlined.Image,
+        Icons.Outlined.FileUpload,
         Icons.Outlined.Shield
     )
 
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .padding(vertical = 12.dp),
+            .padding(vertical = 15.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
@@ -57,7 +59,7 @@ fun BarraDePasos(
             // Círculo con el ícono del paso
             Box(
                 modifier = Modifier
-                    .size(36.dp)
+                    .size(40.dp)
                     .clip(CircleShape)
                     .background(if (estaActivo) ColorMoradoBarra else Color.White)
                     .border(
@@ -71,7 +73,7 @@ fun BarraDePasos(
                     imageVector = iconos[i],
                     contentDescription = "Paso ${i + 1}",
                     tint = if (estaActivo) Color.White else ColorGrisBarra,
-                    modifier = Modifier.size(18.dp)
+                    modifier = Modifier.size(20.dp)
                 )
             }
 
@@ -85,5 +87,16 @@ fun BarraDePasos(
                 )
             }
         }
+    }
+}
+@Preview (
+    showBackground = true,
+    showSystemUi = true
+)
+
+@Composable
+fun BarraPreview(){
+    SIPPINAAplicacionTheme{
+        BarraDePasos()
     }
 }
