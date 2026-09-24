@@ -30,6 +30,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -49,9 +50,9 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.lifecycle.viewmodel.compose.viewModel
-
 import com.example.sippina_aplicacion.R
 import com.example.sippina_aplicacion.ui.theme.SIPPINAAplicacionTheme
 import com.example.sippina_aplicacion.viewmodel.ReporteVM
@@ -73,9 +74,9 @@ fun PrivacidadSeguimiento(
     val colorTextoBotonAtras = Color(0xFF5A5A5A)
 
 
-    var opcionSeleccionada by rememberSaveable {
-        mutableStateOf("anonimo")
-    }
+    val state by viewModel.uiState.collectAsState()
+    val opcionSeleccionada = state.opcionPrivacidad
+
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -134,7 +135,7 @@ fun PrivacidadSeguimiento(
                 icon = Icons.Default.Person,
                 seleccionado = opcionSeleccionada == "anonimo",
                 onClick = {
-                    opcionSeleccionada = "anonimo"
+                    viewModel.actualizarOpcionPrivacidad("anonimo")
                 }
             )
 
@@ -146,7 +147,7 @@ fun PrivacidadSeguimiento(
                 icon = Icons.Default.Email,
                 seleccionado = opcionSeleccionada == "actualizaciones",
                 onClick = {
-                    opcionSeleccionada = "actualizaciones"
+                    viewModel.actualizarOpcionPrivacidad("actualizaciones")
                 }
             )
 

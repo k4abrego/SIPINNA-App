@@ -40,6 +40,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.sippina_aplicacion.viewmodel.ReporteVM
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -75,6 +76,7 @@ fun AppNavHost(
     navController: NavHostController,
     modifier: Modifier = Modifier
 ) {
+    val reporteViewModel: ReporteVM = viewModel()
 
     //estado temporal hasta implementar la autenticación.
     var cuentaCreadaDemo by rememberSaveable {
@@ -111,7 +113,9 @@ fun AppNavHost(
                         route = Pantalla.DondeOcurrio.ruta
                     )
                 },
-
+                onBuscarReporte = {
+                    navController.navigate(Pantalla.BuscarReporte.ruta)
+                },
 
                 onNavegarAPerfil = {
                     if (cuentaCreadaDemo) {
@@ -356,6 +360,7 @@ fun AppNavHost(
 
         composable(Pantalla.DondeOcurrio.ruta) {
             DondeOcurrio(
+                viewModel = reporteViewModel,
                 onSiguiente = {
                     navController.navigate(
                         Pantalla.Detalles.ruta
@@ -369,34 +374,42 @@ fun AppNavHost(
 
         composable(Pantalla.Detalles.ruta) {
             Detalles(
+                viewModel = reporteViewModel,
                 onSiguiente = {
+                    reporteViewModel.irAlPrimerMenor()
                     navController.navigate(
                         Pantalla.Detalles2.ruta
                     )
                 },
-                onAtras = {
-                    navController.popBackStack()
-                }
+                onAtras = { navController.popBackStack() }
             )
         }
-
 
         composable(Pantalla.Detalles2.ruta) {
             Detalles2(
+                viewModel = reporteViewModel,
                 onSiguiente = {
-                    navController.navigate(
-                        Pantalla.Evidencia.ruta
-                    )
+                    val hayOtroMenor =
+                        reporteViewModel.avanzarAlSiguienteMenor()
+                    if (!hayOtroMenor) {
+                        navController.navigate(
+                            Pantalla.Evidencia.ruta
+                        )
+                    }
                 },
                 onAtras = {
-                    navController.popBackStack()
+                    val hayMenorAnterior =
+                        reporteViewModel.regresarAlMenorAnterior()
+                    if (!hayMenorAnterior) {
+                        navController.popBackStack()
+                    }
                 }
             )
         }
 
-
         composable(Pantalla.Evidencia.ruta) {
             Evidencia(
+                viewModel = reporteViewModel,
                 onSiguiente = {
                     navController.navigate(
                         Pantalla.PrivacidadSeguimiento.ruta
@@ -410,6 +423,7 @@ fun AppNavHost(
 
         composable(route = Pantalla.PrivacidadSeguimiento.ruta) {
             PrivacidadSeguimiento(
+                viewModel = reporteViewModel,
                 onAtras = {
                     navController.popBackStack() },
                 onSiguiente = {
@@ -421,6 +435,7 @@ fun AppNavHost(
 
         composable(Pantalla.ReporteGenerado.ruta) {
             ReporteGenerado(
+                viewModel = reporteViewModel,
                 onVolverInicio = {
                     navController.navigate(
                         Pantalla.PantallaInicio.ruta

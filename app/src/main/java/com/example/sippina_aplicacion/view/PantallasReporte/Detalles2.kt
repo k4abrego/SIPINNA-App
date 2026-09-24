@@ -76,8 +76,8 @@ fun Detalles2(
     val opcionesGenero = listOf("Masculino", "Femenino", "Desconocido")
 
     // Asignaciones por defecto
-    val edadActual = state.rangoEdad.ifEmpty { "0-4" }
-    val generoActual = state.genero.ifEmpty { "Masculino" }
+    val edadActual = state.rangoEdad
+    val generoActual = state.genero
 
     // Validación sobre el estado de la descripción física
     var mostrarError by remember { mutableStateOf(false) }
@@ -121,7 +121,7 @@ fun Detalles2(
             Spacer(modifier = Modifier.height(20.dp))
 
             Text(
-                text = "Descripción : Menor 1",
+                text = "Descripción : Menor ${state.indiceMenorActual + 1} de ${state.cantidadMenores}",
                 fontWeight = FontWeight.Bold,
                 textDecoration = TextDecoration.Underline,
                 color = colorMorado,
@@ -297,7 +297,18 @@ fun Detalles2(
                     .weight(1f)
                     .height(46.dp)
             ) {
-                Text(text = "Siguiente", fontSize = 15.sp, fontWeight = FontWeight.Bold)
+                //por si hay más de 1 menor o se va a la otra pantalla
+                Text(
+                    text = if (
+                        state.indiceMenorActual < state.cantidadMenores - 1
+                    ) {
+                        "Siguiente menor"
+                    } else {
+                        "Siguiente"
+                    },
+                    fontSize = 15.sp,
+                    fontWeight = FontWeight.Bold
+                )
             }
         }
     }

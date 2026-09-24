@@ -31,6 +31,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.activity.compose.BackHandler
+import androidx.compose.material3.AlertDialog
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -57,6 +62,13 @@ fun DondeOcurrio(
 
     val state by viewModel.uiState.collectAsState()
 
+    var mostrarDialogoSalida by remember {
+        mutableStateOf(false)
+    }
+    BackHandler {
+        mostrarDialogoSalida = true
+    }
+
     val colorMorado = Color(0xFF381DC3)
     val colorFondo = Color(0xFFEAF4FC)
     val colorFondoBotonSiguiente = Color(0xFFD3E4F4)
@@ -80,8 +92,8 @@ fun DondeOcurrio(
             .navigationBarsPadding()
             .padding(horizontal = 24.dp),
         horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-
+    )
+    {
         // CONTENIDO DESPLAZABLE
         // Los botones de navegación quedan fuera de esta columna.
 
@@ -95,19 +107,13 @@ fun DondeOcurrio(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
-            // LOGO SIPINNA
-
             Image(
-                painter = painterResource(
-                    id = R.drawable.imagensippina
-                ),
+                painter = painterResource(id = R.drawable.imagensippina),
                 contentDescription = "Logo SIPINNA",
                 modifier = Modifier.size(120.dp)
             )
 
-            Spacer(
-                modifier = Modifier.height(4.dp)
-            )
+            Spacer(modifier = Modifier.height(4.dp))
 
             // TÍTULO
 
@@ -120,19 +126,13 @@ fun DondeOcurrio(
                 textAlign = TextAlign.Center
             )
 
-            Spacer(
-                modifier = Modifier.height(12.dp)
-            )
+            Spacer(modifier = Modifier.height(12.dp))
 
             // BARRA DE PROGRESO
 
-            BarraDePasos(
-                pasoActual = 0
-            )
+            BarraDePasos(pasoActual = 0)
 
-            Spacer(
-                modifier = Modifier.height(16.dp)
-            )
+            Spacer(modifier = Modifier.height(16.dp))
 
             // INSTRUCCIONES
 
@@ -146,33 +146,22 @@ fun DondeOcurrio(
                 modifier = Modifier.fillMaxWidth()
             )
 
-            Spacer(
-                modifier = Modifier.height(16.dp)
-            )
+            Spacer(modifier = Modifier.height(16.dp))
 
             // MAPA
 
             Card(
                 shape = RoundedCornerShape(12.dp),
-
-                elevation = CardDefaults.cardElevation(
-                    defaultElevation = 2.dp
-                ),
-
-                colors = CardDefaults.cardColors(
-                    containerColor = Color(0xFFEBEEF8)
-                ),
-
+                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+                colors = CardDefaults.cardColors(containerColor = Color(0xFFEBEEF8)),
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(150.dp)
             ) {
-
                 Box(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
                 ) {
-
                     Text(
                         text = "Mapa",
                         color = Color.Gray,
@@ -182,15 +171,12 @@ fun DondeOcurrio(
                 }
             }
 
-            Spacer(
-                modifier = Modifier.height(18.dp)
-            )
+            Spacer(modifier = Modifier.height(18.dp))
 
             // OPCIONES DE UBICACIÓN
 
             Column(
                 modifier = Modifier.fillMaxWidth(),
-
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
 
@@ -252,9 +238,7 @@ fun DondeOcurrio(
                 }
             }
 
-            Spacer(
-                modifier = Modifier.height(12.dp)
-            )
+            Spacer(modifier = Modifier.height(12.dp))
         }
 
         // BOTONES INFERIORES
@@ -263,23 +247,13 @@ fun DondeOcurrio(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(
-                    top = 10.dp,
-                    bottom = 12.dp
-                ),
-
+                .padding(top = 10.dp, bottom = 12.dp),
             horizontalArrangement = Arrangement.spacedBy(16.dp),
-
             verticalAlignment = Alignment.CenterVertically
         ) {
-
-            // BOTÓN ATRÁS
-
             Button(
-                onClick = onAtras,
-
+                onClick = { mostrarDialogoSalida = true} ,
                 shape = CircleShape,
-
                 colors = ButtonDefaults.buttonColors(
                     containerColor = colorFondoBotonAtras,
                     contentColor = colorTextoBotonAtras
@@ -296,19 +270,10 @@ fun DondeOcurrio(
                     fontWeight = FontWeight.Bold
                 )
             }
-
-            // BOTÓN SIGUIENTE
-
             Button(
                 onClick = onSiguiente,
-
                 shape = CircleShape,
-
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = colorFondoBotonSiguiente,
-                    contentColor = colorTextoBotonSiguiente
-                ),
-
+                colors = ButtonDefaults.buttonColors(containerColor = colorFondoBotonSiguiente, contentColor = colorTextoBotonSiguiente),
                 modifier = Modifier
                     .weight(1f)
                     .height(50.dp)
@@ -317,10 +282,56 @@ fun DondeOcurrio(
                 Text(
                     text = "Siguiente",
                     fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold
-                )
+                    fontWeight = FontWeight.Bold)
             }
         }
+    }
+    if (mostrarDialogoSalida) {
+        AlertDialog(
+            onDismissRequest = {
+                mostrarDialogoSalida = false
+            },
+            title = {
+                Text(
+                    text = "¿Seguro que deseas salir?",
+                    color = colorMorado,
+                    fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            },
+            text = {
+                Text(
+                    text = "Tu progreso quedará guardado en Borradores, " +
+                            "disponibles en tu perfil en este dispositivo.",
+                    textAlign = TextAlign.Center
+                )
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        mostrarDialogoSalida = false
+                        onAtras()
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = colorMorado
+                    )
+                ) {
+                    Text("Sí, guardar y salir")
+                }
+            },
+            dismissButton = {
+                OutlinedButton(
+                    onClick = {
+                        mostrarDialogoSalida = false
+                    }
+                ) {
+                    Text("No, continuar")
+                }
+            },
+            containerColor = Color(0xFFEAF4FC),
+            shape = RoundedCornerShape(20.dp)
+        )
     }
 }
 
