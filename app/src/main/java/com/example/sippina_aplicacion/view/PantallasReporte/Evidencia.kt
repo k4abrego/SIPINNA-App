@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -53,146 +54,215 @@ import com.example.sippina_aplicacion.viewmodel.ReporteVM
 fun Evidencia(
     viewModel: ReporteVM = viewModel(),
     modifier: Modifier = Modifier,
-    onSiguiente: () -> Unit = { },
-    onAtras: () -> Unit = { }
+    onSiguiente: () -> Unit = {},
+    onAtras: () -> Unit = {}
 ) {
-    // Suscripcion al estado centralizado de viewModel
-    val state by viewModel.uiState.collectAsState()
 
+    val colorMorado = Color(0xFF381DC3)
+    val colorFondo = Color(0xFFEAF4FC)
 
-    val colorMorado = Color(0xFF381EBD)
     val colorFondoBotonSiguiente = Color(0xFFD3E4F4)
     val colorTextoBotonSiguiente = Color(0xFF3B719F)
+
     val colorFondoBotonAtras = Color(0xFFE2E2E2)
     val colorTextoBotonAtras = Color(0xFF5A5A5A)
 
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
-            .padding(horizontal = 24.dp, vertical = 15.dp)
-            .verticalScroll(rememberScrollState())
+            .background(colorFondo)
             .imePadding()
-            .background(Color(0xFFEDF7FF))
-            .navigationBarsPadding(),
+            .navigationBarsPadding()
+            .padding(horizontal = 24.dp),
+
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Image(
-            painter = painterResource(id = R.drawable.imagensippina),
-            contentDescription = "Logo Sippina",
-            modifier = Modifier.size(120.dp)
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-        Text(
-            text = "Evidencia",
-            fontSize = 30.sp,
-            fontWeight = FontWeight.Bold,
-            color = colorMorado
-        )
-        Spacer(modifier = Modifier.height(10.dp))
-
-        BarraDePasos(pasoActual = 3)
-
-        Spacer(modifier = Modifier.height(35.dp))
-
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            TarjetaOpcionMedia(
-                icon = Icons.Default.PhotoCamera,
-                contentDescription = "Tomar Foto",
-                modifier = Modifier.weight(1f),
-                onClick = { })
-
-            TarjetaOpcionMedia(
-                icon = Icons.Default.Image,
-                contentDescription = "Galeria",
-                modifier = Modifier.weight(1f),
-                onClick = {
-                })
-
-        }
-        Spacer(modifier = Modifier.height(25.dp))
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            TarjetaOpcionMedia(
-                icon = Icons.Default.Videocam,
-                contentDescription = "Grabar Video",
-                modifier = Modifier.weight(1f),
-                onClick = { })
-
-            TarjetaOpcionMedia(
-                icon = Icons.Default.Mic,
-                contentDescription = "Grabar Audio",
-                modifier = Modifier.weight(1f),
-                onClick = {
-                })
-
-        }
-
-        Spacer(modifier = Modifier.height(25.dp))
-
-        OutlinedCard(
-            onClick = {}, shape = RoundedCornerShape(15.dp),
-            border = BorderStroke(1.5.dp, colorMorado),
-            //colors = CardDefaults.outlinedCardColors(containerColor = Color.LightGray),
+        Column(
             modifier = Modifier
+                .weight(1f)
                 .fillMaxWidth()
-                .height(105.dp)
+                .verticalScroll(rememberScrollState())
+                .padding(top = 8.dp, bottom = 12.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            Image(
+                painter = painterResource(id = R.drawable.imagensippina),
+                contentDescription = "Logo SIPINNA",
+                modifier = Modifier.size(120.dp)
+            )
+
+            Spacer(modifier = Modifier.height(4.dp))
+
+            Text(
+                text = "Evidencia",
+                fontSize = 30.sp,
+                fontWeight = FontWeight.Bold,
+                color = colorMorado,
+                textAlign = TextAlign.Center
+            )
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            BarraDePasos(pasoActual = 3)
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Text(
+                text = "Si tienes alguna evidencia, puedes agregarla aquí.",
+                fontSize = 16.sp,
+                lineHeight = 20.sp,
+                fontWeight = FontWeight.SemiBold,
+                color = colorMorado,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Spacer(modifier = Modifier.height(18.dp))
 
             Row(
-                modifier = Modifier.fillMaxSize(),
-                horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically
-            )
-            {
-                Icon(
-                    imageVector = Icons.Default.AttachFile,
-                    contentDescription = "Adjuntar archivo",
-                    tint = Color.Gray,
-                    modifier = Modifier.size(32.dp)
-                )
-                Spacer(modifier = Modifier.width(12.dp))
-                Text(
-                    text = "Adjuntar o subir archivo",
-                    fontSize = 15.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    color = Color.Gray,
-                    textAlign = TextAlign.Center
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+
+                TarjetaOpcionMedia(
+                    icon = Icons.Default.PhotoCamera,
+                    contentDescription = "Tomar foto",
+                    modifier = Modifier.weight(1f),
+                    onClick = {
+                        //pendiente conectar la cámara
+                    }
                 )
 
+                TarjetaOpcionMedia(
+                    icon = Icons.Default.Image,
+                    contentDescription = "Galería",
+                    modifier = Modifier.weight(1f),
+                    onClick = {
+                        //conectar el selector de galería
+                    }
+                )
             }
 
+            Spacer(
+                modifier = Modifier.height(16.dp)
+            )
 
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+
+                TarjetaOpcionMedia(
+                    icon = Icons.Default.Videocam,
+                    contentDescription = "Grabar video",
+                    modifier = Modifier.weight(1f),
+                    onClick = {
+                        // cconectar la grabación de video
+                    }
+                )
+
+                TarjetaOpcionMedia(
+                    icon = Icons.Default.Mic,
+                    contentDescription = "Grabar audio",
+                    modifier = Modifier.weight(1f),
+                    onClick = {
+                        //conectar la grabación de audio
+                    }
+                )
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            OutlinedCard(
+                onClick = {
+                // conectar el selector de archivos.
+                },
+                shape = RoundedCornerShape(15.dp),
+                border = BorderStroke(1.5.dp, colorMorado),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(90.dp)
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(horizontal = 12.dp),
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.AttachFile,
+                        contentDescription = null,
+                        tint = Color.Gray,
+                        modifier = Modifier.size(32.dp)
+                    )
+
+                    Spacer(modifier = Modifier.width(12.dp))
+
+                    Text(
+                        text = "Adjuntar o subir archivo",
+                        fontSize = 15.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        color = Color.DarkGray,
+                        textAlign = TextAlign.Center
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(15.dp))
+
+            Text(
+                text = "Este paso es opcional. Puedes continuar sin adjuntar archivos.",
+                fontSize = 14.sp,
+                lineHeight = 18.sp,
+                color = Color.DarkGray,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
         }
 
-        Spacer(modifier = Modifier.height(83.dp))
-
-        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(16.dp))
-        {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 10.dp, bottom = 12.dp),
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
             Button(
-                onClick = { onAtras() },
-                colors = ButtonDefaults.buttonColors(colorFondoBotonAtras, colorTextoBotonAtras),
-                modifier = Modifier
-                    .weight(1f)
-                    .height(46.dp)
-            ) {
-                Text(text = "Atrás", fontSize = 15.sp, fontWeight = FontWeight.Bold)
-            }
-            Button(
-                onClick = { onSiguiente() },
+                onClick = onAtras,
+                shape = CircleShape,
                 colors = ButtonDefaults.buttonColors(
-                    colorFondoBotonSiguiente,
-                    colorTextoBotonSiguiente
+                    containerColor = colorFondoBotonAtras,
+                    contentColor = colorTextoBotonAtras
                 ),
                 modifier = Modifier
                     .weight(1f)
-                    .height(46.dp)
+                    .height(50.dp)
             ) {
-                Text(text = "Siguiente", fontSize = 15.sp, fontWeight = FontWeight.Bold)
+                Text(
+                    text = "Atrás",
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+
+            Button(
+                onClick = onSiguiente,
+                shape = CircleShape,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = colorFondoBotonSiguiente,
+                    contentColor = colorTextoBotonSiguiente),
+                modifier = Modifier
+                    .weight(1f)
+                    .height(50.dp)
+            ) {
+                Text(
+                    text = "Siguiente",
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold
+                )
             }
         }
     }
@@ -204,13 +274,18 @@ private fun TarjetaOpcionMedia(
     contentDescription: String,
     modifier: Modifier = Modifier,
     onClick: () -> Unit
+
+
 ) {
+
     OutlinedCard(
         onClick = onClick,
         shape = RoundedCornerShape(16.dp),
-        border = BorderStroke(1.5.dp, Color(0xFF381EBD)),
-        //colors = CardDefaults.outlinedCardColors(containerColor = Color.LightGray),
-        modifier = modifier.height(115.dp)
+        border = BorderStroke(
+            1.5.dp,
+            Color(0xFF381DC3)
+        ),
+        modifier = modifier.height(100.dp)
     ) {
         Box(
             modifier = Modifier.fillMaxSize(),
@@ -223,13 +298,13 @@ private fun TarjetaOpcionMedia(
                 modifier = Modifier.size(42.dp)
             )
         }
+
     }
 }
 
 @Preview(
     showBackground = true,
     showSystemUi = true,
-    name = "Evidencia Opcional"
 )
 
 @Composable

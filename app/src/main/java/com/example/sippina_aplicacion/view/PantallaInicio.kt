@@ -16,6 +16,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material.icons.outlined.Person
+import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.Icon
@@ -35,29 +36,30 @@ import androidx.compose.ui.unit.sp
 import com.example.sippina_aplicacion.R
 import com.example.sippina_aplicacion.ui.theme.SIPPINAAplicacionTheme
 //import com.example.sippina_aplicacion.viewmodel.ReporteVM
-
-// Paleta de colores usados
 val colorMorado = Color(0xFF381DC3)
-val colorRojo = Color(0xFFA00000)
 
 @Composable
 fun PantallaInicio(
     modifier: Modifier = Modifier,
+    mostrarNotificaciones: Boolean = false,
     //viewModel: ReporteVM = viewModel(),
     accionBoton: () -> Unit = {},
     onNavegarAReporte: () -> Unit = {},
     onNavegarAPerfil: () -> Unit = {},
     onNavegarANotificaciones: () -> Unit = {},
     onQueSituacionesReportar: () -> Unit = {},
-    onConoceSIPINNA: () -> Unit = {}
+    onConoceSIPINNA: () -> Unit = {},
+    onBuscarReporte: () -> Unit = {}
 ) {
     Box(
-        modifier = modifier.background(Color(0xFFDDEEFB)).fillMaxSize()
+        modifier = modifier
+            .background(Color(0xFFDDEEFB))
+            .fillMaxSize()
     ) {
         Column(
-            modifier = Modifier.fillMaxSize().padding(
-                    horizontal = 24.dp,
-                    vertical = 15.dp)
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 24.dp, vertical = 15.dp)
         ) {
             Row(
                 modifier = Modifier
@@ -69,16 +71,31 @@ fun PantallaInicio(
                 Image(
                     painter = painterResource(id = R.drawable.imagensippina),
                     contentDescription = "Logo Sippinna",
-                    modifier = Modifier.size(120.dp)
+                    modifier = Modifier.size(130.dp)
                 )
-                Row {
 
-                    IconButton(onClick = onNavegarANotificaciones) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    if (mostrarNotificaciones) {
+                        IconButton(
+                            onClick = onNavegarANotificaciones
+                        ) {
+                            Icon(
+                                imageVector = Icons.Outlined.Notifications,
+                                contentDescription = "Notificaciones",
+                                tint = colorMorado,
+                                modifier = Modifier.size(40.dp)
+                            )
+                        }
+                    }
+
+                    IconButton(onClick = onBuscarReporte) {
                         Icon(
-                            imageVector = Icons.Outlined.Notifications,
-                            contentDescription = "Notificaciones",
+                            imageVector = Icons.Outlined.Search,
+                            contentDescription = "Buscar reporte",
                             tint = colorMorado,
-                            modifier = Modifier.size(40.dp)
+                            modifier = Modifier.size(38.dp)
                         )
                     }
 
@@ -133,7 +150,9 @@ fun PantallaInicio(
 
                 ElevatedButton(onClick = onQueSituacionesReportar ,
                     modifier = Modifier.height(50.dp).fillMaxWidth(),
-                    shape = RoundedCornerShape(20.dp)
+                    shape = RoundedCornerShape(20.dp),
+                    colors = ButtonDefaults.elevatedButtonColors(
+                        containerColor = Color(0xCCDDE9))
                 ) {
                     Text(
                         text = "¿Qué situaciones debo de reportar?",
@@ -145,7 +164,9 @@ fun PantallaInicio(
 
                 ElevatedButton(onClick = onConoceSIPINNA,
                     modifier = Modifier.height(50.dp).fillMaxWidth(),
-                    shape = RoundedCornerShape(20.dp)
+                    shape = RoundedCornerShape(20.dp),
+                    colors = ButtonDefaults.elevatedButtonColors(
+                        containerColor = Color(0xCCDDE9))
                 ) {
                     Text(
                         text = "Conoce más de SIPINNA",
@@ -159,13 +180,13 @@ fun PantallaInicio(
                     modifier = Modifier.height(50.dp).fillMaxWidth(),
                     shape = RoundedCornerShape(20.dp),
                     colors = ButtonDefaults.elevatedButtonColors(
-                        containerColor = colorRojo
+                        containerColor = Color(0xFFC01B1E)
                     )
                 ) {
                     Text(
                         text = "EMERGENCIA",
                         fontSize = 18.sp,
-                        color = Color.White,
+                        color = Color(0xFFDDEEFB),
                         fontWeight = FontWeight.Bold
                     )
                 }

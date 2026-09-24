@@ -1,13 +1,34 @@
+import java.util.Properties
+import java.io.FileInputStream
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
 }
+
+val localProperties = Properties().apply {
+    val archivo = rootProject.file("local.properties")
+
+    if (archivo.exists()) {
+        load(FileInputStream(archivo))
+    }
+}
+
+val mapsApiKey = localProperties
+    .getProperty("MAPS_API_KEY", "")
+
 
 android {
     namespace = "com.example.sippina_aplicacion"
     compileSdk {
         version = release(37)
     }
+
+
+    defaultConfig {
+        manifestPlaceholders["MAPS_API_KEY"] = mapsApiKey
+    }
+
 
     defaultConfig {
         applicationId = "com.example.sippina_aplicacion"
@@ -41,6 +62,7 @@ dependencies {
     implementation(libs.androidx.compose.foundation)
     implementation(libs.androidx.compose.foundation.layout)
     implementation(libs.androidx.compose.material3)
+    implementation(libs.androidx.compose.runtime.saveable)
     implementation(libs.androidx.compose.ui)
     implementation(libs.androidx.compose.ui.graphics)
     implementation(libs.androidx.compose.ui.tooling.preview)
@@ -61,11 +83,13 @@ dependencies {
     implementation(libs.retrofit)
     implementation(libs.gson)
     // Google Maps
-    implementation("    com.google.maps.android:maps-compose")
-    implementation("com.google.android.gms:play-services-maps")
-    // Servicios de Ubicación
-    implementation("com.google.android.gms:play-services-location")
-    // Manejo de los permisos en Android
-    implementation("com.google.accompanist:accompanist-permissions")
+    implementation(libs.google.maps.compose)
+    implementation(libs.google.play.services.maps)
+
+    // Servicios de ubicación
+    implementation(libs.google.play.services.location)
+
+    // Manejo de permisos en Android
+    implementation(libs.accompanist.permissions)
 
 }

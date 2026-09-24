@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -31,7 +32,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -47,125 +49,188 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.ViewModel
+
 import androidx.lifecycle.viewmodel.compose.viewModel
+
 import com.example.sippina_aplicacion.R
 import com.example.sippina_aplicacion.ui.theme.SIPPINAAplicacionTheme
-import com.example.sippina_aplicacion.view.colorMorado
 import com.example.sippina_aplicacion.viewmodel.ReporteVM
 
 @Composable
 fun PrivacidadSeguimiento(
-    viewModel: ReporteVM = viewModel(), modifier: Modifier = Modifier,
-    onSiguiente: () -> Unit = { },
-    onAtras: () -> Unit = { }
+    viewModel: ReporteVM = viewModel(),
+    modifier: Modifier = Modifier,
+    onSiguiente: () -> Unit = {},
+    onAtras: () -> Unit = {},
+    onAvisoPrivacidad: () -> Unit = {}
 ) {
-    // Colores para los botones
-    val colorMorado = Color(0xFF3D27C9)
+    val colorMorado = Color(0xFF381DC3)
+    val colorFondo = Color(0xFFEAF4FC)
     val colorFondoBotonSiguiente = Color(0xFFD3E4F4)
     val colorTextoBotonSiguiente = Color(0xFF3B719F)
+
     val colorFondoBotonAtras = Color(0xFFE2E2E2)
     val colorTextoBotonAtras = Color(0xFF5A5A5A)
-    val colorFondo = Color(0xFFEAF4FC)
 
-    var opcionSeleccionada by remember { mutableStateOf("anonimo") }
+
+    var opcionSeleccionada by rememberSaveable {
+        mutableStateOf("anonimo")
+    }
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
-            .padding(horizontal = 24.dp, vertical = 15.dp)
-            .verticalScroll(rememberScrollState())
+            .background(colorFondo)
             .imePadding()
             .navigationBarsPadding()
-            .background(Color(0xFFEAF4FC)),
+            .padding(horizontal = 24.dp),
         horizontalAlignment = Alignment.CenterHorizontally
-    )
-    {
-        Image(
-            painter = painterResource(id = R.drawable.imagensippina),
-            contentDescription = "Logo Sippina",
-            modifier = Modifier.size(120.dp))
-
-        Spacer(modifier = Modifier.height(7.dp))
-
-        Text(
-            text = "Privacidad y Seguimiento",
-            fontSize = 28.sp,
-            fontWeight = FontWeight.Bold,
-            color = colorMorado
-        )
-        Spacer(modifier = Modifier.height(12.dp))
-        BarraDePasos(pasoActual = 4)
-        Spacer(modifier = Modifier.height(35.dp))
-
-        TarjetaOpcionPrivacidad(
-            titulo = "Reporte anónimo",
-            descripcion = "No guardaremos tus datos personales. Podrás consultar tu reporte con el folio y código",
-            icon = Icons.Default.Person,
-            seleccionado = opcionSeleccionada == "anonimo",
-            onClick = { opcionSeleccionada = "anonimo" }
-        )
-
-        Spacer(modifier = Modifier.height(35.dp))
-
-        TarjetaOpcionPrivacidad(
-            titulo = "Me interesa recibir actualizaciones",
-            descripcion = "Te pediremos tu correo para enviarte el seguimiento y actualizaciones.",
-            icon = Icons.Default.Email,
-            seleccionado = opcionSeleccionada == "actualizaciones",
-            onClick = { opcionSeleccionada = "actualizaciones" }
-        )
-        Spacer(modifier = Modifier.height(35.dp))
-        Text(
-            text = "Tus datos están protegidos y solo el equipo autorizado podrá verlos",
-            fontSize = 18.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color.Gray,
-            textAlign = TextAlign.Center,
-            modifier = Modifier.padding(horizontal = 15.dp))
-        Spacer(modifier = Modifier.height(10.dp))
-
-
-        val textoAviso = buildAnnotatedString {
-            append("Si quieres saber más, da click ")
-            withStyle(style = SpanStyle(
-                fontWeight = FontWeight.Bold,
-                textDecoration = TextDecoration.Underline
-            )
-            ) {
-                append("aquí")
-            }
-            append(" para nuestro aviso de privacidad")
-        }
-        Spacer(modifier = Modifier.width(100.dp))
-        Spacer(modifier = Modifier.height(15.dp))
-
-        Text(
-            text = textoAviso,
-            fontSize = 13.sp,
-            color = Color.Gray,
-            textAlign = TextAlign.Center,
+    ) {
+        Column(
             modifier = Modifier
-                .clickable { /* Abrir enlace */ }
-                .padding(horizontal = 16.dp),
-            fontWeight = FontWeight.Bold
-        )
-
-        Spacer(modifier = Modifier.height(49.dp))
-
-        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(16.dp))
-        {
-            Button(onClick = {onAtras()}, colors = ButtonDefaults.buttonColors(colorFondoBotonAtras, colorTextoBotonAtras), modifier = Modifier
                 .weight(1f)
-                .height(46.dp)){
-                Text(text = "Atrás", fontSize = 15.sp, fontWeight = FontWeight.Bold)
+                .fillMaxWidth()
+                .verticalScroll(rememberScrollState())
+                .padding(top = 8.dp, bottom = 12.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.imagensippina),
+                contentDescription = "Logo SIPINNA",
+                modifier = Modifier.size(120.dp)
+            )
+
+            Spacer(modifier = Modifier.height(4.dp))
+
+            Text(
+                text = "Privacidad y seguimiento",
+                fontSize = 28.sp,
+                lineHeight = 34.sp,
+                fontWeight = FontWeight.Bold,
+                color = colorMorado,
+                textAlign = TextAlign.Center
+            )
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            BarraDePasos(pasoActual = 4)
+
+            Spacer(modifier = Modifier.height(18.dp))
+
+            Text(
+                text = "Elige cómo deseas dar seguimiento a tu reporte",
+                fontSize = 16.sp,
+                lineHeight = 20.sp,
+                fontWeight = FontWeight.SemiBold,
+                color = colorMorado,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Spacer(modifier = Modifier.height(18.dp))
+
+            TarjetaOpcionPrivacidad(
+                titulo = "Reporte anónimo",
+                descripcion = "Podrás consultar tu reporte con el folio y el código privado, sin proporcionar tus datos de contacto.",
+                icon = Icons.Default.Person,
+                seleccionado = opcionSeleccionada == "anonimo",
+                onClick = {
+                    opcionSeleccionada = "anonimo"
+                }
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            TarjetaOpcionPrivacidad(
+                titulo = "Me interesa recibir actualizaciones",
+                descripcion = "En esta modalidad podrás proporcionar un correo para recibir información sobre el seguimiento de tu reporte.",
+                icon = Icons.Default.Email,
+                seleccionado = opcionSeleccionada == "actualizaciones",
+                onClick = {
+                    opcionSeleccionada = "actualizaciones"
+                }
+            )
+
+            Spacer(modifier = Modifier.height(22.dp))
+
+            Text(
+                text = "Tu información debe ser tratada únicamente por el personal autorizado, conforme al aviso de privacidad.",
+                fontSize = 15.sp,
+                lineHeight = 20.sp,
+                fontWeight = FontWeight.Medium,
+                color = Color.DarkGray,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Spacer(modifier = Modifier.height(14.dp))
+
+            val textoAviso = buildAnnotatedString {
+                append("Consulta nuestro ")
+                withStyle(
+                    SpanStyle(
+                        fontWeight = FontWeight.Bold,
+                        textDecoration = TextDecoration.Underline,
+                        color = colorMorado
+                    )
+                ) {
+                    append("aviso de privacidad")
+                }
             }
-            Button(onClick = {onSiguiente()},colors = ButtonDefaults.buttonColors(colorFondoBotonSiguiente, colorTextoBotonSiguiente), modifier = Modifier
-                .weight(1f)
-                .height(46.dp)){
-                Text(text = "Siguiente", fontSize = 15.sp, fontWeight = FontWeight.Bold)
+            Text(
+                text = textoAviso,
+                fontSize = 14.sp,
+                lineHeight = 19.sp,
+                color = Color.DarkGray,
+                textAlign = TextAlign.Center,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { onAvisoPrivacidad() }
+                    .padding(horizontal = 8.dp, vertical = 8.dp)
+            )
+            Spacer(modifier = Modifier.height(12.dp))
+        }
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 10.dp, bottom = 12.dp),
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Button(
+                onClick = onAtras,
+                shape = CircleShape,
+                colors = ButtonDefaults.buttonColors(containerColor = colorFondoBotonAtras, contentColor = colorTextoBotonAtras
+                ),
+                modifier = Modifier
+                    .weight(1f)
+                    .height(50.dp)
+            ) {
+                Text(
+                    text = "Atrás",
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+
+            Button(
+                onClick = onSiguiente,
+                shape = CircleShape,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = colorFondoBotonSiguiente,
+                    contentColor = colorTextoBotonSiguiente
+                ),
+                modifier = Modifier
+                    .weight(1f)
+                    .height(50.dp)
+            ) {
+                Text(
+                    text = "Finalizar reporte",
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Bold,
+                    maxLines = 1
+                )
             }
         }
-        Spacer(modifier = Modifier.height(36.dp))
     }
 }
 
@@ -177,12 +242,21 @@ private fun TarjetaOpcionPrivacidad(
     seleccionado: Boolean,
     onClick: () -> Unit
 ) {
+    val colorMorado = Color(0xFF381DC3)
+
     OutlinedCard(
         onClick = onClick,
         shape = RoundedCornerShape(16.dp),
-        border = BorderStroke(1.5.dp, colorMorado ),
+        border = BorderStroke(
+            width = if (seleccionado) 2.dp else 1.5.dp,
+            color = colorMorado
+        ),
         colors = CardDefaults.outlinedCardColors(
-            containerColor = if (seleccionado) Color.White else Color.White
+            containerColor = if (seleccionado) {
+                Color(0xFFE4DCFF)
+            } else {
+                Color.White
+            }
         ),
         modifier = Modifier.fillMaxWidth()
     ) {
@@ -197,26 +271,40 @@ private fun TarjetaOpcionPrivacidad(
             ) {
                 Text(
                     text = titulo,
-                    fontSize = 18.sp,
+                    fontSize = 17.sp,
+                    lineHeight = 21.sp,
                     fontWeight = FontWeight.Bold,
                     color = colorMorado
                 )
+
                 Spacer(modifier = Modifier.height(6.dp))
+
                 Text(
                     text = descripcion,
                     fontSize = 14.sp,
-                    color = Color.Gray,
-                    lineHeight = 16.sp
+                    lineHeight = 19.sp,
+                    color = Color.DarkGray
                 )
+
+                if (seleccionado) {
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    Text(
+                        text = "Opción seleccionada",
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = colorMorado
+                    )
+                }
             }
 
             Spacer(modifier = Modifier.width(12.dp))
 
             Icon(
                 imageVector = icon,
-                contentDescription = titulo,
-                tint = Color.Gray,
-                modifier = Modifier.size(45.dp)
+                contentDescription = null,
+                tint = colorMorado,
+                modifier = Modifier.size(38.dp)
             )
         }
     }
@@ -225,7 +313,7 @@ private fun TarjetaOpcionPrivacidad(
 @Preview(
     showBackground = true,
     showSystemUi = true,
-    name = "Privacidad y Seguimiento"
+    name = "Privacidad y seguimiento"
 )
 @Composable
 fun PrivacidadSeguimientoPreview() {

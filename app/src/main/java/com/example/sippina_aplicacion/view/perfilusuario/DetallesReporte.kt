@@ -59,11 +59,8 @@ fun DetalleReporte(
     // 2 = En atención
     // 3 = Cerrado
     estadoActual: Int = 0,
-
     descripcion: String = "Menor de edad encontrado solo en la vía pública, sin la supervisión de una persona adulta.",
-
     direccion: String = "Calle Flop, Av. Ware s/n, Col. Papu, C.P. 6767",
-
     onAtras: () -> Unit = {}
 ) {
 

@@ -35,7 +35,11 @@ import com.example.sippina_aplicacion.view.perfilusuario.DetalleReporte
 import com.example.sippina_aplicacion.view.VistasExtra.AvisoPrivacidad
 import com.example.sippina_aplicacion.view.VistasExtra.ConoceSIPINNA
 import com.example.sippina_aplicacion.view.VistasExtra.QueSituacionesReportar
-
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.lifecycle.viewmodel.compose.viewModel
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -71,6 +75,11 @@ fun AppNavHost(
     navController: NavHostController,
     modifier: Modifier = Modifier
 ) {
+
+    //estado temporal hasta implementar la autenticación.
+    var cuentaCreadaDemo by rememberSaveable {
+        mutableStateOf(false)
+    }
     fun abrirDetalleReporte(folio: String) {
 
         navController.navigate(
@@ -94,20 +103,34 @@ fun AppNavHost(
             )
         }
 
-        composable(Pantalla.PantallaInicio.ruta) {
+        composable(route = Pantalla.PantallaInicio.ruta) {
             PantallaInicio(
+                mostrarNotificaciones = cuentaCreadaDemo,
                 onNavegarAReporte = {
-                    navController.navigate(Pantalla.DondeOcurrio.ruta)
+                    navController.navigate(
+                        route = Pantalla.DondeOcurrio.ruta
+                    )
                 },
 
+
                 onNavegarAPerfil = {
-                    navController.navigate(Pantalla.VistaPerfil1.ruta)
+                    if (cuentaCreadaDemo) {
+                        navController.navigate(
+                            Pantalla.VistaPerfil2.ruta
+                        )
+                    } else {
+                        navController.navigate(
+                            Pantalla.VistaPerfil1.ruta
+                        )
+                    }
                 },
 
                 onNavegarANotificaciones = {
-                    navController.navigate(
-                        Pantalla.Notificaciones.ruta
-                    )
+                    if (cuentaCreadaDemo) {
+                        navController.navigate(
+                            Pantalla.Notificaciones.ruta
+                        )
+                    }
                 },
 
                 onQueSituacionesReportar = {
@@ -186,19 +209,35 @@ fun AppNavHost(
                 onAtras = {
                     navController.popBackStack()
                 },
+
                 onSiguiente = {
-                    // aún no crea una cuenta ni autentica al usuario.
-                    navController.navigate(
-                        Pantalla.VistaPerfil2.ruta
-                    )
+                    //simula una cuenta creada para probar las vistas
+                    cuentaCreadaDemo = true
+                    navController.navigate(Pantalla.VistaPerfil2.ruta
+                    ) {
+                        popUpTo(Pantalla.RegistroNuevoPerfil.ruta
+                        ) {
+                            inclusive = true
+                        }
+                        launchSingleTop = true
+                    }
                 }
             )
         }
 
-        composable(Pantalla.VistaPerfil2.ruta) {
+        composable(route = Pantalla.VistaPerfil2.ruta) {
             VistaPerfil2(
                 onAtras = {
-                    navController.popBackStack()
+                    navController.navigate(
+                        route = Pantalla.PantallaInicio.ruta
+                    ) {
+                        popUpTo(
+                            route = Pantalla.PantallaInicio.ruta
+                        ) {
+                            inclusive = false
+                        }
+                        launchSingleTop = true
+                    }
                 },
                 onBorradores = {
                     navController.navigate(
@@ -369,17 +408,14 @@ fun AppNavHost(
             )
         }
 
-
-        composable(Pantalla.PrivacidadSeguimiento.ruta) {
+        composable(route = Pantalla.PrivacidadSeguimiento.ruta) {
             PrivacidadSeguimiento(
-                onSiguiente = {
-                    navController.navigate(
-                        Pantalla.ReporteGenerado.ruta
-                    )
-                },
                 onAtras = {
-                    navController.popBackStack()
-                }
+                    navController.popBackStack() },
+                onSiguiente = {
+                    navController.navigate(Pantalla.ReporteGenerado.ruta) },
+                onAvisoPrivacidad = {
+                    navController.navigate(Pantalla.AvisoPrivacidad.ruta) }
             )
         }
 

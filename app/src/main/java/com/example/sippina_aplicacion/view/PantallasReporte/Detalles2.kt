@@ -86,10 +86,10 @@ fun Detalles2(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(horizontal = 24.dp)
-            .padding(top = 15.dp, bottom = 43.dp)
             .imePadding()
-            .background(Color(0xFFEAF4FC)),
+            .background(Color(0xFFEAF4FC))
+            .padding(horizontal = 24.dp)
+            .padding(top = 15.dp, bottom = 43.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Column(
