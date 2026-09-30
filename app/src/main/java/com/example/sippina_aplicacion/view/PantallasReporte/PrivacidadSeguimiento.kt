@@ -28,6 +28,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedCard
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -137,7 +138,7 @@ fun PrivacidadSeguimiento(
                 icon = Icons.Default.Person,
                 seleccionado = opcionSeleccionada == "anonimo",
                 onClick = {
-                    viewModel.actualizarOpcionPrivacidad("anonimo")
+                    viewModel.actualizarOpcionPrivacidad("anónimo")
                 }
             )
 
@@ -152,6 +153,28 @@ fun PrivacidadSeguimiento(
                     viewModel.actualizarOpcionPrivacidad("actualizaciones")
                 }
             )
+            if (opcionSeleccionada == "actualizaciones") {
+                Spacer(modifier = Modifier.height(16.dp))
+                Text(
+                    text = "Correo para recibir actualizaciones",
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = colorMorado
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                OutlinedTextField(
+                    value = correo,
+                    onValueChange = { correo = it
+                        viewModel.setCorreoSeguimiento(it)
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    placeholder = { Text("correo@ejemplo.com") },
+                    singleLine = true,
+                    shape = RoundedCornerShape(14.dp)
+                )
+            }
 
             Spacer(modifier = Modifier.height(22.dp))
 
