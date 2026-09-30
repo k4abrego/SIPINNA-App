@@ -49,13 +49,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.sippina_aplicacion.R
 import com.example.sippina_aplicacion.ui.theme.SIPPINAAplicacionTheme
+import com.example.sippina_aplicacion.model.BorradorGuardado
+import com.example.sippina_aplicacion.viewmodel.EstadoReporte
 
 @Composable
 fun Borradores(
     modifier: Modifier = Modifier,
     onAtras: () -> Unit = {},
-    onContinuar: () -> Unit = {},
-    onEliminar: () -> Unit = {}
+    onContinuar: (String) -> Unit = {},
+    onEliminar: (String) -> Unit = {}
 ) {
     Column(
         modifier = modifier
@@ -115,24 +117,43 @@ fun Borradores(
 
         Spacer(modifier = Modifier.height(30.dp))
 
-        BorradorCard(
-            paso = "Descripción del menor",
-            fecha = "Creado: Lun 31 agosto 2026, 12:36 pm",
-            pasoActual = 2,
-            onContinuar = onContinuar,
-            onEliminar = onEliminar
+        val borradores = listOf(
+            BorradorGuardado(
+                id = "1",
+                creadoEn = System.currentTimeMillis(),
+                actualizadoEn = System.currentTimeMillis(),
+                estado = EstadoReporte(
+                    pasoActual = 2
+                )
+            ),
+
+            BorradorGuardado(
+                id = "2",
+                creadoEn = System.currentTimeMillis(),
+                actualizadoEn = System.currentTimeMillis(),
+                estado = EstadoReporte(
+                    pasoActual = 0
+                )
+            )
         )
+        borradores.forEach { borrador ->
+            BorradorCard(
+                paso = when (borrador.estado.pasoActual) {
+                    0 -> "Marcar ubicación"
+                    1 -> "Cuéntanos qué pasó"
+                    2 -> "Descripción del menor"
+                    3 -> "Agregar evidencia"
+                    4 -> "Privacidad y seguimiento"
+                    else -> "Reporte en progreso"
+                },
 
-        Spacer(modifier = Modifier.height(40.dp))
-
-        BorradorCard(
-            paso = "Marcar ubicación",
-            fecha = "Creado: Mar 1 septiembre 2026, 17:33 pm",
-            pasoActual = 0,
-            onContinuar = onContinuar,
-            onEliminar = onEliminar
-        )
-
+                fecha = "Actualizado recientemente",
+                pasoActual = borrador.estado.pasoActual,
+                onContinuar = { onContinuar(borrador.id) },
+                onEliminar = { onEliminar(borrador.id) }
+            )
+            Spacer(modifier = Modifier.height(40.dp))
+        }
         Spacer(modifier = Modifier.height(20.dp))
     }
 }
