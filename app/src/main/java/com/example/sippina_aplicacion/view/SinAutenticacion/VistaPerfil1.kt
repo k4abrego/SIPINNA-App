@@ -45,7 +45,7 @@ fun VistaPerfil1(
     modifier: Modifier = Modifier,
     onAtras: () -> Unit = {},
     onBorradores: () -> Unit = {},
-    onMisReportes: () -> Unit = {},
+    onBuscarReporte: () -> Unit = {},
     onAvisoPrivacidad: () -> Unit = {},
     onCrearCuenta: () -> Unit = {}
 ) {
@@ -139,8 +139,8 @@ fun VistaPerfil1(
                         fontWeight = FontWeight.SemiBold
                     )
                 }
-
-                Button(onClick = onMisReportes,
+                Button(
+                    onClick = onBuscarReporte,
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(50.dp),
@@ -151,7 +151,7 @@ fun VistaPerfil1(
                     )
                 ) {
                     Text(
-                        text = "Mis reportes",
+                        text = "Buscar reporte",
                         fontSize = 20.sp,
                         fontWeight = FontWeight.SemiBold
                     )

@@ -1,4 +1,3 @@
-
 package com.example.sippina_aplicacion.view.PantallasReporte
 
 import android.annotation.SuppressLint
@@ -285,52 +284,8 @@ fun DondeOcurrio(
             }
         }
     }
-    if (mostrarDialogoSalida) {
-        AlertDialog(
-            onDismissRequest = {
-                mostrarDialogoSalida = false
-            },
-            title = {
-                Text(
-                    text = "¿Seguro que deseas salir?",
-                    color = colorMorado,
-                    fontWeight = FontWeight.Bold,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.fillMaxWidth()
-                )
-            },
-            text = {
-                Text(
-                    text = "Tu progreso quedará guardado en Borradores, " +
-                            "disponibles en tu perfil en este dispositivo.",
-                    textAlign = TextAlign.Center
-                )
-            },
-            confirmButton = {
-                Button(
-                    onClick = {
-                        mostrarDialogoSalida = true
-                    },
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = colorMorado
-                    )
-                ) {
-                    Text("Sí, guardar y salir")
-                }
-            },
-            dismissButton = {
-                OutlinedButton(
-                    onClick = {
-                        mostrarDialogoSalida = false
-                    }
-                ) {
-                    Text("No, continuar")
-                }
-            },
-            containerColor = Color(0xFFEAF4FC),
-            shape = RoundedCornerShape(20.dp)
-        )
-    }
+
+
     if (mostrarDialogoSalida) {
 
         AlertDialog(

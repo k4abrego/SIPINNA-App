@@ -49,8 +49,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.sippina_aplicacion.R
 import com.example.sippina_aplicacion.ui.theme.SIPPINAAplicacionTheme
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.drawscope.Fill
@@ -64,7 +62,8 @@ fun VistaPerfil2(
     onMisReportes: () -> Unit = {},
     onAvisoPrivacidad: () -> Unit = {},
     onEliminarCuenta: () -> Unit = {},
-    onEditarPerfil: () -> Unit = {}
+    onEditarPerfil: () -> Unit = {},
+    onNotificaciones: () -> Unit = {}
 ) {
     val morado = Color(0xFF381DC3)
     val fondo = Color(0xFFEAF4FC)
@@ -190,6 +189,24 @@ fun VistaPerfil2(
             ) {
                 Text(
                     text = "Mis reportes",
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.SemiBold
+                )
+            }
+
+            Button(
+                onClick = onNotificaciones,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(55.dp),
+                shape = RoundedCornerShape(15.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color.White,
+                    contentColor = Color(0xFF666666)
+                )
+            ) {
+                Text(
+                    text = "Notificaciones",
                     fontSize = 20.sp,
                     fontWeight = FontWeight.SemiBold
                 )

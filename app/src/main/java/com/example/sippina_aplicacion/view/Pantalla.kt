@@ -1,7 +1,6 @@
 package com.example.sippina_aplicacion.view
 
 import androidx.compose.ui.graphics.vector.ImageVector
-import com.example.sippina_aplicacion.view.PerfilAutenticado.EditarPerfil
 
 
 sealed class Pantalla(
@@ -30,7 +29,8 @@ sealed class Pantalla(
             EditarPerfil,
             Notificaciones,
             BuscarReporte,
-            DetalleReporte,
+            BuscarReporteExis,
+            DetallesReporte,
             ConoceSIPINNA,
             QueSituacionesReportar
         )
@@ -72,9 +72,10 @@ sealed class Pantalla(
     data object AvisoPrivacidad : Pantalla(RUTA_AVISO_PRIVACIDAD,"Aviso de privacidad")
     data object Notificaciones : Pantalla(RUTA_NOTIFICACIONES, "Notificaciones")
     data object BuscarReporte : Pantalla(RUTA_BUSCAR_REPORTE, "Buscar reporte")
-    data object DetalleReporte : Pantalla(RUTA_DETALLE_REPORTE, "Detalle del reporte")
+    data object DetallesReporte : Pantalla(RUTA_DETALLE_REPORTE, "Detalles del reporte")
     data object ConoceSIPINNA : Pantalla(RUTA_CONOCE_SIPINNA, "Conoce SIPINNA")
     data object QueSituacionesReportar : Pantalla(RUTA_QUE_SITUACIONES_REPORTAR, "Qué situaciones reportar")
     data object EditarPerfil : Pantalla(RUTA_EDITAR_PERFIL, "EditarPerfil")
+    data object BuscarReporteExis : Pantalla("BuscarReporteExis","Buscar reporte existente")
 
 }

@@ -85,7 +85,7 @@ fun AppNavHost(
     fun abrirDetalleReporte(folio: String) {
 
         navController.navigate(
-            "${Pantalla.DetalleReporte.ruta}/${Uri.encode(folio)}"
+            "${Pantalla.DetallesReporte.ruta}/${Uri.encode(folio)}"
         )
     }
 
@@ -189,9 +189,9 @@ fun AppNavHost(
                     )
                 },
 
-                onMisReportes = {
+                onBuscarReporte = {
                     navController.navigate(
-                        Pantalla.MisReportes.ruta
+                        Pantalla.BuscarReporteExis.ruta
                     )
                 },
 
@@ -251,6 +251,12 @@ fun AppNavHost(
                 onMisReportes = {
                     navController.navigate(
                         Pantalla.MisReportes.ruta
+                    )
+                },
+
+                onNotificaciones = {
+                    navController.navigate(
+                        Pantalla.Notificaciones.ruta
                     )
                 },
 
@@ -314,19 +320,21 @@ fun AppNavHost(
             )
         }
 
-        composable(Pantalla.BuscarReporte.ruta) {
+        composable(Pantalla.BuscarReporteExis.ruta) {
             BuscarReporteExistente(
                 onAtras = {
                     navController.popBackStack()
                 },
                 onVerDetalleReporte = { folio ->
-                    abrirDetalleReporte(folio)
+                    navController.navigate(
+                        Pantalla.DetallesReporte.ruta
+                    )
                 }
             )
         }
 
         composable(
-            route = "${Pantalla.DetalleReporte.ruta}/{folio}",
+            route = "${Pantalla.DetallesReporte.ruta}/{folio}",
             arguments = listOf(
                 navArgument("folio") {
                     type = NavType.StringType
