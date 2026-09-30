@@ -52,6 +52,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.sippina_aplicacion.R
 import com.example.sippina_aplicacion.ui.theme.SIPPINAAplicacionTheme
@@ -75,6 +76,7 @@ fun PrivacidadSeguimiento(
 
 
     val state by viewModel.uiState.collectAsState()
+    var correo by remember { mutableStateOf(state.correoSeguimiento) }
     val opcionSeleccionada = state.opcionPrivacidad
 
     Column(

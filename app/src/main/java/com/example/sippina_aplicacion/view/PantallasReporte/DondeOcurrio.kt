@@ -59,7 +59,6 @@ fun DondeOcurrio(
     onAtras: () -> Unit = {}
 ) {
 
-
     val state by viewModel.uiState.collectAsState()
 
     var mostrarDialogoSalida by remember {
@@ -310,8 +309,7 @@ fun DondeOcurrio(
             confirmButton = {
                 Button(
                     onClick = {
-                        mostrarDialogoSalida = false
-                        onAtras()
+                        mostrarDialogoSalida = true
                     },
                     colors = ButtonDefaults.buttonColors(
                         containerColor = colorMorado
@@ -331,6 +329,54 @@ fun DondeOcurrio(
             },
             containerColor = Color(0xFFEAF4FC),
             shape = RoundedCornerShape(20.dp)
+        )
+    }
+    if (mostrarDialogoSalida) {
+
+        AlertDialog(
+            onDismissRequest = {
+                mostrarDialogoSalida = false
+            },
+
+            title = {
+                Text(
+                    text = "¿Seguro que deseas salir?",
+                    color = colorMorado,
+                    fontWeight = FontWeight.Bold
+                )
+            },
+
+            text = {
+                Text(
+                    text = "Tu progreso quedará guardado en Borradores, " +
+                            "disponibles en tu perfil en este dispositivo."
+                )
+            },
+
+            confirmButton = {
+
+                Button(
+                    onClick = {
+                        mostrarDialogoSalida = false
+                        onAtras()
+                    },
+
+                    colors = ButtonDefaults.buttonColors(containerColor = colorMorado)
+                ) {
+                    Text(text = "Sí, guardar y salir")
+                }
+            },
+
+            dismissButton = {
+                OutlinedButton(
+                    onClick = { mostrarDialogoSalida = false }
+                ) {
+
+                    Text(text = "No, continuar")
+                }
+            },
+            shape = RoundedCornerShape(20.dp),
+            containerColor = Color(0xFFEAF4FC)
         )
     }
 }
