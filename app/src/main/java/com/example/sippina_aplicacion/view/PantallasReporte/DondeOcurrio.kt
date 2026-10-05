@@ -32,6 +32,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.activity.compose.BackHandler
 import androidx.compose.material3.AlertDialog
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -48,6 +49,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.sippina_aplicacion.R
 import com.example.sippina_aplicacion.ui.theme.SIPPINAAplicacionTheme
 import com.example.sippina_aplicacion.viewmodel.ReporteVM
+import androidx.compose.ui.platform.LocalContext
 
 @SuppressLint("MissingPermission")
 @Composable
@@ -57,8 +59,13 @@ fun DondeOcurrio(
     onSiguiente: () -> Unit = {},
     onAtras: () -> Unit = {}
 ) {
+    val appContext = LocalContext.current
 
     val state by viewModel.uiState.collectAsState()
+
+    LaunchedEffect(Unit) {
+        viewModel.iniciarlizarBorradorStorage(appContext)
+    }
 
     var mostrarDialogoSalida by remember {
         mutableStateOf(false)
@@ -313,6 +320,7 @@ fun DondeOcurrio(
                 Button(
                     onClick = {
                         mostrarDialogoSalida = false
+                        viewModel.guardarBorrador()
                         onAtras()
                     },
 

@@ -1,27 +1,74 @@
 package com.example.sippina_aplicacion.model.Autenticacion
-
+import android.util.Base64
 import java.security.MessageDigest
 
 // Se crea el repositorio de autenticacion en donde se definen los metodos de autenticacion
 class AuthRepository(
-    private val api: AutentificacionAPI = ServicioRemoto.autentificacionAPI
+    private val api: AutenticacionAPI = ServicioRemoto.autenticacionAPI
 ) {
-    private fun String.toSha256(): String {
-        val bytes = MessageDigest.getInstance("SHA-256").digest(this.toByteArray(Charsets.UTF_8))
-        return bytes.joinToString("") { "%02x".format(it) }
+    private fun String.toSha256Bytes(): ByteArray {
+        return MessageDigest.getInstance("SHA-256").digest(this.toByteArray(Charsets.UTF_8))
     }
-    // Este metodo se debe de usar para iniciar sesion en el viewModel
-    suspend fun iniciarSesion(correo: String, pass: String): Result<AuthResponse> {
+
+    private fun resolverReto(challengeStr: String, passwordSha256: ByteArray): String {
+        val challengeBytes = challengeStr.toByteArray(Charsets.UTF_8)
+        val digest = MessageDigest.getInstance("SHA-256")
+        digest.update(challengeBytes)
+        val respuestaBytes = digest.digest(passwordSha256)
+        return Base64.encodeToString(respuestaBytes, Base64.NO_WRAP)
+    }
+
+    suspend fun iniciarSesion(correo: String, pass: String): Result<String> {
         return try {
-            val request = LoginRequest(
-                correo = correo,
-                contrasena = pass.toSha256()
+            val respuestaReto = api.solicitarReto(correo)
+            if (!respuestaReto.isSuccessful || respuestaReto.body() == null) {
+                return Result.failure(Exception("Usuario no encontrado o correo inválido"))
+            }
+            val retoData = respuestaReto.body()!!
+            val passHash = pass.toSha256Bytes()
+
+            val respuestaBase64 = resolverReto(retoData.challenge, passHash)
+
+            val verifyInput = VerifyChallengeInput(
+                userId = retoData.userId,
+                response = respuestaBase64
             )
-            val response = api.login(request)
+
+            val respuestaLogin = api.verificarReto(verifyInput)
+            if (respuestaLogin.isSuccessful && respuestaLogin.body() != null) {
+                // Guarda el token generado por el backend Go
+                val token = respuestaLogin.body()!!.token
+                SessionManager.guardarSesion(token)
+                Result.success(token)
+            } else {
+                Result.failure(Exception("Credenciales inválidas"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    // Registro de usuario en Go
+    suspend fun registrarUsuario(
+        correo: String,
+        contrasena:String,
+        nombre: String,
+        apellidos: String,
+        telefono: String?,
+    ): Result<RegistroResponse> {
+        return try {
+            val request = RegistroInput(
+                nombre = nombre,
+                apellido = apellidos,
+                correo = correo,
+                contrasena = contrasena,
+                telefono = telefono
+            )
+            val response = api.registrar(request)
             if (response.isSuccessful && response.body() != null) {
                 Result.success(response.body()!!)
             } else {
-                Result.failure(Exception("Error de autenticación: ${response.code()}"))
+                Result.failure(Exception("Error al registrar: ${response.code()}"))
             }
         } catch (e: Exception) {
             Result.failure(e)
@@ -29,25 +76,57 @@ class AuthRepository(
     }
 
 
-    // Tambien este metodo se debe de usar para registrar un usuario en el viewModel
-    suspend fun registrarUsuario(
-        correo: String,
-        contrasena: String,
-        nombre: String,
-        apellidos: String,
-        telefono: String?
-    ): Result<AuthResponse> {
+    suspend fun obtenerPerfil(token : String):Result<UsuarioPerfilModel>{
         return try {
-            val request = RegistroRequest(correo = correo, contrasena = contrasena.toSha256(), nombre = nombre, apellidos = apellidos, telefono = telefono)
-            val response = api.registrarUsuario(request)
-            if(response.isSuccessful && response.body() != null){
-                Result.success(response.body()!!)
-            }else{
-                Result.failure(Exception("Error de autenticación: ${response.code()}"))
-            }
-        }catch (e: Exception){
+            Result.failure(Exception("Error al obtener el perfil"))
+        }catch(e:Exception){
             Result.failure(e)
-            }
+
+        }
+    }
+
+    suspend fun actualizarPerfil(token:String , nombre:String, apellidos:String, telefono:String?):Result<UsuarioPerfilModel>{
+        return try{
+            Result.failure(Exception("Error no se implemento el API"))
+
+        }catch (e:Exception)
+        {Result.failure(e)
+        }
+    }
+
+
+    suspend fun recuperarContrasena(correo:String):Result<RespuestaBase>{
+        return try {
+            Result.failure(Exception("Método no implementado en API"))
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+
+    suspend fun eliminarCuenta(token:String):Result<Unit>{
+        return try{
+            Result.success(Unit)
+        }catch(e:Exception) {
+            Result.failure(e)
+
         }
 
     }
+
+    suspend fun cerrarSesion(token:String):Result<Unit>{
+        SessionManager.cerrarSesion()
+        return Result.success(Unit)
+        }
+
+
+
+
+
+
+
+
+
+
+
+}

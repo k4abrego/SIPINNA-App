@@ -1,6 +1,7 @@
 
 package com.example.sippina_aplicacion.view.reportes
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -69,6 +70,11 @@ fun Detalles(
 ) {
 
     val state by viewModel.uiState.collectAsState()
+
+    //Este es para el manejo de boton de retroceso
+    BackHandler() {
+        onAtras()
+    }
 
     val colorMorado = Color(0xFF381DC3)
     val colorFondo = Color(0xFFEAF4FC)
@@ -447,6 +453,7 @@ fun Detalles(
                             .isNotBlank()
                     ) {
                         mostrarError = false
+                        viewModel.irAlPrimerMenor()
                         onSiguiente()
                     } else {
                         mostrarError = true

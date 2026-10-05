@@ -37,11 +37,17 @@ import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -52,12 +58,37 @@ import com.example.sippina_aplicacion.ui.theme.SIPPINAAplicacionTheme
 import com.example.sippina_aplicacion.model.BorradorGuardado
 import com.example.sippina_aplicacion.viewmodel.EstadoReporte
 
+
+// Principalemnte es la pantalla principal que conecta la logica de SharedPreferences de la UI
+@Composable
+fun BorradoresScreen(
+    onAtras: () -> Unit = {},
+    onContinuar: () -> Unit = {}
+) {
+    val context = LocalContext.current
+    val borradorStorage = remember { BorradorGuardado(context) }
+
+    // Se obtiene  el borrador guardado localmente
+    var borradorActual by remember { mutableStateOf(borradorStorage.obtenerBorradorLocal()) }
+
+    Borradores(
+        borrador = borradorActual,
+        onAtras = onAtras,
+        onContinuar = onContinuar,
+        onEliminar = {
+            borradorStorage.eliminarBorradorLocal()
+            borradorActual = null // Actualiza la UI para mostrar una pantalla vacia
+        }
+    )
+}
+
 @Composable
 fun Borradores(
     modifier: Modifier = Modifier,
+    borrador: EstadoReporte? = null,
     onAtras: () -> Unit = {},
-    onContinuar: (String) -> Unit = {},
-    onEliminar: (String) -> Unit = {}
+    onContinuar: () -> Unit = {},
+    onEliminar: () -> Unit = {}
 ) {
     Column(
         modifier = modifier
@@ -117,46 +148,45 @@ fun Borradores(
 
         Spacer(modifier = Modifier.height(30.dp))
 
-        val borradores = listOf(
-            BorradorGuardado(
-                id = "1",
-                creadoEn = System.currentTimeMillis(),
-                actualizadoEn = System.currentTimeMillis(),
-                estado = EstadoReporte(
-                    pasoActual = 2
-                )
-            ),
+        if (borrador != null) {
+            val nombrePaso = when (borrador.pasoActual) {
+                0 -> "Marcar ubicación"
+                1 -> "Cuéntanos qué pasó"
+                2 -> "Descripción del menor"
+                3 -> "Agregar evidencia"
+                4 -> "Privacidad y seguimiento"
+                else -> "Reporte en progreso"
+            }
 
-            BorradorGuardado(
-                id = "2",
-                creadoEn = System.currentTimeMillis(),
-                actualizadoEn = System.currentTimeMillis(),
-                estado = EstadoReporte(
-                    pasoActual = 0
-                )
-            )
-        )
-        borradores.forEach { borrador ->
             BorradorCard(
-                paso = when (borrador.estado.pasoActual) {
-                    0 -> "Marcar ubicación"
-                    1 -> "Cuéntanos qué pasó"
-                    2 -> "Descripción del menor"
-                    3 -> "Agregar evidencia"
-                    4 -> "Privacidad y seguimiento"
-                    else -> "Reporte en progreso"
-                },
-
-                fecha = "Actualizado recientemente",
-                pasoActual = borrador.estado.pasoActual,
-                onContinuar = { onContinuar(borrador.id) },
-                onEliminar = { onEliminar(borrador.id) }
+                paso = nombrePaso,
+                fecha = "Guardado en este dispositivo",
+                pasoActual = borrador.pasoActual,
+                onContinuar = onContinuar,
+                onEliminar = onEliminar
             )
-            Spacer(modifier = Modifier.height(40.dp))
+        } else {
+            Box(
+                modifier = modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = "No hay reportes pendientes de completar",
+                    color = Color.Gray,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Medium,
+                    textAlign = TextAlign.Center
+
+                )
+            }
+            }
+        Spacer(modifier = modifier.height(20.dp))
+
         }
-        Spacer(modifier = Modifier.height(20.dp))
+
     }
-}
 
 @Composable
 fun BorradorCard(
@@ -165,8 +195,8 @@ fun BorradorCard(
     pasoActual: Int,
     onContinuar: () -> Unit = {},
     onEliminar: () -> Unit = {}
-) {
-
+)
+{
     val morado = Color(0xFF3D27C9)
 
     val iconos = listOf(
@@ -187,7 +217,9 @@ fun BorradorCard(
         )
     ) {
         Column(
-            modifier = Modifier.fillMaxSize().padding(16.dp)
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp)
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically
@@ -201,8 +233,7 @@ fun BorradorCard(
 
                 Spacer(modifier = Modifier.width(12.dp))
 
-                Column(modifier = Modifier.weight(1f))
-                {
+                Column(modifier = Modifier.weight(1f)) {
                     Text(
                         text = "Reporte en progreso",
                         color = morado,
@@ -229,9 +260,10 @@ fun BorradorCard(
 
             Spacer(modifier = Modifier.height(14.dp))
 
-            Box(modifier = Modifier
-                .fillMaxWidth()
-                .height(38.dp),
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(38.dp),
                 contentAlignment = Alignment.Center
             ) {
                 Box(
@@ -253,17 +285,15 @@ fun BorradorCard(
                             modifier = Modifier
                                 .size(36.dp)
                                 .background(
-                                    color = if (completado) { morado
-                                    } else { Color(0xFFE5E5E5)
-                                    }, shape = CircleShape
+                                    color = if (completado) morado else Color(0xFFE5E5E5),
+                                    shape = CircleShape
                                 ),
                             contentAlignment = Alignment.Center
                         ) {
                             Icon(
                                 imageVector = icono,
                                 contentDescription = "Etapa ${index + 1}",
-                                tint = if (completado) { Color.White
-                                } else { morado },
+                                tint = if (completado) Color.White else morado,
                                 modifier = Modifier.size(22.dp)
                             )
                         }
@@ -285,7 +315,6 @@ fun BorradorCard(
                         .height(40.dp),
                     shape = RoundedCornerShape(25.dp),
                     border = BorderStroke(1.dp, Color.Red),
-
                     colors = ButtonDefaults.outlinedButtonColors(
                         containerColor = Color.White,
                         contentColor = Color.Red
@@ -305,6 +334,7 @@ fun BorradorCard(
                         fontWeight = FontWeight.Bold
                     )
                 }
+
                 Button(
                     onClick = onContinuar,
                     modifier = Modifier
@@ -325,7 +355,9 @@ fun BorradorCard(
             }
         }
     }
+
 }
+
 
 @Preview(
     showBackground = true,
@@ -335,6 +367,7 @@ fun BorradorCard(
 fun BorradoresPreview() {
 
     SIPPINAAplicacionTheme {
-        Borradores()
+        Borradores(
+        )
     }
 }

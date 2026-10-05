@@ -18,10 +18,13 @@ import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -35,6 +38,7 @@ import androidx.compose.ui.unit.sp
 //import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.sippina_aplicacion.R
 import com.example.sippina_aplicacion.ui.theme.SIPPINAAplicacionTheme
+
 //import com.example.sippina_aplicacion.viewmodel.ReporteVM
 val colorMorado = Color(0xFF381DC3)
 
@@ -42,6 +46,13 @@ val colorMorado = Color(0xFF381DC3)
 fun PantallaInicio(
     modifier: Modifier = Modifier,
     mostrarNotificaciones: Boolean = false,
+
+    // Parte para la visualizacion del ultimo reporte
+    ultimoReporteFolio :String? = null,
+    ultimoReporteEstatus: String? = null,
+
+
+
     //viewModel: ReporteVM = viewModel(),
     accionBoton: () -> Unit = {},
     onNavegarAReporte: () -> Unit = {},
@@ -49,7 +60,17 @@ fun PantallaInicio(
     onNavegarANotificaciones: () -> Unit = {},
     onQueSituacionesReportar: () -> Unit = {},
     onConoceSIPINNA: () -> Unit = {},
-    onBuscarReporte: () -> Unit = {}
+    onBuscarReporte: () -> Unit = {},
+
+    // Este es cuando esta registrado
+    onNavegarALogin: () -> Unit = {},
+
+    onNavegarCrearCuenta:() -> Unit = {},
+
+    // Estas son las navegaciones de la tarjeta
+    onVerTodosReportes : () -> Unit = {},
+    onAbrirUltimoReporte:(String) -> Unit = {},
+
 ) {
     Box(
         modifier = modifier
@@ -125,34 +146,108 @@ fun PantallaInicio(
                 fontSize = 20.sp
             )
 
-            Spacer(modifier = Modifier.height(250.dp))
+            Spacer(modifier = Modifier.weight(1f))
+
+            if (mostrarNotificaciones && ultimoReporteFolio != null) {
+                Card(
+                    onClick = { onAbrirUltimoReporte(ultimoReporteFolio) },
+                    modifier = Modifier.fillMaxWidth().padding(16.dp),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = CardDefaults.cardColors(containerColor = Color(0xFFCFE1F5)),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+                ) {
+                    Column(modifier = Modifier.padding(18.dp)) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = "Tus reportes",
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 16.sp,
+                                color = Color.Black
+                            )
+
+                            // Botón "Ver todos >" que navega a MisReportes
+                            TextButton(onClick = onVerTodosReportes) {
+                                Text(
+                                    text = "Ver todos >",
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 14.sp,
+                                    color = Color.Black
+                                )
+                            }
+                        }
+
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        Text(
+                            text = ultimoReporteFolio,
+                            fontSize = 26.sp,
+                            fontWeight = FontWeight.ExtraBold,
+                            color = colorMorado
+                        )
+
+                        Spacer(modifier = Modifier.height(12.dp))
+
+                        Text(
+                            text = ultimoReporteEstatus ?: "Reporte en proceso",
+                            fontSize = 12.sp,
+                            color = Color.DarkGray,
+                            modifier = Modifier.align(Alignment.End)
+                        )
+                    }
+                }
+            }
 
             Column(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth().padding(top = 1.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
 
-                ElevatedButton(onClick = { onNavegarAReporte() },
-                    modifier = Modifier.height(50.dp).fillMaxWidth(),
+                if(!mostrarNotificaciones){
+                    ElevatedButton(
+                        onClick = { onNavegarALogin() },
+                        modifier = Modifier
+                            .height(50.dp)
+                            .fillMaxWidth(),
+                        shape = RoundedCornerShape(20.dp))
+                    {
+                        Text(
+                            text = "Iniciar Sesión / Crear Cuenta",
+                            color = colorMorado,
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                }
+
+                ElevatedButton(
+                    onClick = { onNavegarAReporte() },
+                    modifier = Modifier
+                        .height(50.dp)
+                        .fillMaxWidth(),
                     shape = RoundedCornerShape(20.dp),
                     colors = ButtonDefaults.elevatedButtonColors(
                         containerColor = colorMorado
                     )
                 ) {
                     Text(
-                        text = "Generar un reporte",
+                        text = "Generar un reporte anónimo",
                         color = Color.White,
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold
                     )
                 }
 
-                ElevatedButton(onClick = onQueSituacionesReportar ,
-                    modifier = Modifier.height(50.dp).fillMaxWidth(),
-                    shape = RoundedCornerShape(20.dp),
-                    colors = ButtonDefaults.elevatedButtonColors(
-                        containerColor = Color(0xCCDDE9))
+                ElevatedButton(
+                    onClick = onQueSituacionesReportar,
+                    modifier = Modifier
+                        .height(50.dp)
+                        .fillMaxWidth(),
+                    shape = RoundedCornerShape(20.dp)
                 ) {
                     Text(
                         text = "¿Qué situaciones debo de reportar?",
@@ -162,11 +257,12 @@ fun PantallaInicio(
                     )
                 }
 
-                ElevatedButton(onClick = onConoceSIPINNA,
-                    modifier = Modifier.height(50.dp).fillMaxWidth(),
-                    shape = RoundedCornerShape(20.dp),
-                    colors = ButtonDefaults.elevatedButtonColors(
-                        containerColor = Color(0xCCDDE9))
+                ElevatedButton(
+                    onClick = onConoceSIPINNA,
+                    modifier = Modifier
+                        .height(50.dp)
+                        .fillMaxWidth(),
+                    shape = RoundedCornerShape(20.dp)
                 ) {
                     Text(
                         text = "Conoce más de SIPINNA",
@@ -176,8 +272,11 @@ fun PantallaInicio(
                     )
                 }
 
-                ElevatedButton(onClick = { accionBoton() },
-                    modifier = Modifier.height(50.dp).fillMaxWidth(),
+                ElevatedButton(
+                    onClick = { accionBoton() },
+                    modifier = Modifier
+                        .height(50.dp)
+                        .fillMaxWidth(),
                     shape = RoundedCornerShape(20.dp),
                     colors = ButtonDefaults.elevatedButtonColors(
                         containerColor = Color(0xFFC01B1E)
@@ -195,13 +294,13 @@ fun PantallaInicio(
     }
 }
 
-@Preview (
+@Preview(
     showBackground = true,
     showSystemUi = true
 )
 
 @Composable
-fun PantallaPreview () {
+fun PantallaPreview() {
     SIPPINAAplicacionTheme {
         PantallaInicio()
     }

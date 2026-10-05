@@ -47,6 +47,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.sippina_aplicacion.R
 import com.example.sippina_aplicacion.ui.theme.SIPPINAAplicacionTheme
+import com.example.sippina_aplicacion.view.PantallasReporte.BarraDePasos
 
 
 @Composable
@@ -428,6 +429,17 @@ fun DetalleReportePreview() {
         DetalleReporte(
             estadoActual = 0
         )
+    }
+}
+
+// Esta es una funcion auxiliar para convertir el texto del backend al numero de paso de la barra
+fun mapearEstatusAInt(estatus: String): Int {
+    return when (estatus.lowercase().trim()) {
+        "enviado", "recibido" -> 0
+        "en revisión", "en revision" -> 1
+        "en proceso", "en atención", "en atencion" -> 2
+        "cerrado", "concluido" -> 3
+        else -> 0
     }
 }
 
