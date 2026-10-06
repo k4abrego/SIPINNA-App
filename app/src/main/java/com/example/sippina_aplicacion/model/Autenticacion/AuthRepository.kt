@@ -6,7 +6,7 @@ import java.security.MessageDigest
 class AuthRepository(
     private val api: AutenticacionAPI = ServicioRemoto.autenticacionAPI
 ) {
-    private fun String.toSha256Bytes(): ByteArray {
+    private fun String.toMacSha256(): ByteArray {
         return MessageDigest.getInstance("SHA-256").digest(this.toByteArray(Charsets.UTF_8))
     }
 
@@ -25,7 +25,7 @@ class AuthRepository(
                 return Result.failure(Exception("Usuario no encontrado o correo inválido"))
             }
             val retoData = respuestaReto.body()!!
-            val passHash = pass.toSha256Bytes()
+            val passHash = pass.toMacSha256()
 
             val respuestaBase64 = resolverReto(retoData.challenge, passHash)
 
@@ -118,15 +118,4 @@ class AuthRepository(
         SessionManager.cerrarSesion()
         return Result.success(Unit)
         }
-
-
-
-
-
-
-
-
-
-
-
 }
