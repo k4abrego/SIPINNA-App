@@ -23,6 +23,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButtonDefaults
@@ -43,59 +44,38 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.sippina_aplicacion.R
 import com.example.sippina_aplicacion.ui.theme.SIPPINAAplicacionTheme
+import com.example.sippina_aplicacion.viewmodel.EstadoNotificacion
 
 
 // datos temporales de notificaciones
-private data class NotificacionTemporal(
-    val id: Int,
-    val titulo: String,
-    val descripcion: String,
-    val fecha: String,
-    val folio: String,
-    val leida: Boolean = false
-)
 
 
 @Composable
 fun Notificaciones(
+    modifier: Modifier = Modifier,
+    notificaciones: List<EstadoNotificacion> = emptyList(),
+    cargando: Boolean = false,
     onAtras: () -> Unit = {},
-
-    //se ejecutará cuando el usuario seleccione un reporte
-    onAbrirReporte: (String) -> Unit = {}
+    // se ejecutará cuando el usuario seleccione un reporte
+    onAbrirReporte: (String) -> Unit = {},
+    onMarcarLeida: (Int) -> Unit = {}
 ) {
     val morado = Color(0xFF3D27C9)
     val fondo = Color(0xFFEAF4FC)
 
-    //temporal
-    val notificaciones = remember {
-        mutableStateListOf(
-            NotificacionTemporal(
-                id = 1,
-                titulo = "Reporte actualizado",
-                descripcion = "Tu reporte REP-1234-1234 cambió a En revisión.",
-                fecha = "Hace 10 min",
-                folio = "REP-1234-1234"
-            ),
-            NotificacionTemporal(
-                id = 2,
-                titulo = "Caso recibido",
-                descripcion = "Se recibió correctamente tu reporte con folio REP-1234-1234",
-                fecha = "Ayer",
-                folio = "REP-1234-1234"
-            )
-        )
-    }
     Box(
-        modifier = Modifier.fillMaxSize()
+        modifier = modifier
+            .fillMaxSize()
+            .background(fondo)
     ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(fondo)
                 .verticalScroll(rememberScrollState())
                 .padding(horizontal = 24.dp, vertical = 20.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            // Cabecera con botón atrás y logo
             Box(
                 modifier = Modifier.fillMaxWidth(),
                 contentAlignment = Alignment.Center
@@ -105,7 +85,10 @@ fun Notificaciones(
                     modifier = Modifier
                         .size(50.dp)
                         .align(Alignment.CenterStart),
-                    colors = IconButtonDefaults.filledIconButtonColors(containerColor = fondo, contentColor = morado)
+                    colors = IconButtonDefaults.filledIconButtonColors(
+                        containerColor = fondo,
+                        contentColor = morado
+                    )
                 ) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
@@ -132,10 +115,13 @@ fun Notificaciones(
 
             Spacer(modifier = Modifier.height(25.dp))
 
-            //lista de notificaciones
-
-            if (notificaciones.isEmpty()) {
-
+            // Estado de carga
+            if (cargando) {
+                Spacer(modifier = Modifier.height(40.dp))
+                CircularProgressIndicator(color = morado)
+            }
+            // Estado sin notificaciones
+            else if (notificaciones.isEmpty()) {
                 Spacer(modifier = Modifier.height(35.dp))
 
                 Icon(
@@ -153,58 +139,41 @@ fun Notificaciones(
                     color = Color.DarkGray,
                     textAlign = TextAlign.Center
                 )
-
-            } else {
-                notificaciones.forEachIndexed { index, notificacion ->
-
-                    //animacioness
+            }
+            // Lista dinámica recibida por parámetros
+            else {
+                notificaciones.forEach { notificacion ->
 
                     val colorTarjeta by animateColorAsState(
-                        targetValue = if (notificacion.leida) {
-                            Color.White
-                        } else {
-                            Color(0xFFF7F5FF)
-                        },
+                        targetValue = if (notificacion.leida) Color.White else Color(0xFFF7F5FF),
                         animationSpec = tween(durationMillis = 350),
                         label = "AnimacionFondoNotificacion"
                     )
 
-                    //para el borde
                     val colorBorde by animateColorAsState(
-                        targetValue = if (notificacion.leida) {
-                            Color(0xFFB6AFE8)
-                        } else { morado
-                        },
+                        targetValue = if (notificacion.leida) Color(0xFFB6AFE8) else morado,
                         animationSpec = tween(durationMillis = 350),
                         label = "AnimacionBordeNotificacion"
                     )
 
-                    //para el ícono
                     val colorIcono by animateColorAsState(
-                        targetValue = if (notificacion.leida) {
-                            Color(0xFF9289CC)
-                        } else { morado
-                        },
+                        targetValue = if (notificacion.leida) Color(0xFF9289CC) else morado,
                         animationSpec = tween(durationMillis = 350),
                         label = "AnimacionIconoNotificacion"
                     )
 
-                    //esto ya es la tarjeta
-                    OutlinedCard(shape = RoundedCornerShape(16.dp),
+                    OutlinedCard(
+                        shape = RoundedCornerShape(16.dp),
                         border = BorderStroke(width = 1.5.dp, color = colorBorde),
                         colors = CardDefaults.outlinedCardColors(containerColor = colorTarjeta),
                         onClick = {
-                            //marca la notificación como leída
                             if (!notificacion.leida) {
-                                notificaciones[index] =
-                                    notificacion.copy(
-                                        leida = true
-                                    )
+                                onMarcarLeida(notificacion.id)
                             }
-                            //solicita la apertura del reporte
-                            onAbrirReporte(notificacion.folio)
+                            if (notificacion.folio.isNotBlank()) {
+                                onAbrirReporte(notificacion.folio)
+                            }
                         },
-
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         Row(
@@ -223,16 +192,10 @@ fun Notificaciones(
                                     Text(
                                         text = notificacion.titulo,
                                         fontSize = 17.sp,
-                                        fontWeight = if (notificacion.leida) {
-                                            FontWeight.Medium
-                                        } else {
-                                            FontWeight.Bold
-                                        },
+                                        fontWeight = if (notificacion.leida) FontWeight.Medium else FontWeight.Bold,
                                         color = Color.DarkGray,
                                         modifier = Modifier.weight(1f, fill = false)
                                     )
-
-                                    //notificaiocn no leída
 
                                     if (!notificacion.leida) {
                                         Box(
@@ -267,10 +230,7 @@ fun Notificaciones(
 
                             Icon(
                                 imageVector = Icons.Outlined.Notifications,
-                                contentDescription = if (notificacion.leida) { "Notificación leída"
-                                } else {
-                                    "Notificación sin leer"
-                                },
+                                contentDescription = if (notificacion.leida) "Notificación leída" else "Notificación sin leer",
                                 tint = colorIcono,
                                 modifier = Modifier.size(35.dp)
                             )

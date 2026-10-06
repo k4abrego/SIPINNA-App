@@ -1,5 +1,6 @@
 package com.example.sippina_aplicacion.view.PantallasReporte
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -22,6 +23,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -54,6 +56,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.sippina_aplicacion.R
 import com.example.sippina_aplicacion.ui.theme.SIPPINAAplicacionTheme
@@ -75,10 +78,21 @@ fun PrivacidadSeguimiento(
     val colorFondoBotonAtras = Color(0xFFE2E2E2)
     val colorTextoBotonAtras = Color(0xFF5A5A5A)
 
-
     val state by viewModel.uiState.collectAsState()
     var correo by remember { mutableStateOf(state.correoSeguimiento) }
     val opcionSeleccionada = state.opcionPrivacidad
+
+    // Estado para controlar la visualización de errores
+    var mostrarErrorCorreo by remember { mutableStateOf(false) }
+
+    // Evaluaciones de estado para la validación
+    val requiereCorreo = opcionSeleccionada == "actualizaciones"
+    val correoVacio = correo.trim().isEmpty()
+    val tieneError = mostrarErrorCorreo && requiereCorreo && correoVacio
+
+    val context = LocalContext.current
+
+    BackHandler { onAtras() }
 
     Column(
         modifier = modifier
@@ -136,8 +150,9 @@ fun PrivacidadSeguimiento(
                 titulo = "Reporte anónimo",
                 descripcion = "Podrás consultar tu reporte con el folio y el código privado, sin proporcionar tus datos de contacto.",
                 icon = Icons.Default.Person,
-                seleccionado = opcionSeleccionada == "anonimo",
+                seleccionado = opcionSeleccionada == "anonimo" || opcionSeleccionada == "anónimo",
                 onClick = {
+                    mostrarErrorCorreo = false
                     viewModel.actualizarOpcionPrivacidad("anónimo")
                 }
             )
@@ -153,25 +168,51 @@ fun PrivacidadSeguimiento(
                     viewModel.actualizarOpcionPrivacidad("actualizaciones")
                 }
             )
+
             if (opcionSeleccionada == "actualizaciones") {
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(
                     text = "Correo para recibir actualizaciones",
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Bold,
-                    color = colorMorado
+                    color = if (tieneError) Color.Red else colorMorado,
+                    modifier = Modifier.fillMaxWidth()
                 )
 
                 Spacer(modifier = Modifier.height(8.dp))
 
                 OutlinedTextField(
                     value = correo,
-                    onValueChange = { correo = it
-                        viewModel.setCorreoSeguimiento(it)
+                    onValueChange = { nuevoTexto ->
+                        correo = nuevoTexto
+                        viewModel.setCorreoSeguimiento(nuevoTexto)
+                        if (nuevoTexto.trim().isNotBlank()) {
+                            mostrarErrorCorreo = false
+                        }
                     },
                     modifier = Modifier.fillMaxWidth(),
                     placeholder = { Text("correo@ejemplo.com") },
                     singleLine = true,
+                    isError = tieneError,
+                    supportingText = {
+                        if (tieneError) {
+                            Text(
+                                text = "* Por favor ingresa un correo para recibir actualizaciones",
+                                color = Color.Red,
+                                fontSize = 12.sp,
+                                fontWeight = FontWeight.Medium
+                            )
+                        }
+                    },
+                    trailingIcon = {
+                        if (tieneError) {
+                            Icon(
+                                imageVector = Icons.Default.Error,
+                                contentDescription = "Error de correo",
+                                tint = Color.Red
+                            )
+                        }
+                    },
                     shape = RoundedCornerShape(14.dp)
                 )
             }
@@ -215,6 +256,7 @@ fun PrivacidadSeguimiento(
             )
             Spacer(modifier = Modifier.height(12.dp))
         }
+
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -225,7 +267,9 @@ fun PrivacidadSeguimiento(
             Button(
                 onClick = onAtras,
                 shape = CircleShape,
-                colors = ButtonDefaults.buttonColors(containerColor = colorFondoBotonAtras, contentColor = colorTextoBotonAtras
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = colorFondoBotonAtras,
+                    contentColor = colorTextoBotonAtras
                 ),
                 modifier = Modifier
                     .weight(1f)
@@ -239,7 +283,17 @@ fun PrivacidadSeguimiento(
             }
 
             Button(
-                onClick = onSiguiente,
+                onClick = {
+                    val esInvalido = requiereCorreo && correoVacio
+
+                    if (esInvalido) {
+                        mostrarErrorCorreo = true
+                    } else {
+                        mostrarErrorCorreo = false
+                        viewModel.enviarReporteAlBackEnd(context = context)
+                        onSiguiente()
+                    }
+                },
                 shape = CircleShape,
                 colors = ButtonDefaults.buttonColors(
                     containerColor = colorFondoBotonSiguiente,

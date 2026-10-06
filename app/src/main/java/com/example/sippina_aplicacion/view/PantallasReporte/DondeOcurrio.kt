@@ -32,6 +32,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.activity.compose.BackHandler
 import androidx.compose.material3.AlertDialog
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -48,6 +49,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.sippina_aplicacion.R
 import com.example.sippina_aplicacion.ui.theme.SIPPINAAplicacionTheme
 import com.example.sippina_aplicacion.viewmodel.ReporteVM
+import androidx.compose.ui.platform.LocalContext
 
 @SuppressLint("MissingPermission")
 @Composable
@@ -57,8 +59,13 @@ fun DondeOcurrio(
     onSiguiente: () -> Unit = {},
     onAtras: () -> Unit = {}
 ) {
+    val appContext = LocalContext.current
 
     val state by viewModel.uiState.collectAsState()
+
+    LaunchedEffect(Unit) {
+        viewModel.iniciarlizarBorradorStorage(appContext)
+    }
 
     var mostrarDialogoSalida by remember {
         mutableStateOf(false)
@@ -92,8 +99,7 @@ fun DondeOcurrio(
         horizontalAlignment = Alignment.CenterHorizontally
     )
     {
-        // CONTENIDO DESPLAZABLE
-        // Los botones de navegación quedan fuera de esta columna.
+        // Este contenido se puede desplazar por si existe un desfase en el tamaño del dispositivo
 
         Column(
             modifier = Modifier
@@ -113,8 +119,7 @@ fun DondeOcurrio(
 
             Spacer(modifier = Modifier.height(4.dp))
 
-            // TÍTULO
-
+            // Parte del título
             Text(
                 text = "¿Dónde ocurrió?",
                 color = colorMorado,
@@ -125,14 +130,13 @@ fun DondeOcurrio(
             )
 
             Spacer(modifier = Modifier.height(12.dp))
-
-            // BARRA DE PROGRESO
+            // Esta es la barrra de progreso de la pantalla
 
             BarraDePasos(pasoActual = 0)
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // INSTRUCCIONES
+            // Son las instrucciones a seguir para el usuarui
 
             Text(
                 text = "Puedes seleccionar en el mapa, usar tu ubicación actual o buscar una dirección",
@@ -146,8 +150,7 @@ fun DondeOcurrio(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // MAPA
-
+            // Esta es para la parte del mapa
             Card(
                 shape = RoundedCornerShape(12.dp),
                 elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
@@ -171,7 +174,7 @@ fun DondeOcurrio(
 
             Spacer(modifier = Modifier.height(18.dp))
 
-            // OPCIONES DE UBICACIÓN
+            // Opciones de ubicación
 
             Column(
                 modifier = Modifier.fillMaxWidth(),
@@ -239,8 +242,8 @@ fun DondeOcurrio(
             Spacer(modifier = Modifier.height(12.dp))
         }
 
-        // BOTONES INFERIORES
-        // Permanecen visibles mientras se desplaza el contenido.
+
+        // Estos son los botoenes de la parte inferior
 
         Row(
             modifier = Modifier
@@ -313,6 +316,7 @@ fun DondeOcurrio(
                 Button(
                     onClick = {
                         mostrarDialogoSalida = false
+                        viewModel.guardarBorrador()
                         onAtras()
                     },
 

@@ -78,8 +78,6 @@ fun EditarPerfil(
     val morado = Color(0xFF381DC3)
     val fondo = Color(0xFFEAF4FC)
 
-    // DATOS DE EJEMPLO
-
     var nombreCompleto by remember {
         mutableStateOf("Roberto Martínez Román")
     }

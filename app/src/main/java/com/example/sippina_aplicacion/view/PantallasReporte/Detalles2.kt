@@ -2,6 +2,7 @@ package com.example.sippina_aplicacion.view.PantallasReporte
 
 import android.R.attr.padding
 import android.text.style.UnderlineSpan
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -83,8 +84,19 @@ fun Detalles2(
     var mostrarError by remember { mutableStateOf(false) }
     val tieneError = mostrarError && state.descripcionFisica.trim().isEmpty()
 
+    val manejarAtras = {
+        mostrarError = false
+        if(!viewModel.regresarAlMenorAnterior()){
+            onAtras()
+        }
+
+    }
+
+    BackHandler{manejarAtras()}
+
+
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .imePadding()
             .background(Color(0xFFEAF4FC))
@@ -93,7 +105,7 @@ fun Detalles2(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Column(
-            modifier = Modifier
+            modifier = modifier
                 .weight(1f)
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState()),
@@ -267,7 +279,7 @@ fun Detalles2(
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             Button(
-                onClick = { onAtras() },
+                onClick = { manejarAtras() },
                 shape = CircleShape,
                 colors = ButtonDefaults.buttonColors(
                     containerColor = colorFondoBotonAtras,
@@ -283,7 +295,11 @@ fun Detalles2(
             Button(
                 onClick = {
                     if (state.descripcionFisica.trim().isNotBlank()) {
-                        onSiguiente()
+                        mostrarError = false
+                        // Si era el último menor entonces  avanza a la siguiente pantalla
+                        if (!viewModel.avanzarAlSiguienteMenor()) {
+                            onSiguiente()
+                        }
                     } else {
                         mostrarError = true
                     }

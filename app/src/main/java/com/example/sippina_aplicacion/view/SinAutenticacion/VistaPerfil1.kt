@@ -47,7 +47,8 @@ fun VistaPerfil1(
     onBorradores: () -> Unit = {},
     onBuscarReporte: () -> Unit = {},
     onAvisoPrivacidad: () -> Unit = {},
-    onCrearCuenta: () -> Unit = {}
+    onCrearCuenta: () -> Unit = {},
+    onIniciarSesion: () -> Unit ={ }
 ) {
     val morado = Color(0xFF381DC3)
     val fondo = Color(0xFFEAF4FC)

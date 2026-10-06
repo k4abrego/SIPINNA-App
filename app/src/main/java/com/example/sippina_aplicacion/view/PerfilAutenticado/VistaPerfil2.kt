@@ -28,6 +28,7 @@ import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -57,6 +58,8 @@ import androidx.compose.ui.window.Dialog
 @Composable
 fun VistaPerfil2(
     modifier: Modifier = Modifier,
+    nombreUsuario:String = "Usuario",
+    cargando : Boolean = false,
     onAtras: () -> Unit = {},
     onBorradores: () -> Unit = {},
     onMisReportes: () -> Unit = {},
@@ -145,17 +148,21 @@ fun VistaPerfil2(
             }
         }
 
-        Spacer(modifier = Modifier.height(10.dp))
+        if(cargando){
+            CircularProgressIndicator(color = morado, modifier = Modifier.padding(16.dp))
+        }
+        else {
+            Text(
+                text = nombreUsuario.ifBlank { "Usuario" },
+                color = Color(0xFF3D20C9),
+                fontSize = 28.sp,
+                fontWeight = FontWeight.Bold,
+                lineHeight = 32.sp,
+                textAlign = TextAlign.Center
 
-        Text(
-            text = "Ariel\n Martínez Serrato",
-            color = Color(0xFF3D20C9),
-            fontSize = 28.sp,
-            fontWeight = FontWeight.Bold,
-            lineHeight = 32.sp,
-            textAlign = TextAlign.Center
-        )
+            )
 
+        }
         Spacer(modifier = Modifier.height(55.dp))
 
         Column(
@@ -356,6 +363,6 @@ fun VistaPerfil2(
 @Composable
 fun VistaPerfil2Preview() {
     SIPPINAAplicacionTheme {
-        VistaPerfil2()
+        VistaPerfil2(nombreUsuario = "Ariel Martinez")
     }
 }
