@@ -104,6 +104,7 @@ fun RegistroNuevoPerfil(
     LaunchedEffect(state.autenticado) {
         if (state.autenticado) {
             onSiguiente()
+            authVM.limpiarMensajes()
         }
     }
 

@@ -3,43 +3,59 @@ package com.example.sippina_aplicacion.model.Autenticacion
 import com.google.gson.annotations.SerializedName
 
 
-// Son modelos de peticion para el componente de autenticación
 data class ChallengeResponse(
-    val userId:Long,
-    val challenge:String,
-    val mensaje:String? = null
-
-)
-data class VerifyChallengeInput(
+    @SerializedName("user_id")
     val userId: Long,
-    val response:String,
+
+    @SerializedName("challenge")
+    val challenge: String,
+
+    @SerializedName("mensaje")
+    val mensaje: String? = null
+)
+
+data class VerifyChallengeInput(
+    @SerializedName("user_id")
+    val userId: Long,
+
+    @SerializedName("response")
+    val response: String
 )
 
 data class TokenResponse(
-    val token:String,
+    @SerializedName("token")
+    val token: String
 )
 
-// Esta es la respuesta del registro
 data class RegistroInput(
+    @SerializedName("name")
     val nombre: String,
+
+    @SerializedName("surname")
     val apellido: String,
+
+    @SerializedName("email")
     val correo: String,
-    @SerializedName("contraseña") // El backend de Go espera contraseña con ñ
+
+    @SerializedName("password")
     val contrasena: String,
+
+    @SerializedName("phone_number")
     val telefono: String? = null
 )
 
 data class RegistroResponse(
+    @SerializedName("user_id")
     val userId: Long,
-    val mensaje: String
+
+    @SerializedName("mensaje")
+    val mensaje: String? = null
 )
 
 data class CambiarContrasenaInput(
     @SerializedName("nueva_contraseña")
-    val nuevaContrasena: String,
-
+    val nuevaContrasena: String
 )
-
 
 data class InicioSesionModel(
     val correo: String,
@@ -55,24 +71,42 @@ data class RegistroModel(
 )
 
 data class ActualizarPerfilPeticion(
+    @SerializedName("name")
     val nombre: String,
+
+    @SerializedName("surname")
     val apellidos: String,
+
+    @SerializedName("phone_number")
     val telefono: String? = null
 )
 
 data class RecuperarContrasenaPeticion(
+    @SerializedName("email")
     val correo: String
 )
 
 data class AuthResponse(
+    @SerializedName("token")
     val token: String,
+
+    @SerializedName("user")
     val usuario: UsuarioPerfilModel
 )
 
 data class UsuarioPerfilModel(
+    @SerializedName("user_id")
     val idUsuario: Int,
+
+    @SerializedName("email")
     val correo: String,
+
+    @SerializedName("name")
     val nombre: String,
+
+    @SerializedName("surname")
     val apellidos: String,
+
+    @SerializedName("phone_number")
     val telefono: String? = null
 )

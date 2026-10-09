@@ -101,4 +101,10 @@ dependencies {
     // Este es para Coil
     implementation("io.coil-kt:coil-compose:2.6.0")
 
+
+    // Necesario para el backend
+    implementation("com.squareup.retrofit2:converter-scalars:2.9.0")
+
+    implementation(libs.google.play.services.location)
+
 }

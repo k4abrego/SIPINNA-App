@@ -64,13 +64,14 @@ fun PantallaInicio(
 
     // Este es cuando esta registrado
     onNavegarALogin: () -> Unit = {},
-
     onNavegarCrearCuenta:() -> Unit = {},
+    onCerrarSesion:() -> Unit = {},
 
     // Estas son las navegaciones de la tarjeta
     onVerTodosReportes : () -> Unit = {},
     onAbrirUltimoReporte:(String) -> Unit = {},
 
+    usuarioAutenticado: Boolean = false,
 ) {
     Box(
         modifier = modifier
@@ -221,6 +222,26 @@ fun PantallaInicio(
                             fontSize = 18.sp,
                             fontWeight = FontWeight.Bold
                         )
+                    }
+                }else
+                {
+                    ElevatedButton(
+                        onClick = { onCerrarSesion() },
+                        modifier = Modifier
+                            .height(50.dp)
+                            .fillMaxWidth(),
+                        shape = RoundedCornerShape(20.dp),
+                        colors = ButtonDefaults.elevatedButtonColors(
+                            containerColor = Color(0xFFC01B1E)
+                        )
+                    ){
+                        Text(
+                            text = "Cerrar Sesión",
+                            color = Color(0xFFDDEEFB),
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+
                     }
                 }
 

@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.sippina_aplicacion.model.BorradorGuardado
 import com.example.sippina_aplicacion.model.Reporte.PeticionCrearReporte
 import com.example.sippina_aplicacion.model.Reporte.ReporteRepository
+import com.example.sippina_aplicacion.model.Reporte.ReporteRequest
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -333,14 +334,12 @@ class ReporteVM(
         _buscandoReporte.value = false
     }
 
-    // --- CONEXIÓN A BACKEND: Enviar Reporte Real ---
     fun enviarReporteAlBackEnd(context: Context) {
         viewModelScope.launch {
             _uiState.update { it.copy(enviando = true, errorEnvio = null) }
 
             val estadoActual = _uiState.value
 
-            // Construcción del texto unificado de detalles
             val detallesFormulario = buildString {
                 append("Hechos: ${estadoActual.descripcionHechos}\n")
                 append("Horario aprox: ${estadoActual.horarioAprox}\n")
@@ -352,7 +351,8 @@ class ReporteVM(
                 }
             }
 
-            val peticion = PeticionCrearReporte(
+            // Se usa ReporteRequest con nombres unificados y latitud/longitud
+            val peticion = ReporteRequest(
                 tipoReporte = if (estadoActual.tipoEvidenciaSeleccionada.isNotBlank()) estadoActual.tipoEvidenciaSeleccionada else "General",
                 descripcion = detallesFormulario,
                 opcionPrivacidad = estadoActual.opcionPrivacidad,
@@ -364,7 +364,6 @@ class ReporteVM(
             val resultado = repository.crearReporte(peticion)
 
             resultado.onSuccess { respuesta ->
-                // Subir las imágenes si la creación fue exitosa
                 if (estadoActual.evidencias.isNotEmpty()) {
                     val partes = prepararEvidenciasParaBackend(context)
                     repository.subirEvidencias(respuesta.folio, partes)

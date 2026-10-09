@@ -38,13 +38,11 @@ import androidx.compose.material.icons.automirrored.filled.InsertDriveFile
 import androidx.compose.material.icons.filled.AttachFile
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Image
-import androidx.compose.material.icons.filled.InsertDriveFile
 import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material.icons.filled.PhotoCamera
 import androidx.compose.material.icons.filled.Videocam
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedCard
@@ -89,12 +87,28 @@ fun Evidencia(
     val context = LocalContext.current
     BackHandler { onAtras() }
 
+    // Se define el maximo de evidencias de 2 para el usuario
+    val maxEvidencias = 2
+    val limiteAlcanzado = state.evidencias.size >= maxEvidencias
+
+    // Este es un helper para que verifique el limite antes de lanzar o poner otra evidencia
+    fun ejecutarSiExisteEspacio( accion:() -> Unit ){
+        if(limiteAlcanzado){
+            Toast.makeText(context, "Solo se puede aduntar un maximo de $maxEvidencias evidencias",
+                Toast.LENGTH_SHORT).show()
+
+        }else
+        {
+            accion()
+        }
+    }
+
     // Este es el Uri temporal para almacenar las fotos o videos de la camara
     var tempUriCamara by remember { mutableStateOf<Uri?>(null) }
 
     // Las siguiente implementaciones son los launchers para la seleccion de los archivos y multimedia
     // Este es para el selector de imagenes de la galeria
-    var galeriaLauncher = rememberLauncherForActivityResult(
+    val galeriaLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickVisualMedia(),
     )
     { uri ->
@@ -210,16 +224,20 @@ fun Evidencia(
                     icon = Icons.Default.PhotoCamera,
                     contentDescription = "Tomar foto",
                     modifier = Modifier.weight(1f),
+                    deshabilitado = limiteAlcanzado,
                     onClick = {
-                        solicitarPermisoYEjecutar(
-                            context = context,
-                            permiso = Manifest.permission.CAMERA,
-                            launcher = permisoCamaraLauncher
-                        )
-                        {
-                            val uri = crearUriTemporal(context, "jpg")
-                            tempUriCamara = uri
-                            camaraLauncher.launch(uri)
+                        ejecutarSiExisteEspacio {
+
+                            solicitarPermisoYEjecutar(
+                                context = context,
+                                permiso = Manifest.permission.CAMERA,
+                                launcher = permisoCamaraLauncher
+                            )
+                            {
+                                val uri = crearUriTemporal(context, "jpg")
+                                tempUriCamara = uri
+                                camaraLauncher.launch(uri)
+                            }
                         }
                     }
                 )
@@ -228,8 +246,11 @@ fun Evidencia(
                     icon = Icons.Default.Image,
                     contentDescription = "Galería",
                     modifier = Modifier.weight(1f),
+                    deshabilitado = limiteAlcanzado,
                     onClick = {
+                        ejecutarSiExisteEspacio {
                         galeriaLauncher.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+                    }
                     }
                 )
             }
@@ -247,16 +268,19 @@ fun Evidencia(
                     icon = Icons.Default.Videocam,
                     contentDescription = "Grabar video",
                     modifier = Modifier.weight(1f),
+                    deshabilitado = limiteAlcanzado,
                     onClick = {
-                        solicitarPermisoYEjecutar(
-                            context = context,
-                            permiso = Manifest.permission.CAMERA,
-                            launcher = permisoCamaraLauncher
-                        )
-                        {
-                            val uri = crearUriTemporal(context, "mp4")
-                            tempUriCamara = uri
-                            videoLauncher.launch(uri)
+                        ejecutarSiExisteEspacio {
+                            solicitarPermisoYEjecutar(
+                                context = context,
+                                permiso = Manifest.permission.CAMERA,
+                                launcher = permisoCamaraLauncher
+                            )
+                            {
+                                val uri = crearUriTemporal(context, "mp4")
+                                tempUriCamara = uri
+                                videoLauncher.launch(uri)
+                            }
                         }
 
                     }
@@ -266,8 +290,11 @@ fun Evidencia(
                     icon = Icons.Default.Mic,
                     contentDescription = "Grabar audio",
                     modifier = Modifier.weight(1f),
-                    onClick = {
-                        archivoLauncher.launch("audio/*")
+                    deshabilitado = limiteAlcanzado,
+                        onClick = {
+                            ejecutarSiExisteEspacio {
+                            archivoLauncher.launch("audio/*")
+                        }
                     }
                 )
             }
@@ -275,7 +302,10 @@ fun Evidencia(
             Spacer(modifier = Modifier.height(16.dp))
 
             OutlinedCard(
-                onClick = { archivoLauncher.launch("*/*") },
+                onClick = {
+                    ejecutarSiExisteEspacio {
+
+                    archivoLauncher.launch("*/*") } },
                 shape = RoundedCornerShape(15.dp),
                 border = BorderStroke(1.5.dp, colorMorado),
                 modifier = Modifier
@@ -299,8 +329,7 @@ fun Evidencia(
                     Spacer(modifier = Modifier.width(12.dp))
 
                     Text(
-                        text = "Adjuntar o subir archivo",
-                        fontSize = 15.sp,
+                        text = if (limiteAlcanzado) "Límite de evidencias alcanzado ($maxEvidencias/$maxEvidencias)" else "Adjuntar o subir archivo",                        fontSize = 15.sp,
                         fontWeight = FontWeight.SemiBold,
                         color = Color.DarkGray,
                         textAlign = TextAlign.Center
@@ -396,6 +425,7 @@ private fun TarjetaOpcionMedia(
     icon: ImageVector,
     contentDescription: String,
     modifier: Modifier = Modifier,
+    deshabilitado: Boolean = false,
     onClick: () -> Unit
 
 
@@ -404,10 +434,7 @@ private fun TarjetaOpcionMedia(
     OutlinedCard(
         onClick = onClick,
         shape = RoundedCornerShape(16.dp),
-        border = BorderStroke(
-            1.5.dp,
-            Color(0xFF381DC3)
-        ),
+        border = BorderStroke(1.5.dp, if (deshabilitado) Color.LightGray else Color(0xFF381DC3)),
         modifier = modifier.height(100.dp)
     ) {
         Box(

@@ -116,18 +116,26 @@ fun AppNavHost(
         composable(route = Pantalla.PantallaInicio.ruta) {
             LaunchedEffect(usuarioAutenticado) {
                 if (usuarioAutenticado) {
-                    reporteViewModel.obtenerMisReportesDelBackEnd()
+                        reporteViewModel.obtenerMisReportesDelBackEnd()
                 }
             }
             val listaReportes by reporteViewModel.misReportes.collectAsState()
             val ultimoReporte = listaReportes.lastOrNull()
 
             PantallaInicio(
+                usuarioAutenticado = usuarioAutenticado,
                 mostrarNotificaciones = usuarioAutenticado,
                 ultimoReporteFolio = ultimoReporte?.folio,
                 ultimoReporteEstatus = ultimoReporte?.estatus,
                 onNavegarALogin = {
-                    navController.navigate(Pantalla.RegistroNuevoPerfil.ruta)
+                    if (usuarioAutenticado) {
+                        authViewModel.cerrarSesion()
+                    } else {
+                        navController.navigate(Pantalla.RegistroNuevoPerfil.ruta)
+                    }
+                },
+                onCerrarSesion ={
+                    authViewModel.cerrarSesion()
                 },
                 onNavegarAReporte = {
                     navController.navigate(Pantalla.DondeOcurrio.ruta)
@@ -168,7 +176,7 @@ fun AppNavHost(
                 authVM = authViewModel,
                 onAtras = { navController.popBackStack() },
                 onSiguiente = {
-                    navController.navigate(Pantalla.VistaPerfil2.ruta) {
+                    navController.navigate(Pantalla.PantallaInicio.ruta) {
                         popUpTo(Pantalla.RegistroNuevoPerfil.ruta) {
                             inclusive = true
                         }
