@@ -1,21 +1,29 @@
 package com.example.sippina_aplicacion.model.Autenticacion
 import android.util.Base64
 import java.security.MessageDigest
+import javax.crypto.Mac
+import javax.crypto.spec.SecretKeySpec
 
 // Se crea el repositorio de autenticacion en donde se definen los metodos de autenticacion
 class AuthRepository(
     private val api: AutenticacionAPI = ServicioRemoto.autenticacionAPI
 ) {
-    private fun String.toMacSha256(): ByteArray {
+    private fun String.toSha256(): ByteArray {
         return MessageDigest.getInstance("SHA-256").digest(this.toByteArray(Charsets.UTF_8))
     }
 
-    private fun resolverReto(challengeStr: String, passwordSha256: ByteArray): String {
-        val challengeBytes = challengeStr.toByteArray(Charsets.UTF_8)
-        val digest = MessageDigest.getInstance("SHA-256")
-        digest.update(challengeBytes)
-        val respuestaBytes = digest.digest(passwordSha256)
+    // Este es para resolver el reto de HMAC-256
+    private fun resolverRetoHMAC256(challengeStr: String, passwordSha256: ByteArray): String {
+        val Algoritmo= "HmacSHA256"
+        val secretKey = SecretKeySpec(passwordSha256, Algoritmo)
+        val mac = Mac.getInstance(Algoritmo)
+        mac.init(secretKey)
+
+        val challengeBytes = Base64.decode(challengeStr, Base64.NO_WRAP)
+        val respuestaBytes = mac.doFinal(challengeBytes)
+
         return Base64.encodeToString(respuestaBytes, Base64.NO_WRAP)
+
     }
 
     suspend fun iniciarSesion(correo: String, pass: String): Result<String> {
@@ -25,9 +33,9 @@ class AuthRepository(
                 return Result.failure(Exception("Usuario no encontrado o correo inválido"))
             }
             val retoData = respuestaReto.body()!!
-            val passHash = pass.toMacSha256()
+            val passHash = pass.toSha256()
 
-            val respuestaBase64 = resolverReto(retoData.challenge, passHash)
+            val respuestaBase64 = resolverRetoHMAC256(retoData.challenge, passHash)
 
             val verifyInput = VerifyChallengeInput(
                 userId = retoData.userId,
@@ -37,7 +45,7 @@ class AuthRepository(
             val respuestaLogin = api.verificarReto(verifyInput)
             if (respuestaLogin.isSuccessful && respuestaLogin.body() != null) {
                 // Guarda el token generado por el backend Go
-                val token = respuestaLogin.body()!!.token
+                val token = respuestaLogin.body()!!.string()
                 SessionManager.guardarSesion(token)
                 Result.success(token)
             } else {
@@ -76,7 +84,7 @@ class AuthRepository(
     }
 
 
-    suspend fun obtenerPerfil(token : String):Result<UsuarioPerfilModel>{
+    suspend fun obtenerPerfil(token: String, correoTarget: String):Result<UsuarioPerfilModel>{
         return try {
             Result.failure(Exception("Error al obtener el perfil"))
         }catch(e:Exception){

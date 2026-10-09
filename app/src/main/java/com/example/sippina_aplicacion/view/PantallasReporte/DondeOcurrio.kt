@@ -1,7 +1,9 @@
 package com.example.sippina_aplicacion.view.PantallasReporte
 
 import android.annotation.SuppressLint
-
+import android.content.Context
+import android.location.Geocoder
+import android.os.Build
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -31,10 +33,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.activity.compose.BackHandler
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Icon
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -50,6 +56,22 @@ import com.example.sippina_aplicacion.R
 import com.example.sippina_aplicacion.ui.theme.SIPPINAAplicacionTheme
 import com.example.sippina_aplicacion.viewmodel.ReporteVM
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.style.TextOverflow
+import com.example.sippina_aplicacion.viewmodel.EstadoReporte
+import com.google.android.gms.location.LocationServices
+import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.model.CameraPosition
+import com.google.android.gms.maps.model.LatLng
+import com.google.maps.android.compose.CameraMoveStartedReason
+import com.google.maps.android.compose.GoogleMap
+import com.google.maps.android.compose.Marker
+import com.google.maps.android.compose.MarkerState
+import com.google.maps.android.compose.rememberCameraPositionState
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.util.Locale
 
 @SuppressLint("MissingPermission")
 @Composable
@@ -60,8 +82,12 @@ fun DondeOcurrio(
     onAtras: () -> Unit = {}
 ) {
     val appContext = LocalContext.current
-
     val state by viewModel.uiState.collectAsState()
+
+    // Este cliente es para obtener la ubicacion GPS en tiempo real
+    val fusedLocationClient = remember{
+        LocationServices.getFusedLocationProviderClient(appContext)
+    }
 
     LaunchedEffect(Unit) {
         viewModel.iniciarlizarBorradorStorage(appContext)
@@ -81,13 +107,12 @@ fun DondeOcurrio(
     val colorFondoBotonAtras = Color(0xFFE2E2E2)
     val colorTextoBotonAtras = Color(0xFF5A5A5A)
 
-    // OPCIÓN DE UBICACIÓN SELECCIONADA
+    val coroutineScope = rememberCoroutineScope()
+
 
     val opcionUbicacionActual = state.opcionUbicacion.ifEmpty {
         "Seleccionar en el mapa"
     }
-
-    // CONTENEDOR PRINCIPAL
 
     Column(
         modifier = modifier
@@ -152,24 +177,54 @@ fun DondeOcurrio(
 
             // Esta es para la parte del mapa
             Card(
-                shape = RoundedCornerShape(12.dp),
+                shape = RoundedCornerShape(16.dp),
                 elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
                 colors = CardDefaults.cardColors(containerColor = Color(0xFFEBEEF8)),
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(150.dp)
             ) {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = "Mapa",
-                        color = Color.Gray,
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Medium
-                    )
+                MapaInteractivo(
+                    context = appContext,
+                    state = state,
+                    onUbicacionCambiada = { lat, lng, direccion ->
+                        viewModel.setUbicacion(lat, lng, direccion)
+                    }
+                )
+            }
+
+            if (state.ubicacionConfirmada) {
+                Spacer(modifier = modifier.height(10.dp))
+                Card(
+                    modifier = modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(containerColor = Color.White),
+                    shape = RoundedCornerShape(8.dp)
+                )
+                {
+                    Column(modifier = Modifier.padding(12.dp)) {
+                        Text(
+                            text = "Direccion: ${state.direccion.ifEmpty { " Sin direccion exacta" }}",
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = colorMorado,
+                            maxLines = 2,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                        Spacer(modifier = modifier.height(4.dp))
+                        Text(
+                            text = "Coordenadas: Lat ${
+                                String.format(
+                                    Locale.US,
+                                    "%.5f",
+                                    state.latitud
+                                )
+                            }, Lng ${String.format(Locale.US, "%.5f", state.longitud)}",
+                            fontSize = 12.sp,
+                            color = Color.Gray
+                        )
+                    }
                 }
+
             }
 
             Spacer(modifier = Modifier.height(18.dp))
@@ -189,14 +244,29 @@ fun DondeOcurrio(
 
                 opciones.forEach { opcion ->
 
-                    val seleccionado =
-                        opcionUbicacionActual == opcion
+                    val seleccionado = opcionUbicacionActual == opcion
 
                     OutlinedButton(
                         onClick = {
-                            viewModel.seleccionarOpcionUbicacion(
-                                opcion
-                            )
+                            viewModel.seleccionarOpcionUbicacion(opcion)
+                            if(opcion == "Usar mi ubicación actual")
+                            {
+                                fusedLocationClient.lastLocation.addOnSuccessListener { location ->
+                                    if(location != null){
+                                        coroutineScope.launch(Dispatchers.IO){
+                                            val direccion = obtenerDireccionTexto(
+                                                appContext,
+                                                location.latitude,
+                                                location.longitude
+                                            )
+                                            withContext(Dispatchers.Main){
+                                                viewModel.setUbicacion(location.latitude, location.longitude, direccion)
+
+                                            }
+                                        }
+                                    }
+                                }
+                            }
                         },
 
                         modifier = Modifier
@@ -243,7 +313,7 @@ fun DondeOcurrio(
         }
 
 
-        // Estos son los botoenes de la parte inferior
+        // Estos son los botones de la parte inferior
 
         Row(
             modifier = Modifier
@@ -253,7 +323,7 @@ fun DondeOcurrio(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Button(
-                onClick = { mostrarDialogoSalida = true} ,
+                onClick = { mostrarDialogoSalida = true },
                 shape = CircleShape,
                 colors = ButtonDefaults.buttonColors(
                     containerColor = colorFondoBotonAtras,
@@ -274,7 +344,10 @@ fun DondeOcurrio(
             Button(
                 onClick = onSiguiente,
                 shape = CircleShape,
-                colors = ButtonDefaults.buttonColors(containerColor = colorFondoBotonSiguiente, contentColor = colorTextoBotonSiguiente),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = colorFondoBotonSiguiente,
+                    contentColor = colorTextoBotonSiguiente
+                ),
                 modifier = Modifier
                     .weight(1f)
                     .height(50.dp)
@@ -283,7 +356,8 @@ fun DondeOcurrio(
                 Text(
                     text = "Siguiente",
                     fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold)
+                    fontWeight = FontWeight.Bold
+                )
             }
         }
     }
@@ -340,6 +414,114 @@ fun DondeOcurrio(
     }
 }
 
+
+// Esta funcion son los subcompoentes como en el código del prefesor
+
+@Composable
+fun MapaInteractivo(
+    context: Context,
+    state: EstadoReporte,
+    onUbicacionCambiada: (Double, Double, String) -> Unit
+) {
+    val posicionInicial = remember {
+        if (state.latitud != 0.0 && state.longitud != 0.0) {
+            LatLng(state.latitud, state.longitud)
+        } else {
+            LatLng(19.559167, -99.283333) // Este es el centro de Atizapan de Zaragoza
+
+        }
+    }
+    val cameraPositionState = rememberCameraPositionState {
+        position = CameraPosition.fromLatLngZoom(posicionInicial, 15f)
+
+    }
+    val coroutineScope = rememberCoroutineScope()
+
+    // Este detecta cuando se finaliza el movimeinto de arrastrado poe el usuario
+
+    LaunchedEffect(cameraPositionState.isMoving) {
+        if (!cameraPositionState.isMoving && cameraPositionState.cameraMoveStartedReason == CameraMoveStartedReason.GESTURE) {
+            val centroActual = cameraPositionState.position.target
+            coroutineScope.launch(Dispatchers.IO) {
+                val direccion =
+                    obtenerDireccionTexto(context, centroActual.latitude, centroActual.longitude)
+                withContext(Dispatchers.Main) {
+                    onUbicacionCambiada(centroActual.latitude, centroActual.longitude, direccion)
+                }
+
+            }
+        }
+    }
+
+    // Se anima la camara si las coordenadas cambian en el viewModel
+    LaunchedEffect(state.latitud, state.longitud) {
+        if (state.latitud != 0.0 && state.longitud != 0.0) {
+            val nuevaPosicion = LatLng(state.latitud, state.longitud)
+            if (cameraPositionState.position.target != nuevaPosicion) {
+                cameraPositionState.animate(
+                    update = CameraUpdateFactory.newLatLng(nuevaPosicion),
+                    durationMs = 800
+                )
+            }
+        }
+    }
+
+
+    Box(modifier = Modifier.fillMaxSize()) {
+        GoogleMap(
+            modifier = Modifier.fillMaxSize(), cameraPositionState = cameraPositionState,
+            onMapClick = { latLng ->
+                coroutineScope.launch {
+                    cameraPositionState.animate(
+                        update = CameraUpdateFactory.newLatLng(latLng),
+                        durationMs = 600
+                    )
+                }
+            }
+        ) {
+            if (state.ubicacionConfirmada) {
+                val posicion = LatLng(state.latitud, state.longitud)
+
+                val markerState = remember(state.latitud, state.longitud){
+                    MarkerState(position = posicion)
+                }
+                Marker(
+                    state = markerState,
+                    title = state.direccion,
+                    snippet = state.direccion.ifEmpty { "${state.latitud}, ${state.longitud}" }
+                )
+            }
+        }
+        Icon(
+            imageVector = Icons.Default.LocationOn,
+            contentDescription = "Pin del centro del mapa ",
+            tint = Color(0xFFE53935),
+            modifier = Modifier
+                .size(42.dp)
+                .align(Alignment.Center)
+        )
+
+
+    }
+}
+
+// Esta funcion basicamente es un helper para convertir de latitud y logitud a texto
+private fun obtenerDireccionTexto(context: Context, lat: Double, lng: Double): String {
+    return try {
+        val geocoder = Geocoder(context, Locale.getDefault())
+        val direcciones = geocoder.getFromLocation(lat, lng, 1)
+        if (!direcciones.isNullOrEmpty()) {
+            direcciones[0].getAddressLine(0) ?: "Ubicación sin nombre"
+        } else {
+            "Lat: ${String.format(Locale.US, "%.4f", lat)}, Lng: ${String.format(Locale.US, "%.4f", lng)}"
+        }
+    } catch (e: Exception) {
+        "Lat: ${String.format(Locale.US, "%.4f", lat)}, Lng: ${String.format(Locale.US, "%.4f", lng)}"
+    }
+}
+
+
+// Esta funcion auxiliar es para buscar las coordendas por nombre de calle o cuidad gracias a la api de google
 @Preview(
     showBackground = true,
     showSystemUi = true,

@@ -27,6 +27,7 @@ foundationLayoutVersion = "1.12.1"
 ui = "1.12.1"
 uiText = "1.12.1"
 playServicesCastFramework = "22.3.1"
+googlePSVer = "21.4.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -63,6 +64,7 @@ androidx-foundation-layout = { group = "androidx.compose.foundation", name = "fo
 androidx-ui = { group = "androidx.compose.ui", name = "ui", version.ref = "ui" }
 androidx-compose-ui-text = { group = "androidx.compose.ui", name = "ui-text", version.ref = "uiText" }
 play-services-cast-framework = { group = "com.google.android.gms", name = "play-services-cast-framework", version.ref = "playServicesCastFramework" }
+google-services = { group = "com.google.gms", name = "google-services", version.ref = "googlePSVer" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

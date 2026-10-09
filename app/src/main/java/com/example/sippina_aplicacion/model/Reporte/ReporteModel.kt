@@ -2,24 +2,35 @@ package com.example.sippina_aplicacion.model.Reporte
 
 import com.google.gson.annotations.SerializedName
 
-// 1. Objeto que se envia al servidor (Peticion POST )
-data class ReporteResquest(
-    @SerializedName("tipo_reporte") val tipoReporte: String,
-    @SerializedName("descripcion") val descripcion: String,
-    @SerializedName("opcion_privacidad :String") val opcionPrivacidad:String,
-    @SerializedName("telefono") val telefono: String? = null
-
+data class ReporteRequest(
+    @SerializedName("tipo_reporte")
+    val tipoReporte: String,
+    @SerializedName("descripcion")
+    val descripcion: String,
+    @SerializedName("opcion_privacidad")
+    val opcionPrivacidad: String,
+    @SerializedName("telefono")
+    val telefono: String? = null,
+    @SerializedName("latitud")
+    val latitud: Double? = null,
+    @SerializedName("longitud")
+    val longitud: Double? = null
 )
 
-// Respuesta que devuelve el servidor
 data class ReporteResponse(
-    @SerializedName("exito") val exito: Boolean,
-    @SerializedName("mensaje") val mensaje: String,
-    @SerializedName("folio") val folio: String,
-    @SerializedName("codigo_privadidad") val codigoPrivado: String
+    @SerializedName("exito")
+    val exito: Boolean = true,
+    @SerializedName("mensaje")
+    val mensaje: String? = null,
+    @SerializedName("folio")
+    val folio: String,
+    @SerializedName("codigo_privacidad")
+    val codigoPrivado: String? = null,
+    @SerializedName("estatus")
+    val estatus: String = "",
+    @SerializedName("fecha_envio")
+    val fechaEnvio: String? = null
 )
-
-// Estado único de la Pantalla osea es el IU State para stateFlow
 
 data class ReporteState(
     val tipoReporte: String = "",
@@ -32,4 +43,3 @@ data class ReporteState(
     val errorMessage: String? = null,
     val reporteExitoso: Boolean = false
 )
-

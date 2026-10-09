@@ -18,16 +18,19 @@ class AuthVM(
     val state: StateFlow<EstadoAuth> = _state.asStateFlow()
 
     fun iniciarSesion(correo: String, contrasena: String) {
+        val correoLimpio = correo.trim().lowercase()
+        val contrasenaLimpia = contrasena.trim()
+
         viewModelScope.launch {
             _state.update { it.copy(cargando = true, error = null, mensajeExito = null) }
 
-            val resultado = repository.iniciarSesion(correo, contrasena)
+            val resultado = repository.iniciarSesion(correoLimpio, contrasenaLimpia)
 
             resultado.onSuccess { token ->
                 _state.update {
                     it.copy(
                         token = token,
-                        correo = correo,
+                        correo = correoLimpio,
                         autenticado = true,
                         cargando = false
                     )
@@ -53,28 +56,33 @@ class AuthVM(
         apellidos: String,
         telefono: String?
     ) {
+        val correoLimpio = correo.trim().lowercase()
+        val contrasenaLimpia = contrasena.trim()
+        val nombreLimpio = nombre.trim()
+        val apellidosLimpios = apellidos.trim()
+        val telefonoLimpio = telefono?.trim()
+
         viewModelScope.launch {
             _state.update { it.copy(cargando = true, error = null, mensajeExito = null) }
 
             val resultado = repository.registrarUsuario(
-                correo = correo,
-                contrasena = contrasena,
-                nombre = nombre,
-                apellidos = apellidos,
-                telefono = telefono
+                correo = correoLimpio,
+                contrasena = contrasenaLimpia,
+                nombre = nombreLimpio,
+                apellidos = apellidosLimpios,
+                telefono = telefonoLimpio
             )
             resultado.onSuccess { registroResp ->
                 _state.update {
                     it.copy(
                         usuarioId = registroResp.userId.toString(),
-                        nombre = nombre,
-                        apellidos = apellidos,
-                        correo = correo,
-                        telefono = telefono,
-                        cargando = false,
-                        mensajeExito = registroResp.mensaje
+                        nombre = nombreLimpio,
+                        apellidos = apellidosLimpios,
+                        correo = correoLimpio,
+                        telefono = telefonoLimpio
                     )
                 }
+                iniciarSesion(correoLimpio, contrasenaLimpia)
             }.onFailure { error ->
                 _state.update {
                     it.copy(
@@ -86,15 +94,15 @@ class AuthVM(
             }
         }
     }
-
-    fun obtenerPerfil() {
+    fun obtenerPerfil(correoTarget: String = _state.value.correo) {
+        val correoLimpio = correoTarget.trim().lowercase()
         val token = _state.value.token
-        if (token.isBlank()) return
+        if (token.isBlank() || correoLimpio.isBlank()) return
 
         viewModelScope.launch {
             _state.update { it.copy(cargando = true, error = null) }
 
-            val resultado = repository.obtenerPerfil(token)
+            val resultado = repository.obtenerPerfil(token,correoLimpio)
 
             resultado.onSuccess { usuario ->
                 _state.update {
@@ -120,12 +128,14 @@ class AuthVM(
 
     fun actualizarPerfil(nombre: String, apellidos: String, telefono: String?) {
         val token = _state.value.token
-        if (token.isBlank()) return
+        val correo = _state.value.correo
+
+        if (token.isBlank() || correo.isBlank()) return
 
         viewModelScope.launch {
             _state.update { it.copy(cargando = true, error = null, mensajeExito = null) }
 
-            val resultado = repository.actualizarPerfil(token, nombre, apellidos, telefono)
+            val resultado = repository.actualizarPerfil(token , nombre, apellidos, telefono)
 
             resultado.onSuccess { usuario ->
                 _state.update {

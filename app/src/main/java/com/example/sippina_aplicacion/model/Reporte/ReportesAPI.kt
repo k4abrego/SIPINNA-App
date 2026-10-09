@@ -1,5 +1,7 @@
 package com.example.sippina_aplicacion.model.Reporte
+
 import okhttp3.MultipartBody
+import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.Multipart
@@ -7,14 +9,13 @@ import retrofit2.http.POST
 import retrofit2.http.Part
 import retrofit2.http.Path
 import retrofit2.http.Query
-import retrofit2.Response
 
 interface ReportesAPI {
 
     @POST("api/v1/reportes")
     suspend fun crearReporte(
-        @Body request: PeticionCrearReporte
-    ): Response<RespuestaReporte>
+        @Body request: ReporteRequest
+    ): Response<ReporteResponse>
 
     @GET("api/v1/reportes/categorias")
     suspend fun obtenerCategorias(): Response<List<CategoriaModel>>
@@ -24,12 +25,12 @@ interface ReportesAPI {
         @Query("estado") estado: String? = null,
         @Query("limite") limite: Int = 20,
         @Query("pagina") pagina: Int = 1
-    ): Response<List<RespuestaReporte>>
+    ): Response<List<ReporteResponse>>
 
     @GET("api/v1/reportes/folio/{folio}")
     suspend fun obtenerReportePorFolio(
         @Path("folio") folio: String
-    ): Response<RespuestaReporte>
+    ): Response<ReporteResponse>
 
     @GET("api/v1/reportes/{id}/historial")
     suspend fun obtenerHistorialReporte(
@@ -41,5 +42,5 @@ interface ReportesAPI {
     suspend fun subirEvidencias(
         @Path("reporteId") reporteId: String,
         @Part archivos: List<MultipartBody.Part>
-    ): Response<RespuestaReporte>
+    ): Response<ReporteResponse>
 }
