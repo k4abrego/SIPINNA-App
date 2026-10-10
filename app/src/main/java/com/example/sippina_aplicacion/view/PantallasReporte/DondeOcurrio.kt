@@ -3,7 +3,6 @@ package com.example.sippina_aplicacion.view.PantallasReporte
 import android.annotation.SuppressLint
 import android.content.Context
 import android.location.Geocoder
-import android.os.Build
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -57,7 +56,7 @@ import com.example.sippina_aplicacion.ui.theme.SIPPINAAplicacionTheme
 import com.example.sippina_aplicacion.viewmodel.ReporteVM
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextOverflow
-import com.example.sippina_aplicacion.viewmodel.EstadoReporte
+import com.example.sippina_aplicacion.model.EstadoReporte
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.CameraPosition
@@ -68,11 +67,25 @@ import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.Locale
 
+/**
+ * Pantalla principal del inicio del reporte (Paso 1: Ubicación).
+ *
+ * Permite establecer la geolocalización del incidente mediante tres modalidades: seleccionando directamente
+ * en un mapa interactivo ([MapaInteractivo]), consultando la ubicación GPS actual en tiempo real mediante
+ * [LocationServices.getFusedLocationProviderClient] o ingresando una dirección.
+ *
+ * Captura el intento de salida con [BackHandler] desplegando un cuadro de diálogo ([AlertDialog]) que guarda
+ * automáticamente el borrador actual en el dispositivo antes de abandonar el flujo.
+ *
+ * @param viewModel Instancia de [ReporteVM] encargada de la gestión del estado del reporte y la persistencia de borradores.
+ * @param modifier [Modifier] opcional para modificar el contenedor del diseño.
+ * @param onSiguiente Callback ejecutado para continuar hacia la pantalla de detalles del incidente.
+ * @param onAtras Callback invocado tras confirmar la salida de la pantalla.
+ */
 @SuppressLint("MissingPermission")
 @Composable
 fun DondeOcurrio(
@@ -415,8 +428,17 @@ fun DondeOcurrio(
 }
 
 
-// Esta funcion son los subcompoentes como en el código del prefesor
-
+/**
+ * Subcomponente Composable que renderiza un mapa interactivo de Google Maps ([GoogleMap]).
+ *
+ * Muestra la posición geográfica elegida y detecta cuando el usuario desplaza o arrastra la cámara
+ * ([CameraMoveStartedReason.GESTURE]), ejecutando una geocodificación inversa ([obtenerDireccionTexto])
+ * en un hilo en segundo plano para actualizar la ubicación seleccionada mediante [onUbicacionCambiada].
+ *
+ * @param context Contexto [Context] de Android necesario para geocodificación.
+ * @param state Instancia de [EstadoReporte] que contiene la posición en latitud y longitud actual.
+ * @param onUbicacionCambiada Callback invocado al cambiar el centro del mapa pasando `(latitud, longitud, direccionTexto)`.
+ */
 @Composable
 fun MapaInteractivo(
     context: Context,
@@ -505,7 +527,17 @@ fun MapaInteractivo(
     }
 }
 
-// Esta funcion basicamente es un helper para convertir de latitud y logitud a texto
+/**
+ * Función auxiliar privada que realiza la geocodificación inversa de coordenadas a una dirección postal textual.
+ *
+ * Utiliza [Geocoder.getFromLocation] en un contexto bloqueante de E/S. En caso de fallo o falta de resultados,
+ * retorna una cadena formateada con los valores numéricos de latitud y longitud.
+ *
+ * @param context Contexto [Context] para instanciar [Geocoder].
+ * @param lat Coordenada de latitud.
+ * @param lng Coordenada de longitud.
+ * @return La dirección obtenida en texto plano o una cadena formateada con las coordenadas.
+ */
 private fun obtenerDireccionTexto(context: Context, lat: Double, lng: Double): String {
     return try {
         val geocoder = Geocoder(context, Locale.getDefault())
@@ -521,7 +553,9 @@ private fun obtenerDireccionTexto(context: Context, lat: Double, lng: Double): S
 }
 
 
-// Esta funcion auxiliar es para buscar las coordendas por nombre de calle o cuidad gracias a la api de google
+/**
+ * Previsualización de la pantalla [DondeOcurrio] en el entorno de desarrollo de Android Studio.
+ */
 @Preview(
     showBackground = true,
     showSystemUi = true,

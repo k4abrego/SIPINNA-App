@@ -15,11 +15,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -60,9 +57,20 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.sippina_aplicacion.R
 import com.example.sippina_aplicacion.ui.theme.SIPPINAAplicacionTheme
-import com.example.sippina_aplicacion.viewmodel.ReporteModel
+import com.example.sippina_aplicacion.model.ReporteModel
 
-
+/**
+ * Pantalla que lista los reportes registrados por el usuario con soporte para filtrado en tiempo real.
+ *
+ * Incluye un buscador dinámico ([OutlinedTextField]) que filtra por folio o estatus, y presenta
+ * el listado mediante un [LazyColumn] estilizado. En la parte inferior cuenta con una sección de leyenda
+ * que explica el significado de los iconos de estatus ("Enviado", "En proceso", "En revisión" y "Cerrado").
+ *
+ * @param listaReportes Colección de objetos [ReporteModel] recuperados desde la fuente de datos.
+ * @param cargando Flag que indica si los datos están siendo descargados del servidor backend.
+ * @param onAtras Callback invocado para regresar a la vista previa del perfil.
+ * @param onReporteClick Callback ejecutado al hacer clic en un reporte, entregando su `folio`.
+ */
 @Composable
 fun VerListaReportes(
     listaReportes: List<ReporteModel> = emptyList(),
@@ -111,7 +119,7 @@ fun VerListaReportes(
                     )
                 }
                 Image(
-                    painter = painterResource(id = com.example.sippina_aplicacion.R.drawable.imagensippina),
+                    painter = painterResource(id = R.drawable.imagensippina),
                     contentDescription = "Logo SIPINNA",
                     modifier = Modifier.size(120.dp)
                 )
@@ -255,7 +263,12 @@ fun VerListaReportes(
     }
 }
 
-// Función auxiliar para asignar color e icono según el estado devuelto por Retrofit
+/**
+ * Mapea la cadena del estado devuelto por el servidor al icono vectorial ([ImageVector]) correspondiente.
+ *
+ * @param estatus Texto que indica el estado del reporte (ej. "Enviado", "En proceso", "En revisión", "Cerrado").
+ * @return [ImageVector] asociativo para representar visualmente el estado.
+ */
 private fun obtenerIconoPorEstatus(estatus: String): ImageVector {
     return when (estatus.lowercase().trim()) {
         "enviado" -> Icons.AutoMirrored.Filled.Send
@@ -266,6 +279,18 @@ private fun obtenerIconoPorEstatus(estatus: String): ImageVector {
     }
 }
 
+/**
+ * Tarjeta individual para mostrar el folio y el icono descriptivo del estado de un reporte.
+ *
+ * Anima el cambio de color de fondo al ser presionada (`animateColorAsState`).
+ *
+ * @param folio Identificador único del reporte a mostrar.
+ * @param icono Icono vectorial que representa el estado del reporte.
+ * @param colorIcono Color del círculo contenedor del icono.
+ * @param bordeColor Color del borde de la tarjeta.
+ * @param grosorBorde Ancho del borde de la tarjeta.
+ * @param onClick Callback ejecutado al seleccionar la tarjeta.
+ */
 @Composable
 private fun ItemReporteCard(
     folio: String,
@@ -329,6 +354,13 @@ private fun ItemReporteCard(
     }
 }
 
+/**
+ * Elemento gráfico de la leyenda que explica el significado de cada estado de reporte en la aplicación.
+ *
+ * @param etiqueta Texto explicativo del estado (ej. "Enviado").
+ * @param icono Icono asociativo del estado.
+ * @param colorFondo Color de fondo del contenedor circular del icono.
+ */
 @Composable
 private fun ItemEstadoLeyenda(
     etiqueta: String,
@@ -361,6 +393,9 @@ private fun ItemEstadoLeyenda(
     }
 }
 
+/**
+ * Previsualización de la pantalla [VerListaReportes] en el entorno de desarrollo de Android Studio.
+ */
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun ListaReportesPreview() {

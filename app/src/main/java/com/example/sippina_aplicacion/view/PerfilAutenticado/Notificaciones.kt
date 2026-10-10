@@ -31,8 +31,6 @@ import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -44,12 +42,25 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.sippina_aplicacion.R
 import com.example.sippina_aplicacion.ui.theme.SIPPINAAplicacionTheme
-import com.example.sippina_aplicacion.viewmodel.EstadoNotificacion
+import com.example.sippina_aplicacion.model.EstadoNotificacion
 
-
-// datos temporales de notificaciones
-
-
+/**
+ * Pantalla que despliega el historial de notificaciones y avisos del sistema emitidos para el usuario.
+ *
+ * Administra tres estados visuales:
+ * - **Carga**: Despliega un [CircularProgressIndicator] mientras se consultan las notificaciones.
+ * - **Vacío**: Muestra un aviso cuando no existen notificaciones en la lista.
+ * - **Listado dinámico**: Renderiza tarjetas [OutlinedCard] animadas con `animateColorAsState` que diferencian
+ *   visualmente las notificaciones no leídas de las leídas. Al hacer clic, marca el elemento como leído
+ *   mediante [onMarcarLeida] y navega al reporte relacionado con [onAbrirReporte].
+ *
+ * @param modifier [Modifier] opcional para el contenedor principal de la pantalla.
+ * @param notificaciones Lista de objetos [EstadoNotificacion] con los avisos a mostrar.
+ * @param cargando Flag que indica si el proceso de consulta está en curso.
+ * @param onAtras Callback para regresar a la pantalla del perfil o menú previo.
+ * @param onAbrirReporte Callback invocado con el folio del reporte para navegar hacia sus detalles.
+ * @param onMarcarLeida Callback invocado con el identificador único para marcar la notificación como leída.
+ */
 @Composable
 fun Notificaciones(
     modifier: Modifier = Modifier,
@@ -243,6 +254,9 @@ fun Notificaciones(
     }
 }
 
+/**
+ * Previsualización de la pantalla [Notificaciones] en el entorno de desarrollo de Android Studio.
+ */
 @Preview(
     showBackground = true,
     showSystemUi = true

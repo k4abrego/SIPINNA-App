@@ -49,7 +49,20 @@ import com.example.sippina_aplicacion.R
 import com.example.sippina_aplicacion.ui.theme.SIPPINAAplicacionTheme
 import com.example.sippina_aplicacion.view.PantallasReporte.BarraDePasos
 
-
+/**
+ * Pantalla que muestra el detalle y el seguimiento del estado de un reporte específico.
+ *
+ * Presenta la información general del trámite (Folio y fecha de envío), una barra gráfica de estatus
+ * ([BarraEstadoReporte]), un mensaje descriptivo del estado actual, y tarjetas detalladas con
+ * la descripción del incidente y la ubicación geográfica del lugar de los hechos.
+ *
+ * @param folio Identificador único del reporte (ej. `"REP-1234-1234"`).
+ * @param fechaEnvio Fecha y hora formateada en que se registró el reporte.
+ * @param estadoActual Nivel numérico de avance del trámite (0 = Recibido, 1 = En revisión, 2 = En atención, 3 = Cerrado).
+ * @param descripcion Narrativa detallada de la situación reportada.
+ * @param direccion Dirección física o referencia del lugar de los hechos.
+ * @param onAtras Callback invocado al presionar el botón de regresar al listado de reportes.
+ */
 @Composable
 fun DetalleReporte(
     folio: String = "REP-1234-1234",
@@ -287,6 +300,13 @@ fun DetalleReporte(
     }
 }
 
+/**
+ * Componente gráfico que muestra la barra de progreso de estatus del reporte a lo largo de 4 etapas principales.
+ *
+ * Combina nodos ([PasoEstado]) y conectores horizontales ([LineaEstado]) según el [estadoActual].
+ *
+ * @param estadoActual Nivel de avance actual (0 = Recibido, 1 = En revisión, 2 = En atención, 3 = Cerrado).
+ */
 @Composable
 fun BarraEstadoReporte(
     estadoActual: Int = 0
@@ -341,6 +361,14 @@ fun BarraEstadoReporte(
 }
 
 
+/**
+ * Subcomponente Composable que dibuja un paso individual de la barra de estado de un reporte.
+ *
+ * @param etiqueta Texto descriptivo de la etapa.
+ * @param icono Icono vectorial [ImageVector] correspondiente a la etapa.
+ * @param activo Flag que indica si la etapa ha sido alcanzada o superada.
+ * @param modifier [Modifier] opcional para el diseño.
+ */
 @Composable
 private fun PasoEstado(
     etiqueta: String,
@@ -396,6 +424,12 @@ private fun PasoEstado(
     }
 }
 
+/**
+ * Línea conectora horizontal empleada para unir los nodos de la barra de estado.
+ *
+ * @param activa Flag que indica si la línea se ilumina en color morado o se mantiene gris.
+ * @param modifier [Modifier] opcional para el diseño.
+ */
 @Composable
 private fun LineaEstado(
     activa: Boolean,
@@ -416,6 +450,9 @@ private fun LineaEstado(
     }
 }
 
+/**
+ * Previsualización del detalle de reporte en estado "Recibido".
+ */
 @Preview(
     showBackground = true,
     showSystemUi = true,
@@ -432,7 +469,13 @@ fun DetalleReportePreview() {
     }
 }
 
-// Esta es una funcion auxiliar para convertir el texto del backend al numero de paso de la barra
+/**
+ * Mapea una cadena de texto de estatus proveniente del backend a un valor entero de 0 a 3
+ * compatible con los componentes de la barra de estado.
+ *
+ * @param estatus Cadena textual del estado (ej. "Enviado", "En revisión", "Cerrado").
+ * @return Valor entero (0..3) representando el estado normalizado.
+ */
 fun mapearEstatusAInt(estatus: String): Int {
     return when (estatus.lowercase().trim()) {
         "enviado", "recibido" -> 0
@@ -446,7 +489,9 @@ fun mapearEstatusAInt(estatus: String): Int {
 
 
 
-// PREVIEW: REPORTE EN REVISIÓN
+/**
+ * Previsualización del detalle de reporte en estado "En revisión".
+ */
 
 @Preview(
     showBackground = true,
@@ -465,7 +510,9 @@ fun DetalleReporteRevisionPreview() {
 }
 
 
-// PREVIEW: REPORTE EN ATENCIÓN
+/**
+ * Previsualización del detalle de reporte en estado "En atención".
+ */
 
 @Preview(
     showBackground = true,
@@ -484,7 +531,9 @@ fun DetalleReporteAtencionPreview() {
 }
 
 
-// PREVIEW: REPORTE CERRADO
+/**
+ * Previsualización del detalle de reporte en estado "Cerrado".
+ */
 
 @Preview(
     showBackground = true,

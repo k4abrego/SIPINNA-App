@@ -32,7 +32,16 @@ import com.example.sippina_aplicacion.ui.theme.SIPPINAAplicacionTheme
 val ColorMoradoBarra = Color(0xFF3D27C9)
 val ColorGrisBarra = Color(0xFF9c9c9c)
 
-// Funcion principal para la barra de los pasos a realizar en la aplicacion
+/**
+ * Componente visual que muestra un indicador de progreso por pasos para el flujo de generación de un reporte.
+ *
+ * Renderiza 5 etapas consecutivas representadas mediante iconos interactivos (Ubicación, Descripción,
+ * Menor involucrado, Evidencia y Privacidad) unidos por líneas conectoras. Los elementos cambian dinámicamente
+ * entre el color activo ([ColorMoradoBarra]) y el inactivo ([ColorGrisBarra]) según el [pasoActual].
+ *
+ * @param pasoActual Índice de base cero (0 a 4) que representa la etapa activa en el formulario.
+ * @param modifier [Modifier] opcional para personalizar el diseño o comportamiento del contenedor.
+ */
 @Composable
 fun BarraDePasos(
     pasoActual: Int = 0,
@@ -89,11 +98,14 @@ fun BarraDePasos(
         }
     }
 }
+
+/**
+ * Previsualización del componente [BarraDePasos] en el entorno de desarrollo de Android Studio.
+ */
 @Preview (
     showBackground = true,
     showSystemUi = true
 )
-
 @Composable
 fun BarraPreview(){
     SIPPINAAplicacionTheme{

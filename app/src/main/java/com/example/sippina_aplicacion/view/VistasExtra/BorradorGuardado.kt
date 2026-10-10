@@ -1,6 +1,6 @@
 package com.example.sippina_aplicacion.view.VistasExtra
 
-import com.example.sippina_aplicacion.viewmodel.EstadoReporte
+import com.example.sippina_aplicacion.model.EstadoReporte
 
 data class BorradorGuardado(
     val id: String,

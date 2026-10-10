@@ -3,13 +3,22 @@ package com.example.sippina_aplicacion.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.sippina_aplicacion.model.Autenticacion.AuthRepository
+import com.example.sippina_aplicacion.model.EstadoAuth
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-
+/**
+ * ViewModel encargado de la gestión de la lógica de negocio y el estado reactivo del módulo de autenticación.
+ *
+ * Administra operaciones asíncronas de inicio de sesión, registro de nuevos usuarios, consulta y actualización de perfil,
+ * recuperación de contraseña, cierre de sesión y eliminación de cuenta. Expone el estado global de autenticación
+ * mediante un [StateFlow] de tipo [EstadoAuth].
+ *
+ * @property repository Repositorio [AuthRepository] utilizado para la comunicación con los endpoints de red y criptografía.
+ */
 class AuthVM(
     private val repository: AuthRepository = AuthRepository()
 ) : ViewModel() {
@@ -17,6 +26,15 @@ class AuthVM(
     private val _state = MutableStateFlow(EstadoAuth())
     val state: StateFlow<EstadoAuth> = _state.asStateFlow()
 
+    /**
+     * Inicia sesión en la plataforma de forma asíncrona utilizando el repositorio de autenticación.
+     *
+     * Actualiza el estado de carga y, en caso de éxito, almacena el token JWT, marca al usuario como autenticado
+     * y consulta la información detallada de su perfil con [obtenerPerfil]. En caso de error, registra la incidencia.
+     *
+     * @param correo Correo electrónico introducido por el usuario.
+     * @param contrasena Contraseña asociada a la cuenta.
+     */
     fun iniciarSesion(correo: String, contrasena: String) {
         val correoLimpio = correo.trim().lowercase()
         val contrasenaLimpia = contrasena.trim()
@@ -49,6 +67,15 @@ class AuthVM(
         }
     }
 
+    /**
+     * Registra una nueva cuenta de usuario en el servidor y ejecuta el inicio de sesión automático al finalizar.
+     *
+     * @param correo Dirección de correo electrónico única para la nueva cuenta.
+     * @param contrasena Contraseña de acceso.
+     * @param nombre Nombre(s) del usuario.
+     * @param apellidos Apellidos paterno y materno del usuario.
+     * @param telefono Número de teléfono de contacto opcional.
+     */
     fun registrarUsuario(
         correo: String,
         contrasena: String,
@@ -94,6 +121,12 @@ class AuthVM(
             }
         }
     }
+
+    /**
+     * Obtiene la información detallada del perfil del usuario autenticado desde el servidor.
+     *
+     * @param correoTarget Correo electrónico del perfil a consultar (por defecto toma el correo actual del estado).
+     */
     fun obtenerPerfil(correoTarget: String = _state.value.correo) {
         val correoLimpio = correoTarget.trim().lowercase()
         val token = _state.value.token
@@ -126,6 +159,13 @@ class AuthVM(
         }
     }
 
+    /**
+     * Actualiza la información personal del usuario autenticado en la plataforma.
+     *
+     * @param nombre Nombre(s) actualizados del usuario.
+     * @param apellidos Apellidos actualizados del usuario.
+     * @param telefono Número telefónico actualizado opcional.
+     */
     fun actualizarPerfil(nombre: String, apellidos: String, telefono: String?) {
         val token = _state.value.token
         val correo = _state.value.correo
@@ -158,6 +198,11 @@ class AuthVM(
         }
     }
 
+    /**
+     * Solicita la recuperación de contraseña para el correo electrónico indicado.
+     *
+     * @param correo Dirección de correo electrónico asociada a la cuenta a recuperar.
+     */
     fun recuperarContrasena(correo: String) {
         viewModelScope.launch {
             _state.update { it.copy(cargando = true, error = null, mensajeExito = null) }
@@ -182,6 +227,11 @@ class AuthVM(
         }
     }
 
+    /**
+     * Elimina permanentemente la cuenta del usuario en el servidor y purga el estado local.
+     *
+     * @param onExito Callback ejecutado al completarse exitosamente la baja de la cuenta.
+     */
     fun eliminarCuenta(onExito: () -> Unit) {
         val token = _state.value.token
 
@@ -210,6 +260,9 @@ class AuthVM(
         }
     }
 
+    /**
+     * Cierra la sesión activa del usuario, notificando al servidor e invalidando el estado local.
+     */
     fun cerrarSesion() {
         val token = _state.value.token
         if (token.isNotBlank()) {
@@ -220,10 +273,16 @@ class AuthVM(
         limpiarEstadoLocal()
     }
 
+    /**
+     * Restablece el estado de autenticación a su valor predeterminado (vacío / no autenticado).
+     */
     private fun limpiarEstadoLocal() {
         _state.value = EstadoAuth()
     }
 
+    /**
+     * Limpia los mensajes temporales de error o éxito almacenados en el estado actual.
+     */
     fun limpiarMensajes() {
         _state.update { it.copy(error = null, mensajeExito = null) }
     }

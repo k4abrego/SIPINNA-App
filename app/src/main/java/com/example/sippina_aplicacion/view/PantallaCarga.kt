@@ -13,6 +13,16 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import kotlinx.coroutines.delay
 
+/**
+ * Pantalla de carga inicial (Splash Screen) de la aplicación SIPINNA.
+ *
+ * Simula un tiempo de inicialización de 2 segundos mediante [LaunchedEffect] y una corrutina con [delay],
+ * mostrando un fondo con degradado vertical y un indicador de progreso circular ([CircularProgressIndicator]).
+ * Al finalizar el tiempo de espera, invoca automáticamente el callback [onNavegarAInicio].
+ *
+ * @param onNavegarAInicio Callback ejecutado al terminar la carga para navegar hacia la pantalla de inicio.
+ * @param modifier [Modifier] opcional para personalizar el diseño del contenedor principal.
+ */
 @Composable
 fun PantallaCarga(
     onNavegarAInicio: () -> Unit,
