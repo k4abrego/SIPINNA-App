@@ -1,4 +1,3 @@
-
 package com.example.sippina_aplicacion.view.reportes
 
 import androidx.activity.compose.BackHandler
@@ -61,6 +60,20 @@ import com.example.sippina_aplicacion.view.PantallasReporte.BarraDePasos
 import com.example.sippina_aplicacion.viewmodel.ReporteVM
 import java.util.Locale
 
+/**
+ * Pantalla de captura de los detalles del incidente (Paso 2 del flujo de generación de reporte).
+ *
+ * Permite al usuario especificar el horario aproximado de los hechos mediante un deslizador ([Slider]),
+ * ajustar la cantidad de menores involucrados, seleccionar si hubo un adulto presente ("Sí", "No", "No sé")
+ * y redactar la descripción narrativa de los hechos.
+ *
+ * Incluye validación del campo de descripción obligatoria y gestiona la navegación con [BackHandler].
+ *
+ * @param viewModel Instancia de [ReporteVM] que mantiene el estado global del reporte.
+ * @param modifier [Modifier] opcional para aplicar modificaciones de diseño al contenedor principal.
+ * @param onSiguiente Callback ejecutado tras validar con éxito los datos para avanzar al paso del registro del menor.
+ * @param onAtras Callback para regresar al paso anterior (Ubicación).
+ */
 @Composable
 fun Detalles(
     viewModel: ReporteVM = viewModel(),
@@ -477,7 +490,12 @@ fun Detalles(
     }
 }
 
-
+/**
+ * Convierte un valor de hora representado como número flotante a una cadena de texto en formato `HH:mm`.
+ *
+ * @param valor Valor en coma flotante entre 0.0 y 24.0 que representa las horas y fracción de minutos.
+ * @return Cadena de texto con la hora formateada (ej. `"12:30"`).
+ */
 private fun formatearHora(valor: Float): String {
     val horas = valor.toInt()
     val minutos = ((valor - horas) * 60).toInt()
@@ -489,7 +507,9 @@ private fun formatearHora(valor: Float): String {
     )
 }
 
-
+/**
+ * Previsualización de la pantalla [Detalles] en el entorno de desarrollo de Android Studio.
+ */
 @Preview(
     showBackground = true,
     showSystemUi = true,

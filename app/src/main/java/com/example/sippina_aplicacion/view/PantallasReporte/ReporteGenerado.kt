@@ -55,6 +55,23 @@ import com.example.sippina_aplicacion.R
 import com.example.sippina_aplicacion.ui.theme.SIPPINAAplicacionTheme
 import com.example.sippina_aplicacion.viewmodel.ReporteVM
 
+/**
+ * Pantalla final del flujo de reporte que procesa la transmisión y muestra el resultado del registro.
+ *
+ * Administra tres estados dinámicos de la interfaz de usuario:
+ * - **Enviando**: Muestra un [CircularProgressIndicator] bloqueante mientras la petición es procesada por el servidor.
+ * - **Error**: Presenta una interfaz de fallo con la opción de reintentar la transmisión hacia la API backend.
+ * - **Éxito**: Despliega las credenciales resultantes (Folio y Código Privado), ofreciendo la posibilidad de copiarlas
+ *   al portapapeles mediante [ClipboardManager].
+ *
+ * Bloquea la navegación de regreso con un [BackHandler] vacío para evitar envíos duplicados del mismo reporte,
+ * e invoca `viewModel.reiniciarEstadoReporte` al navegar hacia la pantalla de inicio.
+ *
+ * @param viewModel Instancia de [ReporteVM] que expone el estado reactivo del proceso de transmisión.
+ * @param modifier [Modifier] opcional para personalizar el diseño del contenedor principal.
+ * @param onVolverInicio Callback ejecutado al presionar "Página de inicio" para regresar al inicio de la aplicación.
+ * @param setPrimaryClip Función de extensión opcional para inyectar o mockear la interacción con el portapapeles.
+ */
 @SuppressLint("ServiceCast")
 @Composable
 fun ReporteGenerado(
@@ -345,6 +362,9 @@ fun ReporteGenerado(
     }
 }
 
+/**
+ * Previsualización de la pantalla [ReporteGenerado] en el entorno de desarrollo de Android Studio.
+ */
 @Preview(
     showBackground = true,
     showSystemUi = true,

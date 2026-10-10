@@ -50,6 +50,12 @@ import com.example.sippina_aplicacion.view.perfilusuario.mapearEstatusAInt
 import com.example.sippina_aplicacion.viewmodel.AuthVM
 import com.example.sippina_aplicacion.viewmodel.ReporteVM
 
+/**
+ * Actividad principal de la aplicación SIPINNA.
+ *
+ * Configura el soporte de pantalla completa de borde a borde ([enableEdgeToEdge]) y establece
+ * la jerarquía raíz de la interfaz de usuario basada en Jetpack Compose.
+ */
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -62,6 +68,12 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+/**
+ * Componente Composable raíz que encapsula el andamiaje de la interfaz ([Scaffold])
+ * y el controlador de navegación de la aplicación.
+ *
+ * @param modifier [Modifier] opcional para el diseño del contenedor principal.
+ */
 @Composable
 fun AppPrincipal(
     modifier: Modifier = Modifier
@@ -78,6 +90,16 @@ fun AppPrincipal(
     }
 }
 
+/**
+ * Define el grafo de navegación ([NavHost]) y las rutas de la aplicación SIPINNA.
+ *
+ * Conecta los distintos flujos de usuario incluyendo la pantalla de carga, inicio, asistente de reportes en 5 pasos,
+ * autenticación, perfiles (invitado y autenticado), notificaciones, historial de reportes y vistas informativas extra.
+ * Administra instancias compartidas de [ReporteVM] y [AuthVM] para la gestión de estados globales y llamadas de red.
+ *
+ * @param navController Controlador de navegación [NavHostController] encargado de la pila de pantallas.
+ * @param modifier [Modifier] opcional para personalizar el contenedor de navegación.
+ */
 @Composable
 fun AppNavHost(
     navController: NavHostController,

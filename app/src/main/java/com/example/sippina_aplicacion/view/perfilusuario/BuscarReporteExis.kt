@@ -1,6 +1,5 @@
 package com.example.sippina_aplicacion.view.perfilusuario
 
-import android.graphics.fonts.Font
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
@@ -54,9 +53,8 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.R
 import com.example.sippina_aplicacion.ui.theme.SIPPINAAplicacionTheme
-import com.example.sippina_aplicacion.viewmodel.ReporteModel
+import com.example.sippina_aplicacion.model.ReporteModel
 
 @Composable
 fun BuscarReporteExistente(

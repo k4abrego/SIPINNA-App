@@ -7,6 +7,7 @@ import android.net.Uri
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
@@ -72,10 +73,24 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.example.sippina_aplicacion.R
 import com.example.sippina_aplicacion.ui.theme.SIPPINAAplicacionTheme
-import com.example.sippina_aplicacion.viewmodel.EvidenciaReporte
+import com.example.sippina_aplicacion.model.EvidenciaReporte
 import com.example.sippina_aplicacion.viewmodel.ReporteVM
 import java.io.File
 
+/**
+ * Pantalla opcional para la selección y carga de archivos de evidencia multimedia (Paso 4 del reporte).
+ *
+ * Permite al usuario adjuntar hasta un máximo de 2 elementos de evidencia multimedia
+ * capturando fotografías o grabando videos con la cámara del dispositivo, seleccionando imágenes de la galería,
+ * o adjuntando archivos de audio y documentos.
+ *
+ * Gestiona permisos en tiempo de ejecución y utiliza [FileProvider] para generar [Uri] temporales seguras.
+ *
+ * @param viewModel Instancia de [ReporteVM] que mantiene el estado y los archivos de evidencia.
+ * @param modifier [Modifier] opcional para personalizar el contenedor de diseño.
+ * @param onSiguiente Callback ejecutado al presionar el botón "Siguiente" para continuar al paso de Privacidad.
+ * @param onAtras Callback para regresar al paso previo de Descripción del Menor.
+ */
 @Composable
 fun Evidencia(
     viewModel: ReporteVM = viewModel(),
@@ -420,6 +435,15 @@ fun Evidencia(
     }
 }
 
+/**
+ * Tarjeta interactiva para la selección de un tipo de medio de evidencia (Cámara, Galería, Video o Audio).
+ *
+ * @param icon Icono vectorial [ImageVector] correspondiente a la acción.
+ * @param contentDescription Texto alternativo de descripción accesible para el icono.
+ * @param modifier [Modifier] opcional para la tarjeta.
+ * @param deshabilitado Flag que indica si la opción debe deshabilitarse por haber alcanzado el límite máximo de evidencias.
+ * @param onClick Acción ejecutada al hacer clic sobre la tarjeta.
+ */
 @Composable
 private fun TarjetaOpcionMedia(
     icon: ImageVector,
@@ -452,7 +476,15 @@ private fun TarjetaOpcionMedia(
     }
 }
 
-//Este implementacion es para la vista previa de coil
+/**
+ * Vista previa e ítem individual para listar cada evidencia adjunta en la interfaz.
+ *
+ * Muestra una miniatura cargada dinámicamente con Coil ([AsyncImage]) para imágenes o un icono descriptivo
+ * para videos, audios y documentos, incorporando un botón superpuesto para su eliminación ([onEliminar]).
+ *
+ * @param evidencia Objeto [EvidenciaReporte] con la URI y tipo del archivo adjunto.
+ * @param onEliminar Callback ejecutado al presionar el botón de eliminar.
+ */
 @Composable
 private fun ItemEvidenciaAdjunta(
     evidencia: EvidenciaReporte,
@@ -508,11 +540,21 @@ private fun ItemEvidenciaAdjunta(
 }
 
 
-// Estos son permisos y uris temporales
+/**
+ * Verifica si se posee el permiso especificado en tiempo de ejecución antes de lanzar la acción solicitada.
+ *
+ * Si el permiso ya se encuentra concedido ejecuta la acción de forma inmediata; caso contrario, solicita el permiso
+ * utilizando el [launcher] proporcionado.
+ *
+ * @param context Contexto [Context] de Android.
+ * @param permiso Nombre del permiso requerido en el manifiesto (ej. `Manifest.permission.CAMERA`).
+ * @param launcher Launcher para la solicitud de permisos en tiempo de ejecución.
+ * @param onConcedido Lambda que se invoca si el permiso ya está concedido.
+ */
 private fun solicitarPermisoYEjecutar(
     context: Context,
     permiso: String,
-    launcher: androidx.activity.result.ActivityResultLauncher<String>,
+    launcher: ActivityResultLauncher<String>,
     onConcedido: () -> Unit
 ) {
     if (ContextCompat.checkSelfPermission(context, permiso) == PackageManager.PERMISSION_GRANTED) {
@@ -522,6 +564,13 @@ private fun solicitarPermisoYEjecutar(
     }
 }
 
+/**
+ * Crea un archivo temporal en el directorio de caché privado del dispositivo y retorna su [Uri] segura mediante [FileProvider].
+ *
+ * @param context Contexto [Context] para acceder al directorio de caché y proveedor de archivos del paquete.
+ * @param extension Extensión del archivo temporal (ej. `"jpg"` o `"mp4"`).
+ * @return [Uri] segura del archivo temporal creado.
+ */
 private fun crearUriTemporal(context: Context, extension: String): Uri {
     val tempFile = File.createTempFile("media_", ".$extension", context.cacheDir).apply {
         createNewFile()
@@ -533,11 +582,14 @@ private fun crearUriTemporal(context: Context, extension: String): Uri {
         tempFile
     )
 }
+
+/**
+ * Previsualización de la pantalla [Evidencia] en el entorno de desarrollo de Android Studio.
+ */
 @Preview(
     showBackground = true,
     showSystemUi = true,
 )
-
 @Composable
 fun EvidenciaPreview() {
     SIPPINAAplicacionTheme {

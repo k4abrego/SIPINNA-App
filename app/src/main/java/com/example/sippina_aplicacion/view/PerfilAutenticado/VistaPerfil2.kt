@@ -55,6 +55,27 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.window.Dialog
 
+/**
+ * Pantalla principal de perfil para usuarios autenticados en la plataforma SIPINNA.
+ *
+ * Ofrece acceso rápido a la edición de información del usuario ([onEditarPerfil]), la gestión de borradores ([onBorradores]),
+ * consulta de historial de reportes ([onMisReportes]), centro de notificaciones ([onNotificaciones]) y
+ * el Aviso de Privacidad ([onAvisoPrivacidad]).
+ *
+ * Además, incluye la acción crítica de eliminación de cuenta mediante un diálogo de confirmación personalizado ([Dialog])
+ * de advertencia e indicador de carga ([CircularProgressIndicator]) mientras se obtienen los datos del perfil.
+ *
+ * @param modifier [Modifier] opcional para personalizar el diseño del contenedor principal.
+ * @param nombreUsuario Nombre del usuario autenticado que se mostrará en el encabezado.
+ * @param cargando Flag que indica si la consulta del perfil del usuario está en progreso.
+ * @param onAtras Callback invocado al presionar el botón de regresar.
+ * @param onBorradores Callback para navegar hacia la vista de gestión de borradores guardados localmente.
+ * @param onMisReportes Callback para navegar a la lista de reportes enviados por el usuario.
+ * @param onAvisoPrivacidad Callback para abrir el documento del Aviso de Privacidad.
+ * @param onEliminarCuenta Callback invocado tras confirmar la eliminación permanente de la cuenta.
+ * @param onEditarPerfil Callback para abrir el formulario de actualización de datos de perfil.
+ * @param onNotificaciones Callback para consultar el centro de notificaciones del usuario.
+ */
 @Composable
 fun VistaPerfil2(
     modifier: Modifier = Modifier,
@@ -356,6 +377,9 @@ fun VistaPerfil2(
 }
 
 
+/**
+ * Previsualización de la pantalla [VistaPerfil2] en el entorno de desarrollo de Android Studio.
+ */
 @Preview(
     showBackground = true,
     showSystemUi = true

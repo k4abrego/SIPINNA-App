@@ -57,6 +57,21 @@ import com.example.sippina_aplicacion.ui.theme.SIPPINAAplicacionTheme
 import com.example.sippina_aplicacion.view.reportes.Detalles
 import com.example.sippina_aplicacion.viewmodel.ReporteVM
 
+/**
+ * Pantalla para la captura de características descriptivas e identificación de los menores involucrados (Paso 3 del reporte).
+ *
+ * Permite seleccionar el rango de edad aproximado, género y escribir la descripción física detallada de cada menor.
+ * Gestiona dinámicamente un flujo iterativo cuando hay múltiples menores especificados en el reporte (`cantidadMenores`),
+ * permitiendo navegar secuencialmente entre cada menor ("Siguiente menor") o avanzar a la siguiente sección ("Siguiente")
+ * al completar el último registro.
+ *
+ * Incluye validación de campos obligatorios y soporte para navegación con el botón físico de retroceso ([BackHandler]).
+ *
+ * @param viewModel Instancia de [ReporteVM] que gestiona el estado y la lista iterativa de menores.
+ * @param modifier [Modifier] opcional para personalizar el contenedor principal.
+ * @param onSiguiente Callback ejecutado cuando se han completado las descripciones de todos los menores para avanzar al paso de Evidencia.
+ * @param onAtras Callback para regresar a la pantalla de Detalles previos cuando se está en el primer menor.
+ */
 @Composable
 fun Detalles2(
     viewModel: ReporteVM = viewModel(),
@@ -330,6 +345,9 @@ fun Detalles2(
     }
 }
 
+/**
+ * Previsualización de la pantalla [Detalles2] en el entorno de desarrollo de Android Studio.
+ */
 @Preview(
     showBackground = true,
     showSystemUi = true,

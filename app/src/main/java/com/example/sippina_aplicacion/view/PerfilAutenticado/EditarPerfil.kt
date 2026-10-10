@@ -1,5 +1,6 @@
 package com.example.sippina_aplicacion.view.PerfilAutenticado
 
+import android.util.Patterns
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -60,15 +61,35 @@ import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.graphics.SolidColor
 
-// Datos editables del perfil.
-// No incluye la contraseña para evitar almacenarla como parte
-// de los datos generales del usuario.
+/**
+ * Modelo de datos con la información personal editable del perfil de usuario.
+ *
+ * Excluye intencionalmente el campo de contraseña para evitar almacenar o transmitir credenciales sensibles
+ * en el estado del modelo general del usuario.
+ *
+ * @property nombreCompleto Nombre y apellidos completos del usuario.
+ * @property correoElectronico Dirección de correo electrónico asociada a la cuenta.
+ * @property telefono Número telefónico de contacto.
+ */
 data class DatosPerfil(
     val nombreCompleto: String,
     val correoElectronico: String,
     val telefono: String
 )
 
+/**
+ * Pantalla de edición de datos personales del perfil de usuario y cambio de contraseña.
+ *
+ * Permite modificar el nombre, correo electrónico y número de teléfono, así como actualizar la contraseña
+ * previa verificación de requisitos (mínimo 8 caracteres y confirmación coincidente).
+ *
+ * Aplica reglas de validación en tiempo de entrada y solicita confirmación mediante un diálogo ([AlertDialog])
+ * antes de invocar la función [onGuardar].
+ *
+ * @param onAtras Callback invocado al presionar el botón de navegación hacia atrás.
+ * @param onGuardar Callback invocado al confirmar los cambios, entregando la instancia de [DatosPerfil]
+ * e opcionalmente la nueva contraseña (o `null` si no fue modificada).
+ */
 @Composable
 fun EditarPerfil(
     onAtras: () -> Unit = {},
@@ -122,7 +143,7 @@ fun EditarPerfil(
             correoElectronico.isBlank() ->
                 "Por favor, ingresa tu correo electrónico."
 
-            !android.util.Patterns.EMAIL_ADDRESS
+            !Patterns.EMAIL_ADDRESS
                 .matcher(correoElectronico.trim())
                 .matches() ->
                 "Ingresa un correo electrónico válido."
@@ -411,7 +432,17 @@ fun EditarPerfil(
     }
 }
 
-
+/**
+ * Campo de entrada de texto personalizado para los datos del perfil de usuario.
+ *
+ * Utiliza [BasicTextField] para un estilo compacto y ofrece soporte de ocultación/visibilidad para campos de contraseña.
+ *
+ * @param etiqueta Texto descriptivo mostrado sobre el campo de entrada.
+ * @param valor Cadena de texto actual en el campo.
+ * @param onValorChange Callback invocado al modificar el valor del campo.
+ * @param esContrasena Indique `true` si el campo debe ocultar los caracteres por seguridad y mostrar la opción de visibilidad.
+ * @param tipoTeclado Configuración de [KeyboardType] para adaptar el teclado del sistema (ej. email, teléfono).
+ */
 @Composable
 private fun CampoPerfil(
     etiqueta: String,
@@ -501,6 +532,9 @@ private fun CampoPerfil(
     }
 }
 
+/**
+ * Previsualización de la pantalla [EditarPerfil] en el entorno de desarrollo de Android Studio.
+ */
 @Preview(
     showBackground = true,
     showSystemUi = true,

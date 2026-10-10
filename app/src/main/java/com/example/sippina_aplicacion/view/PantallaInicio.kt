@@ -42,6 +42,32 @@ import com.example.sippina_aplicacion.ui.theme.SIPPINAAplicacionTheme
 //import com.example.sippina_aplicacion.viewmodel.ReporteVM
 val colorMorado = Color(0xFF381DC3)
 
+/**
+ * Pantalla principal de inicio de la aplicación SIPINNA.
+ *
+ * Muestra el saludo de bienvenida, accesos superiores a notificaciones, búsqueda y perfil de usuario.
+ * Si el usuario se encuentra autenticado, presenta una tarjeta flotante con el estatus del último reporte registrado.
+ * Ofrece botones de navegación hacia la generación de reportes, información institucional, guías de qué reportar,
+ * gestión de sesión y un botón de emergencia de acceso rápido.
+ *
+ * @param modifier [Modifier] opcional para el contenedor principal.
+ * @param mostrarNotificaciones Flag que indica si se muestran notificaciones y funciones exclusivas para usuarios autenticados.
+ * @param ultimoReporteFolio Folio del último reporte enviado por el usuario, o `null`.
+ * @param ultimoReporteEstatus Estado actual del último reporte registrado.
+ * @param accionBoton Callback ejecutado al presionar el botón de emergencia.
+ * @param onNavegarAReporte Callback para iniciar el asistente de creación de un reporte anónimo.
+ * @param onNavegarAPerfil Callback para navegar a la vista de perfil (invitado o autenticado).
+ * @param onNavegarANotificaciones Callback para abrir la bandeja de notificaciones.
+ * @param onQueSituacionesReportar Callback para consultar la guía de situaciones reportables.
+ * @param onConoceSIPINNA Callback para consultar información institucional sobre SIPINNA.
+ * @param onBuscarReporte Callback para buscar un reporte existente por folio y código.
+ * @param onNavegarALogin Callback para iniciar sesión o registrar cuenta.
+ * @param onNavegarCrearCuenta Callback para registrar una nueva cuenta de usuario.
+ * @param onCerrarSesion Callback para cerrar la sesión activa actual.
+ * @param onVerTodosReportes Callback para listar todos los reportes del usuario.
+ * @param onAbrirUltimoReporte Callback para consultar el detalle del último reporte usando su folio.
+ * @param usuarioAutenticado Flag que indica si hay una sesión activa en la aplicación.
+ */
 @Composable
 fun PantallaInicio(
     modifier: Modifier = Modifier,
@@ -315,6 +341,9 @@ fun PantallaInicio(
     }
 }
 
+/**
+ * Previsualización de la pantalla [PantallaInicio] en el entorno de desarrollo de Android Studio.
+ */
 @Preview(
     showBackground = true,
     showSystemUi = true

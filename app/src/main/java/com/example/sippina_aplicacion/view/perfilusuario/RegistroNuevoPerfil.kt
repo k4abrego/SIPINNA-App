@@ -1,5 +1,6 @@
 package com.example.sippina_aplicacion.view.perfilusuario
 
+import android.util.Patterns
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -50,6 +51,22 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.sippina_aplicacion.viewmodel.AuthVM
+
+/**
+ * Pantalla de registro de una nueva cuenta de usuario en la aplicación SIPINNA.
+ *
+ * Recolecta la información personal (nombre, apellidos, correo, teléfono y contraseña), aplicando
+ * reglas de validación locales en tiempo real para asegurar el formato correcto de correo, longitud del teléfono
+ * (mínimo 10 dígitos) y seguridad de la contraseña (al menos 6 caracteres).
+ *
+ * Interactúa con [AuthVM] para procesar el registro en el servidor backend, mostrando un indicador de carga
+ * durante la petición asíncrona y gestionando la redirección automática al autenticarse exitosamente mediante [LaunchedEffect].
+ *
+ * @param modifier [Modifier] opcional para el contenedor principal.
+ * @param authVM Instancia de [AuthVM] encargada de la comunicación con la capa de autenticación.
+ * @param onSiguiente Callback ejecutado al completar el registro exitosamente para avanzar en el flujo.
+ * @param onAtras Callback para regresar a la pantalla anterior.
+ */
 @Composable
 fun RegistroNuevoPerfil(
     modifier: Modifier = Modifier,
@@ -68,7 +85,7 @@ fun RegistroNuevoPerfil(
 
     var mostrarErrores by remember { mutableStateOf(false) }
 
-    val esCorreoValido = android.util.Patterns.EMAIL_ADDRESS.matcher(correo.trim()).matches()
+    val esCorreoValido = Patterns.EMAIL_ADDRESS.matcher(correo.trim()).matches()
     val esTelefonoValido = numeroMovil.trim().length >= 10
     val esContrasenaValida = contrasena.trim().length >= 6
 
@@ -279,6 +296,17 @@ fun RegistroNuevoPerfil(
     }
 }
 
+/**
+ * Campo de texto estilizado para la captura de datos en el formulario de registro.
+ *
+ * @param valor Texto actual del campo.
+ * @param onValorCambio Callback invocado al modificar el texto.
+ * @param texto Etiqueta o marcador de posición (placeholder) del campo.
+ * @param keyboardType Tipo de teclado ([KeyboardType]) del sistema.
+ * @param visualTransformation Transformación visual aplicada al texto (ej. [PasswordVisualTransformation]).
+ * @param isError Flag que determina si el campo se muestra con indicadores visuales de error.
+ * @param mensajeError Mensaje explicativo mostrado debajo del campo en caso de error.
+ */
 @Composable
 fun CampoRegistro(
     valor: String,
@@ -346,6 +374,9 @@ fun CampoRegistro(
     }
 }
 
+/**
+ * Previsualización de la pantalla [RegistroNuevoPerfil] en el entorno de desarrollo de Android Studio.
+ */
 @Preview(
     showBackground = true,
     showSystemUi = true,
