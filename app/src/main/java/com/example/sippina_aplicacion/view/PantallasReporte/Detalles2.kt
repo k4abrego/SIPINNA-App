@@ -2,6 +2,7 @@ package com.example.sippina_aplicacion.view.PantallasReporte
 
 import android.R.attr.padding
 import android.text.style.UnderlineSpan
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -56,6 +57,21 @@ import com.example.sippina_aplicacion.ui.theme.SIPPINAAplicacionTheme
 import com.example.sippina_aplicacion.view.reportes.Detalles
 import com.example.sippina_aplicacion.viewmodel.ReporteVM
 
+/**
+ * Pantalla para la captura de características descriptivas e identificación de los menores involucrados (Paso 3 del reporte).
+ *
+ * Permite seleccionar el rango de edad aproximado, género y escribir la descripción física detallada de cada menor.
+ * Gestiona dinámicamente un flujo iterativo cuando hay múltiples menores especificados en el reporte (`cantidadMenores`),
+ * permitiendo navegar secuencialmente entre cada menor ("Siguiente menor") o avanzar a la siguiente sección ("Siguiente")
+ * al completar el último registro.
+ *
+ * Incluye validación de campos obligatorios y soporte para navegación con el botón físico de retroceso ([BackHandler]).
+ *
+ * @param viewModel Instancia de [ReporteVM] que gestiona el estado y la lista iterativa de menores.
+ * @param modifier [Modifier] opcional para personalizar el contenedor principal.
+ * @param onSiguiente Callback ejecutado cuando se han completado las descripciones de todos los menores para avanzar al paso de Evidencia.
+ * @param onAtras Callback para regresar a la pantalla de Detalles previos cuando se está en el primer menor.
+ */
 @Composable
 fun Detalles2(
     viewModel: ReporteVM = viewModel(),
@@ -76,15 +92,26 @@ fun Detalles2(
     val opcionesGenero = listOf("Masculino", "Femenino", "Desconocido")
 
     // Asignaciones por defecto
-    val edadActual = state.rangoEdad.ifEmpty { "0-4" }
-    val generoActual = state.genero.ifEmpty { "Masculino" }
+    val edadActual = state.rangoEdad
+    val generoActual = state.genero
 
     // Validación sobre el estado de la descripción física
     var mostrarError by remember { mutableStateOf(false) }
     val tieneError = mostrarError && state.descripcionFisica.trim().isEmpty()
 
+    val manejarAtras = {
+        mostrarError = false
+        if(!viewModel.regresarAlMenorAnterior()){
+            onAtras()
+        }
+
+    }
+
+    BackHandler{manejarAtras()}
+
+
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .imePadding()
             .background(Color(0xFFEAF4FC))
@@ -93,7 +120,7 @@ fun Detalles2(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Column(
-            modifier = Modifier
+            modifier = modifier
                 .weight(1f)
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState()),
@@ -121,7 +148,7 @@ fun Detalles2(
             Spacer(modifier = Modifier.height(20.dp))
 
             Text(
-                text = "Descripción : Menor 1",
+                text = "Descripción : Menor ${state.indiceMenorActual + 1} de ${state.cantidadMenores}",
                 fontWeight = FontWeight.Bold,
                 textDecoration = TextDecoration.Underline,
                 color = colorMorado,
@@ -267,7 +294,7 @@ fun Detalles2(
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             Button(
-                onClick = { onAtras() },
+                onClick = { manejarAtras() },
                 shape = CircleShape,
                 colors = ButtonDefaults.buttonColors(
                     containerColor = colorFondoBotonAtras,
@@ -283,7 +310,11 @@ fun Detalles2(
             Button(
                 onClick = {
                     if (state.descripcionFisica.trim().isNotBlank()) {
-                        onSiguiente()
+                        mostrarError = false
+                        // Si era el último menor entonces  avanza a la siguiente pantalla
+                        if (!viewModel.avanzarAlSiguienteMenor()) {
+                            onSiguiente()
+                        }
                     } else {
                         mostrarError = true
                     }
@@ -297,12 +328,26 @@ fun Detalles2(
                     .weight(1f)
                     .height(46.dp)
             ) {
-                Text(text = "Siguiente", fontSize = 15.sp, fontWeight = FontWeight.Bold)
+                //por si hay más de 1 menor o se va a la otra pantalla
+                Text(
+                    text = if (
+                        state.indiceMenorActual < state.cantidadMenores - 1
+                    ) {
+                        "Siguiente menor"
+                    } else {
+                        "Siguiente"
+                    },
+                    fontSize = 15.sp,
+                    fontWeight = FontWeight.Bold
+                )
             }
         }
     }
 }
 
+/**
+ * Previsualización de la pantalla [Detalles2] en el entorno de desarrollo de Android Studio.
+ */
 @Preview(
     showBackground = true,
     showSystemUi = true,

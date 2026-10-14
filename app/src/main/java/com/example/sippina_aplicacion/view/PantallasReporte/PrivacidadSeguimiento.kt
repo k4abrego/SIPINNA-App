@@ -1,5 +1,6 @@
 package com.example.sippina_aplicacion.view.PantallasReporte
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -22,17 +23,19 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedCard
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -49,13 +52,30 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-
+import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
-
 import com.example.sippina_aplicacion.R
 import com.example.sippina_aplicacion.ui.theme.SIPPINAAplicacionTheme
 import com.example.sippina_aplicacion.viewmodel.ReporteVM
 
+/**
+ * Pantalla final de configuración de privacidad y envío del reporte (Paso 5 del formulario).
+ *
+ * Permite seleccionar entre dos modalidades de privacidad:
+ * - **Anónimo**: Consulta el seguimiento mediante un folio y código privado asignado, sin requerir datos personales.
+ * - **Recibir actualizaciones**: Exige ingresar un correo electrónico válido para la notificación del estatus del trámite.
+ *
+ * Al presionar "Finalizar reporte", realiza las validaciones correspondientes e invoca `viewModel.enviarReporteAlBackEnd`
+ * para transmitir la información y evidencias hacia el servidor. Además, incluye un enlace hacia el Aviso de Privacidad
+ * e integra control de navegación con [BackHandler].
+ *
+ * @param viewModel Instancia de [ReporteVM] encargada de la transmisión del reporte y la gestión de la privacidad.
+ * @param modifier [Modifier] opcional para el contenedor del diseño.
+ * @param onSiguiente Callback ejecutado tras iniciar exitosamente el envío para avanzar a la pantalla de confirmación.
+ * @param onAtras Callback para regresar a la sección de Evidencia.
+ * @param onAvisoPrivacidad Callback ejecutado al presionar el enlace para consultar el Aviso de Privacidad.
+ */
 @Composable
 fun PrivacidadSeguimiento(
     viewModel: ReporteVM = viewModel(),
@@ -72,10 +92,22 @@ fun PrivacidadSeguimiento(
     val colorFondoBotonAtras = Color(0xFFE2E2E2)
     val colorTextoBotonAtras = Color(0xFF5A5A5A)
 
+    val state by viewModel.uiState.collectAsState()
+    var correo by remember { mutableStateOf(state.correoSeguimiento) }
+    val opcionSeleccionada = state.opcionPrivacidad
 
-    var opcionSeleccionada by rememberSaveable {
-        mutableStateOf("anonimo")
-    }
+    // Estado para controlar la visualización de errores
+    var mostrarErrorCorreo by remember { mutableStateOf(false) }
+
+    // Evaluaciones de estado para la validación
+    val requiereCorreo = opcionSeleccionada == "actualizaciones"
+    val correoVacio = correo.trim().isEmpty()
+    val tieneError = mostrarErrorCorreo && requiereCorreo && correoVacio
+
+    val context = LocalContext.current
+
+    BackHandler { onAtras() }
+
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -132,9 +164,10 @@ fun PrivacidadSeguimiento(
                 titulo = "Reporte anónimo",
                 descripcion = "Podrás consultar tu reporte con el folio y el código privado, sin proporcionar tus datos de contacto.",
                 icon = Icons.Default.Person,
-                seleccionado = opcionSeleccionada == "anonimo",
+                seleccionado = opcionSeleccionada == "anonimo" || opcionSeleccionada == "anónimo",
                 onClick = {
-                    opcionSeleccionada = "anonimo"
+                    mostrarErrorCorreo = false
+                    viewModel.actualizarOpcionPrivacidad("anónimo")
                 }
             )
 
@@ -146,9 +179,57 @@ fun PrivacidadSeguimiento(
                 icon = Icons.Default.Email,
                 seleccionado = opcionSeleccionada == "actualizaciones",
                 onClick = {
-                    opcionSeleccionada = "actualizaciones"
+                    viewModel.actualizarOpcionPrivacidad("actualizaciones")
                 }
             )
+
+            if (opcionSeleccionada == "actualizaciones") {
+                Spacer(modifier = Modifier.height(16.dp))
+                Text(
+                    text = "Correo para recibir actualizaciones",
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = if (tieneError) Color.Red else colorMorado,
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                OutlinedTextField(
+                    value = correo,
+                    onValueChange = { nuevoTexto ->
+                        correo = nuevoTexto
+                        viewModel.setCorreoSeguimiento(nuevoTexto)
+                        if (nuevoTexto.trim().isNotBlank()) {
+                            mostrarErrorCorreo = false
+                        }
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    placeholder = { Text("correo@ejemplo.com") },
+                    singleLine = true,
+                    isError = tieneError,
+                    supportingText = {
+                        if (tieneError) {
+                            Text(
+                                text = "* Por favor ingresa un correo para recibir actualizaciones",
+                                color = Color.Red,
+                                fontSize = 12.sp,
+                                fontWeight = FontWeight.Medium
+                            )
+                        }
+                    },
+                    trailingIcon = {
+                        if (tieneError) {
+                            Icon(
+                                imageVector = Icons.Default.Error,
+                                contentDescription = "Error de correo",
+                                tint = Color.Red
+                            )
+                        }
+                    },
+                    shape = RoundedCornerShape(14.dp)
+                )
+            }
 
             Spacer(modifier = Modifier.height(22.dp))
 
@@ -189,6 +270,7 @@ fun PrivacidadSeguimiento(
             )
             Spacer(modifier = Modifier.height(12.dp))
         }
+
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -199,7 +281,9 @@ fun PrivacidadSeguimiento(
             Button(
                 onClick = onAtras,
                 shape = CircleShape,
-                colors = ButtonDefaults.buttonColors(containerColor = colorFondoBotonAtras, contentColor = colorTextoBotonAtras
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = colorFondoBotonAtras,
+                    contentColor = colorTextoBotonAtras
                 ),
                 modifier = Modifier
                     .weight(1f)
@@ -213,7 +297,17 @@ fun PrivacidadSeguimiento(
             }
 
             Button(
-                onClick = onSiguiente,
+                onClick = {
+                    val esInvalido = requiereCorreo && correoVacio
+
+                    if (esInvalido) {
+                        mostrarErrorCorreo = true
+                    } else {
+                        mostrarErrorCorreo = false
+                        viewModel.enviarReporteAlBackEnd(context = context)
+                        onSiguiente()
+                    }
+                },
                 shape = CircleShape,
                 colors = ButtonDefaults.buttonColors(
                     containerColor = colorFondoBotonSiguiente,
@@ -234,6 +328,17 @@ fun PrivacidadSeguimiento(
     }
 }
 
+/**
+ * Tarjeta interactiva para la selección de las opciones de modalidad de privacidad del reporte.
+ *
+ * Muestra el título, descripción e icono de la opción, destacando visualmente cuando está seleccionada.
+ *
+ * @param titulo Título de la opción de privacidad (ej. "Reporte anónimo").
+ * @param descripcion Explicación sobre el manejo de datos y seguimiento de dicha modalidad.
+ * @param icon Icono vectorial [ImageVector] asociativo.
+ * @param seleccionado Flag que indica si la opción se encuentra activa actualmente.
+ * @param onClick Acción ejecutada al seleccionar la tarjeta.
+ */
 @Composable
 private fun TarjetaOpcionPrivacidad(
     titulo: String,
@@ -310,6 +415,9 @@ private fun TarjetaOpcionPrivacidad(
     }
 }
 
+/**
+ * Previsualización de la pantalla [PrivacidadSeguimiento] en el entorno de desarrollo de Android Studio.
+ */
 @Preview(
     showBackground = true,
     showSystemUi = true,

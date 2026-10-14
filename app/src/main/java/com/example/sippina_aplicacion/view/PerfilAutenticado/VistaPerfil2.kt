@@ -28,6 +28,7 @@ import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -49,22 +50,44 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.sippina_aplicacion.R
 import com.example.sippina_aplicacion.ui.theme.SIPPINAAplicacionTheme
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.window.Dialog
 
+/**
+ * Pantalla principal de perfil para usuarios autenticados en la plataforma SIPINNA.
+ *
+ * Ofrece acceso rápido a la edición de información del usuario ([onEditarPerfil]), la gestión de borradores ([onBorradores]),
+ * consulta de historial de reportes ([onMisReportes]), centro de notificaciones ([onNotificaciones]) y
+ * el Aviso de Privacidad ([onAvisoPrivacidad]).
+ *
+ * Además, incluye la acción crítica de eliminación de cuenta mediante un diálogo de confirmación personalizado ([Dialog])
+ * de advertencia e indicador de carga ([CircularProgressIndicator]) mientras se obtienen los datos del perfil.
+ *
+ * @param modifier [Modifier] opcional para personalizar el diseño del contenedor principal.
+ * @param nombreUsuario Nombre del usuario autenticado que se mostrará en el encabezado.
+ * @param cargando Flag que indica si la consulta del perfil del usuario está en progreso.
+ * @param onAtras Callback invocado al presionar el botón de regresar.
+ * @param onBorradores Callback para navegar hacia la vista de gestión de borradores guardados localmente.
+ * @param onMisReportes Callback para navegar a la lista de reportes enviados por el usuario.
+ * @param onAvisoPrivacidad Callback para abrir el documento del Aviso de Privacidad.
+ * @param onEliminarCuenta Callback invocado tras confirmar la eliminación permanente de la cuenta.
+ * @param onEditarPerfil Callback para abrir el formulario de actualización de datos de perfil.
+ * @param onNotificaciones Callback para consultar el centro de notificaciones del usuario.
+ */
 @Composable
 fun VistaPerfil2(
     modifier: Modifier = Modifier,
+    nombreUsuario:String = "Usuario",
+    cargando : Boolean = false,
     onAtras: () -> Unit = {},
     onBorradores: () -> Unit = {},
     onMisReportes: () -> Unit = {},
     onAvisoPrivacidad: () -> Unit = {},
     onEliminarCuenta: () -> Unit = {},
-    onEditarPerfil: () -> Unit = {}
+    onEditarPerfil: () -> Unit = {},
+    onNotificaciones: () -> Unit = {}
 ) {
     val morado = Color(0xFF381DC3)
     val fondo = Color(0xFFEAF4FC)
@@ -146,17 +169,21 @@ fun VistaPerfil2(
             }
         }
 
-        Spacer(modifier = Modifier.height(10.dp))
+        if(cargando){
+            CircularProgressIndicator(color = morado, modifier = Modifier.padding(16.dp))
+        }
+        else {
+            Text(
+                text = nombreUsuario.ifBlank { "Usuario" },
+                color = Color(0xFF3D20C9),
+                fontSize = 28.sp,
+                fontWeight = FontWeight.Bold,
+                lineHeight = 32.sp,
+                textAlign = TextAlign.Center
 
-        Text(
-            text = "Ariel\n Martínez Serrato",
-            color = Color(0xFF3D20C9),
-            fontSize = 28.sp,
-            fontWeight = FontWeight.Bold,
-            lineHeight = 32.sp,
-            textAlign = TextAlign.Center
-        )
+            )
 
+        }
         Spacer(modifier = Modifier.height(55.dp))
 
         Column(
@@ -190,6 +217,24 @@ fun VistaPerfil2(
             ) {
                 Text(
                     text = "Mis reportes",
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.SemiBold
+                )
+            }
+
+            Button(
+                onClick = onNotificaciones,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(55.dp),
+                shape = RoundedCornerShape(15.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color.White,
+                    contentColor = Color(0xFF666666)
+                )
+            ) {
+                Text(
+                    text = "Notificaciones",
                     fontSize = 20.sp,
                     fontWeight = FontWeight.SemiBold
                 )
@@ -332,6 +377,9 @@ fun VistaPerfil2(
 }
 
 
+/**
+ * Previsualización de la pantalla [VistaPerfil2] en el entorno de desarrollo de Android Studio.
+ */
 @Preview(
     showBackground = true,
     showSystemUi = true
@@ -339,6 +387,6 @@ fun VistaPerfil2(
 @Composable
 fun VistaPerfil2Preview() {
     SIPPINAAplicacionTheme {
-        VistaPerfil2()
+        VistaPerfil2(nombreUsuario = "Ariel Martinez")
     }
 }

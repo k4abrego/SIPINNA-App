@@ -15,24 +15,28 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Flag
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.OutlinedCard
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -53,32 +57,51 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.sippina_aplicacion.R
 import com.example.sippina_aplicacion.ui.theme.SIPPINAAplicacionTheme
+import com.example.sippina_aplicacion.model.ReporteModel
 
-
+/**
+ * Pantalla que lista los reportes registrados por el usuario con soporte para filtrado en tiempo real.
+ *
+ * Incluye un buscador dinámico ([OutlinedTextField]) que filtra por folio o estatus, y presenta
+ * el listado mediante un [LazyColumn] estilizado. En la parte inferior cuenta con una sección de leyenda
+ * que explica el significado de los iconos de estatus ("Enviado", "En proceso", "En revisión" y "Cerrado").
+ *
+ * @param listaReportes Colección de objetos [ReporteModel] recuperados desde la fuente de datos.
+ * @param cargando Flag que indica si los datos están siendo descargados del servidor backend.
+ * @param onAtras Callback invocado para regresar a la vista previa del perfil.
+ * @param onReporteClick Callback ejecutado al hacer clic en un reporte, entregando su `folio`.
+ */
 @Composable
 fun VerListaReportes(
+    listaReportes: List<ReporteModel> = emptyList(),
+    // Estado de carga para el backend
+    cargando: Boolean = false,
     onAtras: () -> Unit = {},
-    onBuscarClick: () -> Unit = {},
     onReporteClick: (String) -> Unit = {}
 ) {
     val morado = Color(0xFF381DC3)
     val fondo = Color(0xFFEAF4FC)
 
-    Box(modifier = Modifier.fillMaxSize())
-    {
+    // Estado del buscador
+    var textoBusqueda by remember { mutableStateOf("") }
+
+    // Filtrado automatico para la busqueda
+    val reportesFiltrados = listaReportes.filter {
+        it.folio.contains(textoBusqueda, ignoreCase = true) ||
+                it.estatus.contains(textoBusqueda, ignoreCase = true)
+    }
+
+    Box(modifier = Modifier.fillMaxSize().background(fondo)) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(fondo)
-                .padding(24.dp, 20.dp),
+                .padding(horizontal = 24.dp, vertical = 20.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Box(
-                modifier = Modifier
-                    .fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth(),
                 contentAlignment = Alignment.Center
-            )
-            {
+            ) {
                 FilledIconButton(
                     onClick = onAtras,
                     modifier = Modifier
@@ -88,28 +111,24 @@ fun VerListaReportes(
                         containerColor = fondo,
                         contentColor = Color(0xFF3D27C9)
                     )
-                )
-                {
+                ) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                         contentDescription = "Atrás",
                         modifier = Modifier.size(22.dp)
                     )
-
-
                 }
                 Image(
-                    painter = painterResource(
-                        id = com.example.sippina_aplicacion.R.drawable.imagensippina),
+                    painter = painterResource(id = R.drawable.imagensippina),
                     contentDescription = "Logo SIPINNA",
                     modifier = Modifier.size(120.dp)
                 )
-
             }
+
             Spacer(modifier = Modifier.height(10.dp))
 
             Text(
-                text = "Reportes ",
+                text = "Reportes",
                 fontSize = 35.sp,
                 fontWeight = FontWeight.Bold,
                 color = morado,
@@ -117,150 +136,161 @@ fun VerListaReportes(
             )
 
             Spacer(modifier = Modifier.height(20.dp))
+            // Este es el buscador
 
-            OutlinedCard(
-                onClick = onBuscarClick,
-                shape = RoundedCornerShape(16.dp),
-                border = BorderStroke(width = 1.5.dp, color = morado),
-                colors = CardDefaults.outlinedCardColors(containerColor = fondo),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(45.dp)
-            ) {
-                Row(
-                    modifier = Modifier.fillMaxSize(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Center
-                ) {
+            OutlinedTextField(
+                value = textoBusqueda,
+                onValueChange = { textoBusqueda = it },
+                placeholder = {
+                    Text(
+                        text = "Buscar por folio o estatus...",
+                        fontSize = 15.sp,
+                        color = morado.copy(alpha = 0.7f)
+                    )
+                },
+                leadingIcon = {
                     Icon(
                         imageVector = Icons.Default.Search,
                         contentDescription = "Buscar",
-                        tint = morado,
-                        modifier = Modifier.size(20.dp)
+                        tint = morado
                     )
-                    Spacer(modifier = Modifier.width(8.dp))
+                },
+                trailingIcon = {
+                    if (textoBusqueda.isNotEmpty()) {
+                        IconButton(onClick = { textoBusqueda = "" }) {
+                            Icon(
+                                imageVector = Icons.Default.Close,
+                                contentDescription = "Limpiar",
+                                tint = morado
+                            )
+                        }
+                    }
+                },
+                singleLine = true,
+                shape = RoundedCornerShape(16.dp),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedContainerColor = fondo,
+                    unfocusedContainerColor = fondo,
+                    focusedBorderColor = morado,
+                    unfocusedBorderColor = morado,
+                    focusedTextColor = Color.Black,
+                    unfocusedTextColor = Color.Black
+                ),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(54.dp)
+            )
 
+            Spacer(modifier = Modifier.height(20.dp))
+
+            if (cargando) {
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxWidth(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator(color = morado)
+                }
+            } else if (reportesFiltrados.isEmpty()) {
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxWidth(),
+                    contentAlignment = Alignment.Center
+                ) {
                     Text(
-                        text = "Buscar por folio y código",
+                        text = if (textoBusqueda.isEmpty()) "No tienes reportes registrados." else "No se encontraron coincidencias.",
                         fontSize = 15.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = morado
+                        color = Color.Gray,
+                        textAlign = TextAlign.Center
                     )
+                }
+            } else {
+                LazyColumn(
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
+                    items(reportesFiltrados) { reporte ->
+                        val icono= obtenerIconoPorEstatus(reporte.estatus)
+
+                        ItemReporteCard(
+                            folio = reporte.folio,
+                            icono = icono,
+                            colorIcono = morado,
+                            bordeColor = morado,
+                            onClick = { onReporteClick(reporte.folio) }
+                        )
+                    }
                 }
             }
 
-            Spacer(modifier = Modifier.height(20.dp))
-
-            Column(
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text(
-                    text = "Hoy",
-                    fontSize = 15.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    color = Color.Gray,
-                    modifier = Modifier.padding(start = 4.dp, bottom = 6.dp)
-                )
-
-                ItemReporteCard(
-                    folio = "REP-1234-1234",
-                    icono = Icons.AutoMirrored.Filled.Send,
-                    colorIcono = Color(0xFF9D91D7),
-                    bordeColor = morado,
-                    grosorBorde = 2.5.dp,
-                    onClick = { onReporteClick("REP-1234-1234") }
-                )
-
-            }
-            Spacer(modifier = Modifier.height(20.dp))
-
-            Column(modifier = Modifier.fillMaxWidth()){
-                Text(
-                    text = "Anteriores",
-                    fontSize = 15.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    color = Color.Gray,
-                    modifier = Modifier.padding(start = 4.dp, bottom = 6.dp)
-                )
-
-                ItemReporteCard(
-                    folio = "REP-1234-1235",
-                    icono = Icons.Default.History,
-                    colorIcono = Color(0xFF7A65E0),
-                    bordeColor = morado,
-                    onClick = { onReporteClick("REP-1234-1235") })
-
-                Spacer(modifier = Modifier.height(12.dp))
-
-                ItemReporteCard(
-                    folio = "REP-1234-1236",
-                    icono = Icons.Default.History,
-                    colorIcono = Color(0xFF7A65E0),
-                    bordeColor = morado,
-                    onClick = { onReporteClick("REP-1234-1236") }
-                )
-
-                Spacer(modifier = Modifier.height(12.dp))
-
-                ItemReporteCard(
-                    folio = "REP-1234-1235",
-                    icono = Icons.Default.Flag,
-                    colorIcono = Color(0xFF5F43E4),
-                    bordeColor = morado,
-                    onClick = { onReporteClick("REP-1234-1235") }
-                )
-            }
-
-            Spacer(modifier = Modifier.height(45.dp))
+            Spacer(modifier = Modifier.height(15.dp))
 
             HorizontalDivider(
                 thickness = 1.dp,
                 color = morado.copy(alpha = 0.5f)
             )
 
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(10.dp))
 
             Text(
                 text = "Estado de tu reporte",
-                fontSize = 18.sp,
+                fontSize = 15.sp,
                 fontWeight = FontWeight.Bold,
                 color = Color.Gray,
                 textAlign = TextAlign.Center
             )
-            Spacer(modifier = Modifier.height(20.dp))
 
+            Spacer(modifier = Modifier.height(15.dp))
+
+            // LEYENDA DE ESTADOS
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceAround,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                ItemEstadoLeyenda(
-                    etiqueta = "Enviado",
-                    icono = Icons.AutoMirrored.Filled.Send,
-                    colorFondo = Color(0xFF9D91D7)
-                )
-                ItemEstadoLeyenda(
-                    etiqueta = "En proceso",
-                    icono = Icons.Default.History,
-                    colorFondo = Color(0xFF7A65E0)
-                )
-                ItemEstadoLeyenda(
-                    etiqueta = "En revisión",
-                    icono = Icons.Default.Flag,
-                    colorFondo = Color(0xFF5F43E4)
-                )
-                ItemEstadoLeyenda(
-                    etiqueta = "Cerrado",
-                    icono = Icons.Default.Check,
-                    colorFondo = Color(0xFF381DC3)
-                )
+                ItemEstadoLeyenda("Enviado", Icons.AutoMirrored.Filled.Send, morado)
+                ItemEstadoLeyenda("En proceso", Icons.Default.History, morado)
+                ItemEstadoLeyenda("En revisión", Icons.Default.Flag, morado )
+                ItemEstadoLeyenda("Cerrado", Icons.Default.Check, morado)
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(10.dp))
         }
     }
 }
 
+/**
+ * Mapea la cadena del estado devuelto por el servidor al icono vectorial ([ImageVector]) correspondiente.
+ *
+ * @param estatus Texto que indica el estado del reporte (ej. "Enviado", "En proceso", "En revisión", "Cerrado").
+ * @return [ImageVector] asociativo para representar visualmente el estado.
+ */
+private fun obtenerIconoPorEstatus(estatus: String): ImageVector {
+    return when (estatus.lowercase().trim()) {
+        "enviado" -> Icons.AutoMirrored.Filled.Send
+        "en proceso" -> Icons.Default.History
+        "en revisión", "en revision" -> Icons.Default.Flag
+        "cerrado", "concluido" -> Icons.Default.Check
+        else -> Icons.Default.History
+    }
+}
+
+/**
+ * Tarjeta individual para mostrar el folio y el icono descriptivo del estado de un reporte.
+ *
+ * Anima el cambio de color de fondo al ser presionada (`animateColorAsState`).
+ *
+ * @param folio Identificador único del reporte a mostrar.
+ * @param icono Icono vectorial que representa el estado del reporte.
+ * @param colorIcono Color del círculo contenedor del icono.
+ * @param bordeColor Color del borde de la tarjeta.
+ * @param grosorBorde Ancho del borde de la tarjeta.
+ * @param onClick Callback ejecutado al seleccionar la tarjeta.
+ */
 @Composable
 private fun ItemReporteCard(
     folio: String,
@@ -270,18 +300,11 @@ private fun ItemReporteCard(
     grosorBorde: Dp = 1.5.dp,
     onClick: () -> Unit
 ) {
-    var seleccionado by remember {
-        mutableStateOf(false)
-    }
+    var seleccionado by remember { mutableStateOf(false) }
 
     val colorFondo by animateColorAsState(
-        targetValue = if (seleccionado) { Color(0xFFE0DBFA) }
-        else {
-            Color(0xFFEAF4FC)
-        },
-        animationSpec = tween(
-            durationMillis = 250
-        ),
+        targetValue = if (seleccionado) Color(0xFFE0DBFA) else Color(0xFFEAF4FC),
+        animationSpec = tween(durationMillis = 250),
         label = "AnimacionTarjetaReporte"
     )
 
@@ -318,9 +341,7 @@ private fun ItemReporteCard(
                 color = colorIcono,
                 modifier = Modifier.size(42.dp)
             ) {
-                Box(
-                    contentAlignment = Alignment.Center
-                ) {
+                Box(contentAlignment = Alignment.Center) {
                     Icon(
                         imageVector = icono,
                         contentDescription = null,
@@ -333,15 +354,20 @@ private fun ItemReporteCard(
     }
 }
 
+/**
+ * Elemento gráfico de la leyenda que explica el significado de cada estado de reporte en la aplicación.
+ *
+ * @param etiqueta Texto explicativo del estado (ej. "Enviado").
+ * @param icono Icono asociativo del estado.
+ * @param colorFondo Color de fondo del contenedor circular del icono.
+ */
 @Composable
 private fun ItemEstadoLeyenda(
     etiqueta: String,
     icono: ImageVector,
     colorFondo: Color
 ) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Text(
             text = etiqueta,
             fontSize = 15.sp,
@@ -349,17 +375,13 @@ private fun ItemEstadoLeyenda(
             color = Color.DarkGray,
             textAlign = TextAlign.Center
         )
-
         Spacer(modifier = Modifier.height(6.dp))
-
         Surface(
             shape = CircleShape,
             color = colorFondo,
             modifier = Modifier.size(38.dp)
         ) {
-            Box(
-                contentAlignment = Alignment.Center
-            ) {
+            Box(contentAlignment = Alignment.Center) {
                 Icon(
                     imageVector = icono,
                     contentDescription = etiqueta,
@@ -371,15 +393,20 @@ private fun ItemEstadoLeyenda(
     }
 }
 
-@Preview(
-    showBackground = true,
-    showSystemUi = true,
-    name = "Lista de Reportes - Material 3"
-)
+/**
+ * Previsualización de la pantalla [VerListaReportes] en el entorno de desarrollo de Android Studio.
+ */
+@Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun ListaReportesPreview() {
+    // Ejemplo de prueba con datos simulados
+    val listaEjemplo = listOf(
+        ReporteModel("REP-1234-1234", "Enviado"),
+        ReporteModel("REP-1234-1235", "En proceso"),
+        ReporteModel("REP-1234-1236", "En revisión"),
+        ReporteModel("REP-1234-1237", "Cerrado")
+    )
     SIPPINAAplicacionTheme {
-        VerListaReportes()
+        VerListaReportes(listaReportes = listaEjemplo)
     }
 }
-

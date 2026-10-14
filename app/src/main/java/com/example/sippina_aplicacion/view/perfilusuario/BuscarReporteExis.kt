@@ -1,6 +1,5 @@
 package com.example.sippina_aplicacion.view.perfilusuario
 
-import android.graphics.fonts.Font
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
@@ -26,6 +25,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButtonDefaults
@@ -34,6 +34,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -52,13 +53,17 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.R
 import com.example.sippina_aplicacion.ui.theme.SIPPINAAplicacionTheme
+import com.example.sippina_aplicacion.model.ReporteModel
 
 @Composable
 fun BuscarReporteExistente(
     onAtras: () -> Unit = {},
     onVerDetalleReporte: (String) -> Unit = {},
+    onBuscar: (folio: String, codigo: String) -> Unit = { _, _ -> },
+    reporteEncontrado: ReporteModel? = null,
+    buscando: Boolean = false,
+    errorBusqueda: String? = null,
     folioInicial: String = "",
     codigoInicial: String = ""
 ) {
@@ -66,23 +71,18 @@ fun BuscarReporteExistente(
     val fondo = Color(0xFFEAF4FC)
     val gris = Color(0xFF777777)
 
-    var folioEjemplo = "REP-1234-1234"
-    var codigoEjemplo = "KEFD-2P32"
-
     var folio by remember(folioInicial) { mutableStateOf(folioInicial) }
-    var codigoSeguridad by remember (codigoInicial){ mutableStateOf(codigoInicial) }
+    var codigoSeguridad by remember(codigoInicial) { mutableStateOf(codigoInicial) }
 
-    val datosCompletos =
-        folio.isNotBlank() && codigoSeguridad.isNotBlank()
+    val datosCompletos = folio.isNotBlank() && codigoSeguridad.isNotBlank()
 
-    val reporteEncontrado = folio.trim().equals(
-        folioEjemplo,
-            ignoreCase = true
-        ) &&
-                codigoSeguridad.trim().equals(
-                    codigoEjemplo,
-                    ignoreCase = true
-                )
+    // Busqueda al backend cuando el usuario llena ambos campos
+    LaunchedEffect(folio, codigoSeguridad) {
+        if (datosCompletos) {
+            onBuscar(folio, codigoSeguridad)
+        }
+    }
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -96,8 +96,7 @@ fun BuscarReporteExistente(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Box(
-                modifier = Modifier
-                    .fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth(),
                 contentAlignment = Alignment.Center
             ) {
                 FilledIconButton(
@@ -112,13 +111,13 @@ fun BuscarReporteExistente(
                 ) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = "Atras",
+                        contentDescription = "Atrás",
                         modifier = Modifier.size(22.dp)
                     )
                 }
                 Image(
                     painter = painterResource(id = com.example.sippina_aplicacion.R.drawable.imagensippina),
-                    contentDescription = "LogoSippina",
+                    contentDescription = "Logo SIPINNA",
                     modifier = Modifier.size(120.dp)
                 )
             }
@@ -135,12 +134,12 @@ fun BuscarReporteExistente(
             Spacer(modifier = Modifier.height(12.dp))
 
             Text(
-                text = "Ingrese el folio y código de deguridad para dar seguimiento y detalles de tú reporte",
+                text = "Ingrese el folio y código de seguridad para dar seguimiento y detalles de tu reporte",
                 fontSize = 18.sp,
                 lineHeight = 20.sp,
                 fontWeight = FontWeight.SemiBold,
                 color = gris,
-                textAlign = TextAlign.Center,
+                textAlign = TextAlign.Center
             )
 
             Spacer(modifier = Modifier.height(28.dp))
@@ -166,8 +165,7 @@ fun BuscarReporteExistente(
                 enter = fadeIn() + expandVertically(),
                 exit = fadeOut() + shrinkVertically()
             ) {
-                Column(modifier = Modifier.fillMaxWidth())
-                {
+                Column(modifier = Modifier.fillMaxWidth()) {
                     Text(
                         text = "Resultados:",
                         fontSize = 16.sp,
@@ -175,21 +173,26 @@ fun BuscarReporteExistente(
                         color = gris,
                         modifier = Modifier.padding(start = 4.dp, bottom = 8.dp)
                     )
-                    if (reporteEncontrado) {
+
+                    if (buscando) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(60.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            CircularProgressIndicator(color = morado)
+                        }
+                    } else if (reporteEncontrado != null) {
                         OutlinedCard(
-                            onClick = {
-                                onVerDetalleReporte(folioEjemplo)
-                            },
+                            onClick = { onVerDetalleReporte(reporteEncontrado.folio) },
                             shape = RoundedCornerShape(16.dp),
                             border = BorderStroke(1.5.dp, color = morado),
-                            colors = CardDefaults.outlinedCardColors(
-                                containerColor = fondo
-                            ),
+                            colors = CardDefaults.outlinedCardColors(containerColor = fondo),
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(60.dp)
-                        )
-                        {
+                        ) {
                             Row(
                                 modifier = Modifier
                                     .fillMaxSize()
@@ -198,7 +201,7 @@ fun BuscarReporteExistente(
                                 horizontalArrangement = Arrangement.SpaceBetween
                             ) {
                                 Text(
-                                    text = folioEjemplo,
+                                    text = reporteEncontrado.folio,
                                     fontSize = 18.sp,
                                     fontWeight = FontWeight.Bold,
                                     color = morado,
@@ -230,9 +233,7 @@ fun BuscarReporteExistente(
                         OutlinedCard(
                             shape = RoundedCornerShape(16.dp),
                             border = BorderStroke(width = 1.5.dp, color = morado),
-                            colors = CardDefaults.outlinedCardColors(
-                                contentColor = fondo
-                            ),
+                            colors = CardDefaults.outlinedCardColors(containerColor = fondo),
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(60.dp)
@@ -242,7 +243,7 @@ fun BuscarReporteExistente(
                                 contentAlignment = Alignment.Center
                             ) {
                                 Text(
-                                    text = "Sin reportes",
+                                    text = errorBusqueda ?: "Sin reportes",
                                     fontSize = 19.sp,
                                     fontWeight = FontWeight.Bold,
                                     color = morado,
@@ -253,6 +254,7 @@ fun BuscarReporteExistente(
                     }
                 }
             }
+
             Spacer(modifier = Modifier.height(44.dp))
 
             val textoPie = buildAnnotatedString {
@@ -280,7 +282,6 @@ fun BuscarReporteExistente(
         }
     }
 }
-
 
 @Composable
 private fun CampoFormularioBusqueda(
@@ -318,7 +319,7 @@ private fun CampoFormularioBusqueda(
                 unfocusedContainerColor = Color.White,
                 focusedBorderColor = morado,
                 unfocusedBorderColor = Color.Gray,
-                focusedTextColor =morado,
+                focusedTextColor = morado,
                 unfocusedTextColor = morado
             ),
             modifier = Modifier
@@ -328,51 +329,14 @@ private fun CampoFormularioBusqueda(
     }
 }
 
-
-//@Preview(
-//    showBackground = true,
-//    showSystemUi = true,
-//    name = "Buscar reporte - Inicial"
-//)
-//@Composable
-//fun BuscarReportePreview() {
-//
-//    SIPPINAAplicacionTheme {
-//        BuscarReporteExistente()
-//    }
-//}
-
-
-@Preview(
-    showBackground = true,
-    showSystemUi = true,
-    name = "Buscar reporte - Encontrado"
-)
+@Preview(showBackground = true, showSystemUi = true, name = "Buscar reporte - Encontrado")
 @Composable
 fun BuscarReporteEncontradoPreview() {
-
     SIPPINAAplicacionTheme {
         BuscarReporteExistente(
             folioInicial = "REP-1234-1234",
-            codigoInicial = "KEFD-2P32"
+            codigoInicial = "KEFD-2P32",
+            reporteEncontrado = ReporteModel(folio = "REP-1234-1234", estatus = "En proceso")
         )
     }
 }
-
-
-
-//@Preview(
-//    showBackground = true,
-//    showSystemUi = true,
-//    name = "Buscar reporte - Sin resultados"
-//)
-//@Composable
-//fun BuscarReporteSinResultadosPreview() {
-//
-//    SIPPINAAplicacionTheme {
-//        BuscarReporteExistente(
-//            folioInicial = "REP-1234-1235",
-//            codigoInicial = "KEFD-2P32"
-//        )
-//    }
-//}

@@ -22,6 +22,13 @@ playServicesMaps = "19.2.0"
 playServicesLocation = "21.3.0"
 accompanistPermissions = "0.37.3"
 runtimeSaveable = "1.12.1"
+material3 = "1.4.0"
+foundationLayoutVersion = "1.12.1"
+ui = "1.12.1"
+uiText = "1.12.1"
+playServicesCastFramework = "22.3.1"
+googlePSVer = "21.4.0"
+remoteCreationCore = "1.0.0-alpha21"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -53,6 +60,13 @@ accompanist-permissions = { group = "com.google.accompanist", name = "accompanis
 retrofit = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofitVer" }
 gson = { group = "com.squareup.retrofit2", name = "converter-gson", version.ref = "gsonVer" }
 androidx-compose-runtime-saveable = { group = "androidx.compose.runtime", name = "runtime-saveable", version.ref = "runtimeSaveable" }
+androidx-material3 = { group = "androidx.compose.material3", name = "material3", version.ref = "material3" }
+androidx-foundation-layout = { group = "androidx.compose.foundation", name = "foundation-layout", version.ref = "foundationLayoutVersion" }
+androidx-ui = { group = "androidx.compose.ui", name = "ui", version.ref = "ui" }
+androidx-compose-ui-text = { group = "androidx.compose.ui", name = "ui-text", version.ref = "uiText" }
+play-services-cast-framework = { group = "com.google.android.gms", name = "play-services-cast-framework", version.ref = "playServicesCastFramework" }
+google-services = { group = "com.google.gms", name = "google-services", version.ref = "googlePSVer" }
+androidx-compose-remote-creation-core = { group = "androidx.compose.remote", name = "remote-creation-core", version.ref = "remoteCreationCore" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

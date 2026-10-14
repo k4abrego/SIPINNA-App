@@ -40,14 +40,31 @@ import androidx.compose.ui.unit.sp
 import com.example.sippina_aplicacion.R
 import com.example.sippina_aplicacion.ui.theme.SIPPINAAplicacionTheme
 
+/**
+ * Pantalla de perfil para usuarios no autenticados (modo Invitado).
+ *
+ * Muestra una interfaz simplificada que permite a los usuarios sin sesión activa acceder a funciones públicas
+ * como la consulta de borradores locales ([onBorradores]), la búsqueda de reportes existentes ([onBuscarReporte]),
+ * la lectura del aviso de privacidad ([onAvisoPrivacidad]) y accesos directos para la creación de una cuenta
+ * ([onCrearCuenta]) o inicio de sesión ([onIniciarSesion]).
+ *
+ * @param modifier [Modifier] opcional para el contenedor principal de la vista.
+ * @param onAtras Callback invocado al presionar el botón de regresar.
+ * @param onBorradores Callback para acceder a la lista de borradores guardados localmente.
+ * @param onBuscarReporte Callback para consultar el estatus de un reporte mediante folio y código privado.
+ * @param onAvisoPrivacidad Callback para abrir el documento del Aviso de Privacidad.
+ * @param onCrearCuenta Callback para navegar al formulario de registro de un nuevo perfil.
+ * @param onIniciarSesion Callback para navegar a la pantalla de inicio de sesión.
+ */
 @Composable
 fun VistaPerfil1(
     modifier: Modifier = Modifier,
     onAtras: () -> Unit = {},
     onBorradores: () -> Unit = {},
-    onMisReportes: () -> Unit = {},
+    onBuscarReporte: () -> Unit = {},
     onAvisoPrivacidad: () -> Unit = {},
-    onCrearCuenta: () -> Unit = {}
+    onCrearCuenta: () -> Unit = {},
+    onIniciarSesion: () -> Unit ={ }
 ) {
     val morado = Color(0xFF381DC3)
     val fondo = Color(0xFFEAF4FC)
@@ -139,8 +156,8 @@ fun VistaPerfil1(
                         fontWeight = FontWeight.SemiBold
                     )
                 }
-
-                Button(onClick = onMisReportes,
+                Button(
+                    onClick = onBuscarReporte,
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(50.dp),
@@ -151,7 +168,7 @@ fun VistaPerfil1(
                     )
                 ) {
                     Text(
-                        text = "Mis reportes",
+                        text = "Buscar reporte",
                         fontSize = 20.sp,
                         fontWeight = FontWeight.SemiBold
                     )
@@ -200,6 +217,9 @@ fun VistaPerfil1(
 }
 
 
+/**
+ * Previsualización de la pantalla [VistaPerfil1] en el entorno de desarrollo de Android Studio.
+ */
 @Preview(
     showBackground = true,
     showSystemUi = true,
