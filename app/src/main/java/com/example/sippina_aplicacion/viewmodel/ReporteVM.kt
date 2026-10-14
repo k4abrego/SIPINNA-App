@@ -623,4 +623,13 @@ class ReporteVM(
             null
         }
     }
+
+    fun limpiarFormulario() {
+        borradorStorage?.eliminarBorradorLocal()
+        _uiState.value = EstadoReporte()
+    }
+
+
+
+
 }

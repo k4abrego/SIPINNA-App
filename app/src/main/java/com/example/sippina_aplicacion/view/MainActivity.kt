@@ -1,5 +1,6 @@
 package com.example.sippina_aplicacion.view
 
+import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -45,6 +46,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.sippina_aplicacion.view.perfilusuario.mapearEstatusAInt
 import com.example.sippina_aplicacion.viewmodel.AuthVM
@@ -136,6 +138,9 @@ fun AppNavHost(
         }
 
         composable(route = Pantalla.PantallaInicio.ruta) {
+
+            val context = LocalContext.current
+
             LaunchedEffect(usuarioAutenticado) {
                 if (usuarioAutenticado) {
                         reporteViewModel.obtenerMisReportesDelBackEnd()
@@ -149,6 +154,15 @@ fun AppNavHost(
                 mostrarNotificaciones = usuarioAutenticado,
                 ultimoReporteFolio = ultimoReporte?.folio,
                 ultimoReporteEstatus = ultimoReporte?.estatus,
+
+                accionBoton = {
+                    val intent = Intent(Intent.ACTION_DIAL).apply{
+                        data = Uri.parse("tel:911")
+                    }
+                    context.startActivity(intent)
+                },
+
+
                 onNavegarALogin = {
                     if (usuarioAutenticado) {
                         authViewModel.cerrarSesion()
@@ -160,6 +174,7 @@ fun AppNavHost(
                     authViewModel.cerrarSesion()
                 },
                 onNavegarAReporte = {
+                    reporteViewModel.limpiarFormulario()
                     navController.navigate(Pantalla.DondeOcurrio.ruta)
                 },
                 onBuscarReporte = {
@@ -400,12 +415,13 @@ fun AppNavHost(
         composable(Pantalla.ReporteGenerado.ruta) {
             ReporteGenerado(
                 viewModel = reporteViewModel,
-            ) {
-                navController.navigate(Pantalla.PantallaInicio.ruta) {
-                    popUpTo(Pantalla.PantallaInicio.ruta) { inclusive = false }
-                    launchSingleTop = true
+                onVolverInicio = {
+                    navController.navigate(Pantalla.PantallaInicio.ruta) {
+                        popUpTo(Pantalla.PantallaInicio.ruta) { inclusive = false }
+                        launchSingleTop = true
+                    }
                 }
-            }
+            )
         }
     }
 }

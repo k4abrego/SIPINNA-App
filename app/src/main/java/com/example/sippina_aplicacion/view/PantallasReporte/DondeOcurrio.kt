@@ -34,8 +34,13 @@ import androidx.compose.runtime.getValue
 import androidx.activity.compose.BackHandler
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.remote.creation.dsl.first
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -98,7 +103,7 @@ fun DondeOcurrio(
     val state by viewModel.uiState.collectAsState()
 
     // Este cliente es para obtener la ubicacion GPS en tiempo real
-    val fusedLocationClient = remember{
+    val fusedLocationClient = remember {
         LocationServices.getFusedLocationProviderClient(appContext)
     }
 
@@ -121,6 +126,9 @@ fun DondeOcurrio(
     val colorTextoBotonAtras = Color(0xFF5A5A5A)
 
     val coroutineScope = rememberCoroutineScope()
+
+    // Este es para el BarSearch
+    var textoBusqueda by remember {mutableStateOf("")}
 
 
     val opcionUbicacionActual = state.opcionUbicacion.ifEmpty {
@@ -188,23 +196,81 @@ fun DondeOcurrio(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Esta es para la parte del mapa
-            Card(
-                shape = RoundedCornerShape(16.dp),
-                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-                colors = CardDefaults.cardColors(containerColor = Color(0xFFEBEEF8)),
+
+            Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(150.dp)
+                    .height(280.dp)
             ) {
-                MapaInteractivo(
-                    context = appContext,
-                    state = state,
-                    onUbicacionCambiada = { lat, lng, direccion ->
-                        viewModel.setUbicacion(lat, lng, direccion)
-                    }
-                )
+                Card(
+                    shape = RoundedCornerShape(16.dp),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+                    colors = CardDefaults.cardColors(containerColor = Color(0xFFEBEEF8)),
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    MapaInteractivo(
+                        context = appContext,
+                        state = state,
+                        onUbicacionCambiada = { lat, lng, direccion ->
+                            viewModel.setUbicacion(lat, lng, direccion)
+                        }
+                    )
+                }
+
+                // SearchBar flotante en la parte superior del mapa
+                Card(
+                    shape = RoundedCornerShape(24.dp),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+                    colors = CardDefaults.cardColors(containerColor = Color.White),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(10.dp)
+                        .align(Alignment.TopCenter)
+                ) {
+                    OutlinedTextField(
+                        value = textoBusqueda,
+                        onValueChange = { textoBusqueda = it },
+                        placeholder = {
+                            Text(
+                                text = "Buscar calle, colonia o municipio",
+                                fontSize = 13.sp,
+                                color = Color.Gray
+                            )
+                        },
+                        singleLine = true,
+                        trailingIcon = {
+                            IconButton(
+                                onClick = {
+                                    if (textoBusqueda.isNotBlank()) {
+                                        coroutineScope.launch(Dispatchers.IO) {
+                                            val coords = obtenerCoordenadasDeTexto(appContext, textoBusqueda)
+                                            if (coords != null) {
+                                                withContext(Dispatchers.Main) {
+                                                    viewModel.setUbicacion(coords.first, coords.second, coords.third)
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Search,
+                                    contentDescription = "Buscar ubicación",
+                                    tint = colorMorado
+                                )
+                            }
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = Color.Transparent,
+                            unfocusedBorderColor = Color.Transparent,
+                            focusedContainerColor = Color.White,
+                            unfocusedContainerColor = Color.White
+                        )
+                    )
+                }
             }
+            // Esta es para la parte del mapa
 
             if (state.ubicacionConfirmada) {
                 Spacer(modifier = modifier.height(10.dp))
@@ -252,7 +318,6 @@ fun DondeOcurrio(
                 val opciones = listOf(
                     "Usar mi ubicación actual",
                     "Seleccionar en el mapa",
-                    "Buscar dirección"
                 )
 
                 opciones.forEach { opcion ->
@@ -262,18 +327,21 @@ fun DondeOcurrio(
                     OutlinedButton(
                         onClick = {
                             viewModel.seleccionarOpcionUbicacion(opcion)
-                            if(opcion == "Usar mi ubicación actual")
-                            {
+                            if (opcion == "Usar mi ubicación actual") {
                                 fusedLocationClient.lastLocation.addOnSuccessListener { location ->
-                                    if(location != null){
-                                        coroutineScope.launch(Dispatchers.IO){
+                                    if (location != null) {
+                                        coroutineScope.launch(Dispatchers.IO) {
                                             val direccion = obtenerDireccionTexto(
                                                 appContext,
                                                 location.latitude,
                                                 location.longitude
                                             )
-                                            withContext(Dispatchers.Main){
-                                                viewModel.setUbicacion(location.latitude, location.longitude, direccion)
+                                            withContext(Dispatchers.Main) {
+                                                viewModel.setUbicacion(
+                                                    location.latitude,
+                                                    location.longitude,
+                                                    direccion
+                                                )
 
                                             }
                                         }
@@ -504,7 +572,7 @@ fun MapaInteractivo(
             if (state.ubicacionConfirmada) {
                 val posicion = LatLng(state.latitud, state.longitud)
 
-                val markerState = remember(state.latitud, state.longitud){
+                val markerState = remember(state.latitud, state.longitud) {
                     MarkerState(position = posicion)
                 }
                 Marker(
@@ -545,10 +613,41 @@ private fun obtenerDireccionTexto(context: Context, lat: Double, lng: Double): S
         if (!direcciones.isNullOrEmpty()) {
             direcciones[0].getAddressLine(0) ?: "Ubicación sin nombre"
         } else {
-            "Lat: ${String.format(Locale.US, "%.4f", lat)}, Lng: ${String.format(Locale.US, "%.4f", lng)}"
+            "Lat: ${String.format(Locale.US, "%.4f", lat)}, Lng: ${
+                String.format(
+                    Locale.US,
+                    "%.4f",
+                    lng
+                )
+            }"
         }
     } catch (e: Exception) {
-        "Lat: ${String.format(Locale.US, "%.4f", lat)}, Lng: ${String.format(Locale.US, "%.4f", lng)}"
+        "Lat: ${String.format(Locale.US, "%.4f", lat)}, Lng: ${
+            String.format(
+                Locale.US,
+                "%.4f",
+                lng
+            )
+        }"
+    }
+}
+
+
+
+/**
+ * Función auxiliar privada que realiza la geocodificación de texto a coordenadas de latitud/longitud.
+ */
+private fun obtenerCoordenadasDeTexto(context: Context, direccionTexto: String): Triple<Double, Double, String>? {
+    return try {
+        val geocoder = Geocoder(context, Locale.getDefault())
+        @Suppress("DEPRECATION")
+        val direcciones = geocoder.getFromLocationName(direccionTexto, 1)
+        val primera = direcciones?.firstOrNull()
+        if (primera != null) {
+            Triple(primera.latitude, primera.longitude, primera.getAddressLine(0) ?: direccionTexto)
+        } else null
+    } catch (e: Exception) {
+        null
     }
 }
 
