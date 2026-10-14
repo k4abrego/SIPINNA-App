@@ -161,6 +161,7 @@ fun PantallaInicio(
                 text = "¡Hola!",
                 fontSize = 30.sp,
                 fontWeight = FontWeight.Bold
+                //color = colorMorado
             )
 
             Spacer(modifier = Modifier.height(15.dp))
@@ -168,8 +169,9 @@ fun PantallaInicio(
             Text(
                 text = "Gracias por ayudar a proteger a\nlos niños, niñas y adolescentes.",
                 textAlign = TextAlign.Left,
-                fontWeight = FontWeight.Bold,
+                //fontWeight = FontWeight.Bold,
                 fontSize = 20.sp
+                //color = colorMorado
             )
 
             Spacer(modifier = Modifier.weight(1f))
@@ -244,8 +246,7 @@ fun PantallaInicio(
                         Text(
                             text = "Iniciar Sesión / Crear Cuenta",
                             color = colorMorado,
-                            fontSize = 18.sp,
-                            fontWeight = FontWeight.Bold
+                            fontSize = 18.sp
                         )
                     }
                 }else
@@ -263,8 +264,7 @@ fun PantallaInicio(
                         Text(
                             text = "Cerrar Sesión",
                             color = Color(0xFFDDEEFB),
-                            fontSize = 18.sp,
-                            fontWeight = FontWeight.Bold
+                            fontSize = 18.sp
                         )
 
                     }
@@ -283,8 +283,7 @@ fun PantallaInicio(
                     Text(
                         text = if(usuarioAutenticado) "Generar un reporte " else "Generar un reporte anónimo",
                         color = Color.White,
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold
+                        fontSize = 18.sp
                     )
                 }
 
@@ -298,8 +297,7 @@ fun PantallaInicio(
                     Text(
                         text = "¿Qué situaciones debo de reportar?",
                         fontSize = 18.sp,
-                        color = colorMorado,
-                        fontWeight = FontWeight.Bold
+                        color = colorMorado
                     )
                 }
 
@@ -328,12 +326,23 @@ fun PantallaInicio(
                         containerColor = Color(0xFFC01B1E)
                     )
                 ) {
-                    Text(
-                        text = "EMERGENCIA",
-                        fontSize = 18.sp,
-                        color = Color(0xFFDDEEFB),
-                        fontWeight = FontWeight.Bold
-                    )
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text(
+                            text = "EMERGENCIA",
+                            fontSize = 18.sp,
+                            color = Color(0xFFDDEEFB),
+                            fontWeight = FontWeight.Bold
+                        )
+//
+//                        Spacer(modifier = Modifier.height(-1.dp))
+//
+//                        Text(
+//                            text = "Contacto de emergencia de SIPINNA",
+//                            fontSize = 12.sp,
+//                            color = Color(0xFFDDEEFB),
+//                            fontWeight = FontWeight.Bold
+//                        )
+                    }
                 }
             }
         }
