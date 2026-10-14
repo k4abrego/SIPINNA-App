@@ -29,6 +29,7 @@ uiText = "1.12.1"
 playServicesCastFramework = "22.3.1"
 googlePSVer = "21.4.0"
 remoteCreationCore = "1.0.0-alpha21"
+benchmarkTraceprocessor = "1.5.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -67,6 +68,7 @@ androidx-compose-ui-text = { group = "androidx.compose.ui", name = "ui-text", ve
 play-services-cast-framework = { group = "com.google.android.gms", name = "play-services-cast-framework", version.ref = "playServicesCastFramework" }
 google-services = { group = "com.google.gms", name = "google-services", version.ref = "googlePSVer" }
 androidx-compose-remote-creation-core = { group = "androidx.compose.remote", name = "remote-creation-core", version.ref = "remoteCreationCore" }
+androidx-benchmark-traceprocessor = { group = "androidx.benchmark", name = "benchmark-traceprocessor", version.ref = "benchmarkTraceprocessor" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

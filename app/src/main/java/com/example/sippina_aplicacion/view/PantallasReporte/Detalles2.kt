@@ -2,6 +2,7 @@ package com.example.sippina_aplicacion.view.PantallasReporte
 
 import android.R.attr.padding
 import android.text.style.UnderlineSpan
+import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
@@ -35,6 +36,7 @@ import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.OutlinedTextFieldDefaults.contentPadding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -43,6 +45,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontWeight
@@ -79,6 +82,8 @@ fun Detalles2(
     onSiguiente: () -> Unit = {},
     onAtras: () -> Unit = {}
 ) {
+
+    val appContext = LocalContext.current
     // Escuchar el estado centralizado
     val state by viewModel.uiState.collectAsState()
 
@@ -107,6 +112,8 @@ fun Detalles2(
 
     }
 
+    LaunchedEffect(Unit ) {viewModel.iniciarlizarBorradorStorage(appContext) }
+
     BackHandler{manejarAtras()}
 
 
@@ -126,11 +133,8 @@ fun Detalles2(
                 .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Image(
-                painter = painterResource(id = R.drawable.imagensippina),
-                contentDescription = "Logo Sippina",
-                modifier = Modifier.size(120.dp)
-            )
+            EncabezadoReporte(onGuardarBorrador = {viewModel.guardarBorrador()
+            Toast.makeText(appContext, "Borrador guardado exitosamente", Toast.LENGTH_SHORT).show()})
 
             Spacer(modifier = Modifier.height(8.dp))
 

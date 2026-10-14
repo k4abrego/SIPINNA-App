@@ -1,5 +1,6 @@
 package com.example.sippina_aplicacion.view.PantallasReporte
 
+import android.R.attr.contentDescription
 import android.annotation.SuppressLint
 import android.content.ClipData
 import android.content.ClipboardManager
@@ -20,21 +21,27 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.Error
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.outlined.Save
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
+import androidx.compose.remote.creation.dsl.width
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -42,6 +49,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter.Companion.tint
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -83,15 +92,15 @@ fun ReporteGenerado(
     val state by viewModel.uiState.collectAsState()
     val context = LocalContext.current
 
-    BackHandler {// se deja vacio para evitar que se duplique
+    BackHandler {
+        onVolverInicio()
     }
 
     val colorMorado = Color(0xFF381DC3)
     val moradoClaro = Color(0xFFD0BCFF)
-    val colorBlanco = Color.White
 
     LaunchedEffect(Unit) {
-        if(state.folio.isEmpty() && !state.enviando){
+        if (state.folio.isEmpty() && !state.enviando) {
             viewModel.enviarReporteAlBackEnd(context)
         }
     }
@@ -127,17 +136,26 @@ fun ReporteGenerado(
             }
         }
     }
-    // 2. ESTADO DE ERROR DE CONEXIÓN
     else if (state.errorEnvio != null) {
         Column(
             modifier = modifier
                 .fillMaxSize()
                 .background(colorMorado)
                 .padding(24.dp)
-                .navigationBarsPadding(),
+                .navigationBarsPadding()
+                .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
+            Image(
+                painter = painterResource(id = R.drawable.imagensippina),
+                contentDescription = "Logo Sippina",
+                contentScale = ContentScale.Fit,
+                modifier = Modifier.size(100.dp)
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
             Icon(
                 imageVector = Icons.Default.Error,
                 contentDescription = "Error",
@@ -168,13 +186,59 @@ fun ReporteGenerado(
 
             Button(
                 onClick = { viewModel.enviarReporteAlBackEnd(context) },
-                colors = ButtonDefaults.buttonColors(containerColor = Color.White, contentColor = colorMorado),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color.White,
+                    contentColor = colorMorado
+                ),
                 shape = RoundedCornerShape(20.dp),
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(48.dp)
             ) {
                 Text(text = "Reintentar envío", fontWeight = FontWeight.Bold, fontSize = 16.sp)
+            }
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            OutlinedButton(
+                onClick = {
+                    viewModel.guardarBorrador()
+                    Toast.makeText(context, "Borrador guardado exitosamente", Toast.LENGTH_SHORT).show()
+                },
+                border = BorderStroke(1.5.dp, Color.White),
+                colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.White),
+                shape = RoundedCornerShape(20.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(48.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Outlined.Save,
+                    contentDescription = "Guardar borrador",
+                    tint = Color.White,
+                    modifier = Modifier.size(20.dp)
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(text = "Guardar borrador", fontWeight = FontWeight.Bold, fontSize = 15.sp)
+            }
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            IconButton(
+                onClick = {
+                    viewModel.guardarBorrador()
+                    onVolverInicio()
+                },
+                modifier = Modifier
+                    .size(50.dp)
+                    .background(Color.White.copy(alpha = 0.2f), CircleShape)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Home,
+                    contentDescription = "Página de inicio",
+                    tint = Color.White,
+                    modifier = Modifier.size(28.dp)
+                )
             }
         }
     }
@@ -308,7 +372,6 @@ fun ReporteGenerado(
 
             Spacer(modifier = Modifier.height(20.dp))
 
-            // BOTÓN COPIAR USANDO EL CLIPBOARD NATIVO
             OutlinedButton(
                 onClick = {
                     val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
@@ -344,25 +407,23 @@ fun ReporteGenerado(
 
             Spacer(modifier = Modifier.height(30.dp))
 
-            Text(
-                text = "Página de inicio",
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color.White,
-                textDecoration = TextDecoration.Underline,
+            IconButton(
+                onClick = { onVolverInicio() },
                 modifier = Modifier
-                    .clickable {
-                        onVolverInicio()
-                    }
-                    .padding(8.dp)
-            )
+                    .size(50.dp)
+                    .background(Color.White.copy(alpha = 0.2f), CircleShape)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Home,
+                    contentDescription = "Página de inicio",
+                    tint = Color.White,
+                    modifier = Modifier.size(28.dp)
+                )
+            }
         }
     }
 }
 
-/**
- * Previsualización de la pantalla [ReporteGenerado] en el entorno de desarrollo de Android Studio.
- */
 @Preview(
     showBackground = true,
     showSystemUi = true,

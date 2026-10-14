@@ -49,6 +49,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -100,6 +101,10 @@ fun Evidencia(
 ) {
     val state by viewModel.uiState.collectAsState()
     val context = LocalContext.current
+
+    LaunchedEffect(Unit) {
+        viewModel.iniciarlizarBorradorStorage(context)
+    }
     BackHandler { onAtras() }
 
     // Se define el maximo de evidencias de 2 para el usuario
@@ -196,11 +201,8 @@ fun Evidencia(
                 .padding(top = 8.dp, bottom = 12.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Image(
-                painter = painterResource(id = R.drawable.imagensippina),
-                contentDescription = "Logo SIPINNA",
-                modifier = Modifier.size(120.dp)
-            )
+            EncabezadoReporte(onGuardarBorrador = { viewModel.guardarBorrador()
+            Toast.makeText(context, "Borrador guardado exitosamente", Toast.LENGTH_SHORT).show()})
 
             Spacer(modifier = Modifier.height(4.dp))
 

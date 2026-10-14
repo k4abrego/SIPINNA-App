@@ -1,5 +1,6 @@
 package com.example.sippina_aplicacion.view.reportes
 
+import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
@@ -47,6 +48,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -57,6 +59,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.sippina_aplicacion.R
 import com.example.sippina_aplicacion.ui.theme.SIPPINAAplicacionTheme
 import com.example.sippina_aplicacion.view.PantallasReporte.BarraDePasos
+import com.example.sippina_aplicacion.view.PantallasReporte.EncabezadoReporte
 import com.example.sippina_aplicacion.viewmodel.ReporteVM
 import java.util.Locale
 
@@ -108,6 +111,8 @@ fun Detalles(
     val tieneError = mostrarError &&
             state.descripcionHechos.trim().isEmpty()
 
+    val appContext = LocalContext.current
+
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -126,11 +131,8 @@ fun Detalles(
                 .padding(top = 8.dp, bottom = 12.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Image(
-                painter = painterResource(id = R.drawable.imagensippina),
-                contentDescription = "Logo SIPINNA",
-                modifier = Modifier.size(120.dp)
-            )
+            EncabezadoReporte(onGuardarBorrador = {viewModel.guardarBorrador()
+            Toast.makeText(appContext, "Borrador guardado exitosamente", Toast.LENGTH_SHORT).show()})
 
             Spacer(modifier = Modifier.height(4.dp))
 

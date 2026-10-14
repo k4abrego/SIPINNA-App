@@ -6,7 +6,10 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.benchmark.traceprocessor.Row
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.CircularProgressIndicator
@@ -143,7 +146,7 @@ fun AppNavHost(
 
             LaunchedEffect(usuarioAutenticado) {
                 if (usuarioAutenticado) {
-                        reporteViewModel.obtenerMisReportesDelBackEnd()
+                    reporteViewModel.obtenerMisReportesDelBackEnd()
                 }
             }
             val listaReportes by reporteViewModel.misReportes.collectAsState()
@@ -156,7 +159,7 @@ fun AppNavHost(
                 ultimoReporteEstatus = ultimoReporte?.estatus,
 
                 accionBoton = {
-                    val intent = Intent(Intent.ACTION_DIAL).apply{
+                    val intent = Intent(Intent.ACTION_DIAL).apply {
                         data = Uri.parse("tel:911")
                     }
                     context.startActivity(intent)
@@ -170,7 +173,7 @@ fun AppNavHost(
                         navController.navigate(Pantalla.RegistroNuevoPerfil.ruta)
                     }
                 },
-                onCerrarSesion ={
+                onCerrarSesion = {
                     authViewModel.cerrarSesion()
                 },
                 onNavegarAReporte = {
@@ -307,7 +310,12 @@ fun AppNavHost(
             BuscarReporteExistente(
                 onAtras = { navController.popBackStack() },
                 onVerDetalleReporte = { folio -> abrirDetalleReporte(folio) },
-                onBuscar = { folio, codigo -> reporteViewModel.buscarReportePorFolio(folio, codigo) },
+                onBuscar = { folio, codigo ->
+                    reporteViewModel.buscarReportePorFolio(
+                        folio,
+                        codigo
+                    )
+                },
                 reporteEncontrado = reporteEncontradoState,
                 buscando = buscando,
                 errorBusqueda = errrorBusqueda

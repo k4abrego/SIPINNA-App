@@ -3,6 +3,9 @@ package com.example.sippina_aplicacion.view.PantallasReporte
 import android.annotation.SuppressLint
 import android.content.Context
 import android.location.Geocoder
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
+import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -32,9 +35,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -60,12 +66,17 @@ import com.example.sippina_aplicacion.R
 import com.example.sippina_aplicacion.ui.theme.SIPPINAAplicacionTheme
 import com.example.sippina_aplicacion.viewmodel.ReporteVM
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextOverflow
 import com.example.sippina_aplicacion.model.EstadoReporte
+import com.google.android.gms.common.ConnectionResult
+import com.google.android.gms.common.GoogleApiAvailability
 import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.Priority
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.tasks.CancellationTokenSource
 import com.google.maps.android.compose.CameraMoveStartedReason
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.Marker
@@ -107,13 +118,17 @@ fun DondeOcurrio(
         LocationServices.getFusedLocationProviderClient(appContext)
     }
 
+
+    // Estos son los nuevos estads para controlar el dialogo de direccion manual
+    var mostrarDialogoSalida by remember { mutableStateOf(false) }
+    var mostrarDialogoDireccionManual by remember { mutableStateOf(false) }
+    var campoDireccionManual by remember { mutableStateOf("") }
+
+
     LaunchedEffect(Unit) {
         viewModel.iniciarlizarBorradorStorage(appContext)
     }
 
-    var mostrarDialogoSalida by remember {
-        mutableStateOf(false)
-    }
     BackHandler {
         mostrarDialogoSalida = true
     }
@@ -128,11 +143,32 @@ fun DondeOcurrio(
     val coroutineScope = rememberCoroutineScope()
 
     // Este es para el BarSearch
-    var textoBusqueda by remember {mutableStateOf("")}
+    var textoBusqueda by remember { mutableStateOf("") }
 
 
     val opcionUbicacionActual = state.opcionUbicacion.ifEmpty {
         "Seleccionar en el mapa"
+    }
+
+    val ejecutarBusqueda = {
+        if (textoBusqueda.isNotBlank()) {
+            coroutineScope.launch(Dispatchers.IO)
+            {
+                val coords = obtenerCoordenadasDeTexto(appContext, textoBusqueda)
+                withContext(Dispatchers.Main) {
+                    if (coords != null) {
+                        viewModel.setUbicacion(coords.first, coords.second, coords.third)
+                    } else {
+                        Toast.makeText(
+                            appContext,
+                            "No se encontró la ubicación. Inteta agregar una dirección",
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
+                }
+            }
+
+        }
     }
 
     Column(
@@ -153,15 +189,11 @@ fun DondeOcurrio(
                 .fillMaxWidth()
                 .verticalScroll(rememberScrollState())
                 .padding(top = 8.dp, bottom = 12.dp),
-
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
-            Image(
-                painter = painterResource(id = R.drawable.imagensippina),
-                contentDescription = "Logo SIPINNA",
-                modifier = Modifier.size(120.dp)
-            )
+            EncabezadoReporte(onGuardarBorrador = {viewModel.guardarBorrador()
+                Toast.makeText(appContext, "Borrador guardado exitosamente", Toast.LENGTH_SHORT).show()})
 
             Spacer(modifier = Modifier.height(4.dp))
 
@@ -238,20 +270,10 @@ fun DondeOcurrio(
                             )
                         },
                         singleLine = true,
+                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
+                        keyboardActions = KeyboardActions(onSearch ={ejecutarBusqueda()}),
                         trailingIcon = {
-                            IconButton(
-                                onClick = {
-                                    if (textoBusqueda.isNotBlank()) {
-                                        coroutineScope.launch(Dispatchers.IO) {
-                                            val coords = obtenerCoordenadasDeTexto(appContext, textoBusqueda)
-                                            if (coords != null) {
-                                                withContext(Dispatchers.Main) {
-                                                    viewModel.setUbicacion(coords.first, coords.second, coords.third)
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
+                            IconButton( onClick = {ejecutarBusqueda()}
                             ) {
                                 Icon(
                                     imageVector = Icons.Default.Search,
@@ -318,8 +340,8 @@ fun DondeOcurrio(
                 val opciones = listOf(
                     "Usar mi ubicación actual",
                     "Seleccionar en el mapa",
+                    "Ingresar dirección manualmente"
                 )
-
                 opciones.forEach { opcion ->
 
                     val seleccionado = opcionUbicacionActual == opcion
@@ -327,59 +349,81 @@ fun DondeOcurrio(
                     OutlinedButton(
                         onClick = {
                             viewModel.seleccionarOpcionUbicacion(opcion)
-                            if (opcion == "Usar mi ubicación actual") {
-                                fusedLocationClient.lastLocation.addOnSuccessListener { location ->
-                                    if (location != null) {
-                                        coroutineScope.launch(Dispatchers.IO) {
-                                            val direccion = obtenerDireccionTexto(
-                                                appContext,
-                                                location.latitude,
-                                                location.longitude
-                                            )
-                                            withContext(Dispatchers.Main) {
-                                                viewModel.setUbicacion(
-                                                    location.latitude,
-                                                    location.longitude,
-                                                    direccion
-                                                )
 
+                            if (opcion == "Ingresar dirección manualmente") {
+                                mostrarDialogoDireccionManual = true
+                            } else if (opcion == "Usar mi ubicación actual") {
+                                Toast.makeText(appContext, "Obteniendo ubicación GPS...", Toast.LENGTH_SHORT).show()
+
+                                try {
+                                    fusedLocationClient.lastLocation.addOnSuccessListener { location ->
+                                        if (location != null) {
+                                            coroutineScope.launch(Dispatchers.IO) {
+                                                val direccion = obtenerDireccionTexto(
+                                                    appContext,
+                                                    location.latitude,
+                                                    location.longitude
+                                                )
+                                                withContext(Dispatchers.Main) {
+                                                    viewModel.setUbicacion(
+                                                        location.latitude,
+                                                        location.longitude,
+                                                        direccion
+                                                    )
+                                                }
+                                            }
+                                        } else {
+                                            // <--- AQUÍ VA EL ELSE (Si lastLocation es null)
+                                            fusedLocationClient.getCurrentLocation(
+                                                Priority.PRIORITY_HIGH_ACCURACY,
+                                                CancellationTokenSource().token
+                                            ).addOnSuccessListener { currentLocation ->
+                                                if (currentLocation != null) {
+                                                    coroutineScope.launch(Dispatchers.IO) {
+                                                        val direccion = obtenerDireccionTexto(
+                                                            appContext,
+                                                            currentLocation.latitude,
+                                                            currentLocation.longitude
+                                                        )
+                                                        withContext(Dispatchers.Main) {
+                                                            // <--- CORREGIDO: Usar currentLocation (no location)
+                                                            viewModel.setUbicacion(
+                                                                currentLocation.latitude,
+                                                                currentLocation.longitude,
+                                                                direccion
+                                                            )
+                                                        }
+                                                    }
+                                                } else {
+                                                    // <--- CORREGIDO: El else va dentro del addOnSuccessListener
+                                                    Toast.makeText(
+                                                        appContext,
+                                                        "Error al obtener ubicación GPS",
+                                                        Toast.LENGTH_SHORT
+                                                    ).show()
+                                                }
                                             }
                                         }
                                     }
+                                } catch (e: SecurityException) {
+                                    Toast.makeText(
+                                        appContext,
+                                        "Sin permisos de ubicación concedidos",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
                                 }
                             }
                         },
-
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(48.dp),
-
                         shape = CircleShape,
-
-                        border = if (seleccionado) {
-                            null
-                        } else {
-                            BorderStroke(
-                                width = 1.5.dp,
-                                color = colorMorado
-                            )
-                        },
-
+                        border = if (seleccionado) null else BorderStroke(1.5.dp, colorMorado),
                         colors = ButtonDefaults.outlinedButtonColors(
-                            containerColor = if (seleccionado) {
-                                colorMorado
-                            } else {
-                                Color.Transparent
-                            },
-
-                            contentColor = if (seleccionado) {
-                                Color.White
-                            } else {
-                                colorMorado
-                            }
+                            containerColor = if (seleccionado) colorMorado else Color.Transparent,
+                            contentColor = if (seleccionado) Color.White else colorMorado
                         )
                     ) {
-
                         Text(
                             text = opcion,
                             fontSize = 16.sp,
@@ -443,7 +487,77 @@ fun DondeOcurrio(
         }
     }
 
-
+    if (mostrarDialogoDireccionManual) {
+        AlertDialog(
+            onDismissRequest = { mostrarDialogoDireccionManual = false },
+            title = {
+                Text(
+                    text = "Escribir dirección",
+                    color = colorMorado,
+                    fontWeight = FontWeight.Bold
+                )
+            },
+            text = {
+                Column {
+                    Text(
+                        text = "Ingresa la calle, número, colonia y municipio:",
+                        fontSize = 14.sp,
+                        color = Color.DarkGray
+                    )
+                    Spacer(modifier = Modifier.height(10.dp))
+                    OutlinedTextField(
+                        value = campoDireccionManual,
+                        onValueChange = { campoDireccionManual = it },
+                        placeholder = {
+                            Text(
+                                text = "Ej. Av 1 de Mayo , Col. Centro, Atizapán",
+                                fontSize = 13.sp,
+                                color = Color.Gray
+                            )
+                        },
+                        singleLine = false,
+                        maxLines = 3,
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = colorMorado,
+                            unfocusedBorderColor = Color.Gray,
+                            focusedContainerColor = Color.White,
+                            unfocusedContainerColor = Color.White
+                        )
+                    )
+                }
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        if (campoDireccionManual.isNotBlank()) {
+                            coroutineScope.launch(Dispatchers.IO) {
+                                val coords = obtenerCoordenadasDeTexto(appContext, campoDireccionManual)
+                                withContext(Dispatchers.Main) {
+                                    if (coords != null) {
+                                        viewModel.setUbicacion(coords.first, coords.second, coords.third)
+                                    } else {
+                                        viewModel.setUbicacion(0.0, 0.0, campoDireccionManual)
+                                    }
+                                    mostrarDialogoDireccionManual = false
+                                }
+                            }
+                        }
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = colorMorado)
+                ) {
+                    Text("Guardar dirección")
+                }
+            },
+            dismissButton = {
+                OutlinedButton(onClick = { mostrarDialogoDireccionManual = false }) {
+                    Text("Cancelar")
+                }
+            },
+            shape = RoundedCornerShape(20.dp),
+            containerColor = Color(0xFFEAF4FC)
+        )
+    }
     if (mostrarDialogoSalida) {
 
         AlertDialog(
@@ -513,85 +627,122 @@ fun MapaInteractivo(
     state: EstadoReporte,
     onUbicacionCambiada: (Double, Double, String) -> Unit
 ) {
-    val posicionInicial = remember {
-        if (state.latitud != 0.0 && state.longitud != 0.0) {
-            LatLng(state.latitud, state.longitud)
-        } else {
-            LatLng(19.559167, -99.283333) // Este es el centro de Atizapan de Zaragoza
 
-        }
-    }
-    val cameraPositionState = rememberCameraPositionState {
-        position = CameraPosition.fromLatLngZoom(posicionInicial, 15f)
+    // Implementacion de internet y disponibilidad de la API de Google
+    val hayConexion = remember(context) { esRedDisponible(context) }
+    val apiMapasDisponible = remember(context) { ServicioDisponible(context) }
 
-    }
-    val coroutineScope = rememberCoroutineScope()
 
-    // Este detecta cuando se finaliza el movimeinto de arrastrado poe el usuario
-
-    LaunchedEffect(cameraPositionState.isMoving) {
-        if (!cameraPositionState.isMoving && cameraPositionState.cameraMoveStartedReason == CameraMoveStartedReason.GESTURE) {
-            val centroActual = cameraPositionState.position.target
-            coroutineScope.launch(Dispatchers.IO) {
-                val direccion =
-                    obtenerDireccionTexto(context, centroActual.latitude, centroActual.longitude)
-                withContext(Dispatchers.Main) {
-                    onUbicacionCambiada(centroActual.latitude, centroActual.longitude, direccion)
-                }
-
-            }
-        }
-    }
-
-    // Se anima la camara si las coordenadas cambian en el viewModel
-    LaunchedEffect(state.latitud, state.longitud) {
-        if (state.latitud != 0.0 && state.longitud != 0.0) {
-            val nuevaPosicion = LatLng(state.latitud, state.longitud)
-            if (cameraPositionState.position.target != nuevaPosicion) {
-                cameraPositionState.animate(
-                    update = CameraUpdateFactory.newLatLng(nuevaPosicion),
-                    durationMs = 800
-                )
-            }
-        }
-    }
-
+    val mapaDisponible = hayConexion && apiMapasDisponible
 
     Box(modifier = Modifier.fillMaxSize()) {
-        GoogleMap(
-            modifier = Modifier.fillMaxSize(), cameraPositionState = cameraPositionState,
-            onMapClick = { latLng ->
-                coroutineScope.launch {
-                    cameraPositionState.animate(
-                        update = CameraUpdateFactory.newLatLng(latLng),
-                        durationMs = 600
+        if (hayConexion) {
+            val posicionInicial = remember {
+                if (state.latitud != 0.0 && state.longitud != 0.0) {
+                    LatLng(state.latitud, state.longitud)
+                } else {
+                    LatLng(19.559167, -99.283333)
+                }
+            }
+            val cameraPositionState = rememberCameraPositionState {
+                position = CameraPosition.fromLatLngZoom(posicionInicial, 15f)
+            }
+            val coroutineScope = rememberCoroutineScope()
+
+            LaunchedEffect(cameraPositionState.isMoving) {
+                if (!cameraPositionState.isMoving && cameraPositionState.cameraMoveStartedReason == CameraMoveStartedReason.GESTURE) {
+                    val centroActual = cameraPositionState.position.target
+                    coroutineScope.launch(Dispatchers.IO) {
+                        val direccion = obtenerDireccionTexto(context, centroActual.latitude, centroActual.longitude)
+                        withContext(Dispatchers.Main) {
+                            onUbicacionCambiada(centroActual.latitude, centroActual.longitude, direccion)
+                        }
+                    }
+                }
+            }
+
+            LaunchedEffect(state.latitud, state.longitud) {
+                if (state.latitud != 0.0 && state.longitud != 0.0) {
+                    val nuevaPosicion = LatLng(state.latitud, state.longitud)
+                    if (cameraPositionState.position.target != nuevaPosicion) {
+                        cameraPositionState.animate(
+                            update = CameraUpdateFactory.newLatLng(nuevaPosicion),
+                            durationMs = 800
+                        )
+                    }
+                }
+            }
+
+            GoogleMap(
+                modifier = Modifier.fillMaxSize(),
+                cameraPositionState = cameraPositionState,
+                onMapClick = { latLng ->
+                    coroutineScope.launch { cameraPositionState.animate(update = CameraUpdateFactory.newLatLng(latLng), durationMs = 600
+                        )
+                    }
+                }
+            ) {
+                if (state.ubicacionConfirmada) {
+                    val posicion = LatLng(state.latitud, state.longitud)
+                    val markerState = remember(state.latitud, state.longitud) {
+                        MarkerState(position = posicion)
+                    }
+                    Marker(
+                        state = markerState,
+                        title = state.direccion,
+                        snippet = state.direccion.ifEmpty { "${state.latitud}, ${state.longitud}" }
                     )
                 }
             }
-        ) {
-            if (state.ubicacionConfirmada) {
-                val posicion = LatLng(state.latitud, state.longitud)
 
-                val markerState = remember(state.latitud, state.longitud) {
-                    MarkerState(position = posicion)
-                }
-                Marker(
-                    state = markerState,
-                    title = state.direccion,
-                    snippet = state.direccion.ifEmpty { "${state.latitud}, ${state.longitud}" }
+            Icon(
+                imageVector = Icons.Default.LocationOn,
+                contentDescription = "Pin del centro del mapa",
+                tint = Color(0xFFE53935),
+                modifier = Modifier
+                    .size(42.dp)
+                    .align(Alignment.Center)
+            )
+        } else {
+            val mensajeDetalle = when {
+                !hayConexion -> "Mapa no disponible sin conexión a internet"
+                !apiMapasDisponible -> "Servicio de mapa no disponible"
+                else -> "Servicio de ubicación no disponible"
+            }
+
+            // Este es el mensaje de advertencia por si no se tiene conexión a internet
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color(0xFFE8ECEF))
+                    .padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Warning,
+                    contentDescription = "Sin conexión",
+                    tint = Color(0xFFC01B1E),
+                    modifier = Modifier.size(44.dp)
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = "Servicio no disponible",
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color(0xFFC01B1E),
+                    textAlign = TextAlign.Center
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = mensajeDetalle,
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = Color.DarkGray,
+                    textAlign = TextAlign.Center
                 )
             }
         }
-        Icon(
-            imageVector = Icons.Default.LocationOn,
-            contentDescription = "Pin del centro del mapa ",
-            tint = Color(0xFFE53935),
-            modifier = Modifier
-                .size(42.dp)
-                .align(Alignment.Center)
-        )
-
-
     }
 }
 
@@ -633,13 +784,16 @@ private fun obtenerDireccionTexto(context: Context, lat: Double, lng: Double): S
 }
 
 
-
 /**
  * Función auxiliar privada que realiza la geocodificación de texto a coordenadas de latitud/longitud.
  */
-private fun obtenerCoordenadasDeTexto(context: Context, direccionTexto: String): Triple<Double, Double, String>? {
+private fun obtenerCoordenadasDeTexto(
+    context: Context,
+    direccionTexto: String
+): Triple<Double, Double, String>? {
     return try {
         val geocoder = Geocoder(context, Locale.getDefault())
+
         @Suppress("DEPRECATION")
         val direcciones = geocoder.getFromLocationName(direccionTexto, 1)
         val primera = direcciones?.firstOrNull()
@@ -649,6 +803,30 @@ private fun obtenerCoordenadasDeTexto(context: Context, direccionTexto: String):
     } catch (e: Exception) {
         null
     }
+}
+
+
+// Funcio para verficar si el dispositivo tiene conexion a internet
+
+@SuppressLint("ServiceCast")
+private fun esRedDisponible(context : Context): Boolean{
+    val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+    val network = connectivityManager?.activeNetwork ?: return false
+    val capabilities = connectivityManager.getNetworkCapabilities(network) ?: return false
+    return capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+
+
+
+
+
+}
+
+
+
+private fun ServicioDisponible(context:Context): Boolean {
+    val googleApiAvailability = GoogleApiAvailability.getInstance()
+    val resultCode = googleApiAvailability.isGooglePlayServicesAvailable(context)
+    return resultCode == ConnectionResult.SUCCESS
 }
 
 
