@@ -72,6 +72,7 @@ import com.example.sippina_aplicacion.viewmodel.ReporteVM
  * @param onVolverInicio Callback ejecutado al presionar "Página de inicio" para regresar al inicio de la aplicación.
  * @param setPrimaryClip Función de extensión opcional para inyectar o mockear la interacción con el portapapeles.
  */
+
 @SuppressLint("ServiceCast")
 @Composable
 fun ReporteGenerado(

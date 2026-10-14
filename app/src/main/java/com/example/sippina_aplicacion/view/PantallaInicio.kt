@@ -1,6 +1,6 @@
 package com.example.sippina_aplicacion.view
 
-import androidx.compose.foundation.Image
+import  androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -124,7 +124,7 @@ fun PantallaInicio(
                 Row(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    if (mostrarNotificaciones) {
+                    if (usuarioAutenticado) {
                         IconButton(
                             onClick = onNavegarANotificaciones
                         ) {
@@ -157,34 +157,69 @@ fun PantallaInicio(
                 }
             }
 
-            Text(
-                text = "¡Hola!",
-                fontSize = 30.sp,
-                fontWeight = FontWeight.Bold
-                //color = colorMorado
+            //Distribución diferente según el estado de sesión
+            Spacer(
+                modifier = Modifier.weight(
+                    if (usuarioAutenticado) 0.45f else 0.70f
+                )
             )
 
-            Spacer(modifier = Modifier.height(15.dp))
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = "¡Hola!",
+                    fontSize = 30.sp,
+                    fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Center,
+                    color = Color.Black
+                )
 
-            Text(
-                text = "Gracias por ayudar a proteger a\nlos niños, niñas y adolescentes.",
-                textAlign = TextAlign.Left,
-                //fontWeight = FontWeight.Bold,
-                fontSize = 20.sp
-                //color = colorMorado
+                Spacer(modifier = Modifier.height(10.dp))
+
+                Text(
+                    text = "Gracias por ayudar a proteger a\nniños, niñas y adolescentes.",
+                    textAlign = TextAlign.Center,
+                    fontSize = 18.sp,
+                    lineHeight = 22.sp,
+                    color = Color.Black
+                )
+            }
+
+            Spacer(
+                modifier = Modifier.weight(
+                    if (mostrarNotificaciones) 0.55f else 1.30f
+                )
             )
 
-            Spacer(modifier = Modifier.weight(1f))
 
-            if (mostrarNotificaciones && ultimoReporteFolio != null) {
+            if (usuarioAutenticado) {
+                Spacer(modifier = Modifier.height(30.dp))
                 Card(
-                    onClick = { onAbrirUltimoReporte(ultimoReporteFolio) },
-                    modifier = Modifier.fillMaxWidth().padding(16.dp),
+                    onClick = {
+                        if (ultimoReporteFolio != null) {
+                            onAbrirUltimoReporte(ultimoReporteFolio)
+                        } else {
+                            onVerTodosReportes()
+                        }
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(155.dp),
                     shape = RoundedCornerShape(16.dp),
-                    colors = CardDefaults.cardColors(containerColor = Color(0xFFCFE1F5)),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+                    colors = CardDefaults.cardColors(
+                        containerColor = Color(0xFFCADFEA)
+                    ),
+                    elevation = CardDefaults.cardElevation(
+                        defaultElevation = 3.dp
+                    )
                 ) {
-                    Column(modifier = Modifier.padding(18.dp)) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(18.dp)
+                    ) {
                         Row(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceBetween,
@@ -193,49 +228,68 @@ fun PantallaInicio(
                             Text(
                                 text = "Tus reportes",
                                 fontWeight = FontWeight.Bold,
-                                fontSize = 16.sp,
+                                fontSize = 18.sp,
                                 color = Color.Black
                             )
 
-                            // Botón "Ver todos >" que navega a MisReportes
-                            TextButton(onClick = onVerTodosReportes) {
+                            TextButton(
+                                onClick = onVerTodosReportes
+                            ) {
                                 Text(
                                     text = "Ver todos >",
-                                    fontWeight = FontWeight.Bold,
                                     fontSize = 14.sp,
                                     color = Color.Black
                                 )
                             }
                         }
 
-                        Spacer(modifier = Modifier.height(8.dp))
+                        if (ultimoReporteFolio != null) {
+                            Spacer(modifier = Modifier.height(12.dp))
 
-                        Text(
-                            text = ultimoReporteFolio,
-                            fontSize = 26.sp,
-                            fontWeight = FontWeight.ExtraBold,
-                            color = colorMorado
-                        )
+                            Text(
+                                text = ultimoReporteFolio,
+                                fontSize = 23.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = colorMorado
+                            )
 
-                        Spacer(modifier = Modifier.height(12.dp))
+                            Spacer(modifier = Modifier.weight(1f))
 
-                        Text(
-                            text = ultimoReporteEstatus ?: "Reporte en proceso",
-                            fontSize = 12.sp,
-                            color = Color.DarkGray,
-                            modifier = Modifier.align(Alignment.End)
-                        )
+                            Text(
+                                text = ultimoReporteEstatus ?: "Reporte en proceso",
+                                fontSize = 12.sp,
+                                color = Color.DarkGray,
+                                modifier = Modifier.align(Alignment.End)
+                            )
+                        } else {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .weight(1f),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    text = "Aún no tienes reportes registrados",
+                                    fontSize = 15.sp,
+                                    color = Color.DarkGray,
+                                    textAlign = TextAlign.Center
+                                )
+                            }
+                        }
                     }
                 }
+                Spacer(modifier = Modifier.height(40.dp))
             }
 
             Column(
-                modifier = Modifier.fillMaxWidth().padding(top = 1.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 12.dp),
+                verticalArrangement = Arrangement.spacedBy(24.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
 
-                if(!mostrarNotificaciones){
+                if(!usuarioAutenticado){
                     ElevatedButton(
                         onClick = { onNavegarALogin() },
                         modifier = Modifier
@@ -249,26 +303,8 @@ fun PantallaInicio(
                             fontSize = 18.sp
                         )
                     }
-                }else
-                {
-                    ElevatedButton(
-                        onClick = { onCerrarSesion() },
-                        modifier = Modifier
-                            .height(50.dp)
-                            .fillMaxWidth(),
-                        shape = RoundedCornerShape(20.dp),
-                        colors = ButtonDefaults.elevatedButtonColors(
-                            containerColor = Color(0xFFC01B1E)
-                        )
-                    ){
-                        Text(
-                            text = "Cerrar Sesión",
-                            color = Color(0xFFDDEEFB),
-                            fontSize = 18.sp
-                        )
-
-                    }
                 }
+
 
                 ElevatedButton(
                     onClick = { onNavegarAReporte() },
@@ -311,8 +347,7 @@ fun PantallaInicio(
                     Text(
                         text = "Conoce más de SIPINNA",
                         fontSize = 18.sp,
-                        color = colorMorado,
-                        fontWeight = FontWeight.Bold
+                        color = colorMorado
                     )
                 }
 
@@ -352,14 +387,32 @@ fun PantallaInicio(
 /**
  * Previsualización de la pantalla [PantallaInicio] en el entorno de desarrollo de Android Studio.
  */
+
 @Preview(
+    name = "Sin iniciar sesión",
     showBackground = true,
     showSystemUi = true
 )
-
 @Composable
-fun PantallaPreview() {
+fun PreviewInvitado() {
     SIPPINAAplicacionTheme {
-        PantallaInicio()
+        PantallaInicio(
+            usuarioAutenticado = false
+        )
+    }
+}
+
+@Preview(
+    name = "Usuario autenticado",
+    showBackground = true,
+    showSystemUi = true
+)
+@Composable
+fun PreviewAutenticado() {
+    SIPPINAAplicacionTheme {
+        PantallaInicio(
+            usuarioAutenticado = true,
+            ultimoReporteFolio = null
+        )
     }
 }
