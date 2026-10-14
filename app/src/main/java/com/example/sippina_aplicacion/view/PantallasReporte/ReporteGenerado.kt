@@ -178,7 +178,6 @@ fun ReporteGenerado(
             }
         }
     }
-    // 3. ESTADO DE ÉXITO (MOSTRAR DATOS)
     else {
         val folioMostrar = state.folio.ifEmpty { "REP-1234-1234" }
         val codigoMostrar = state.codigoPrivado.ifEmpty { "KEFD-2P32" }
@@ -353,7 +352,6 @@ fun ReporteGenerado(
                 textDecoration = TextDecoration.Underline,
                 modifier = Modifier
                     .clickable {
-                        viewModel.reiniciarEstadoReporte()
                         onVolverInicio()
                     }
                     .padding(8.dp)

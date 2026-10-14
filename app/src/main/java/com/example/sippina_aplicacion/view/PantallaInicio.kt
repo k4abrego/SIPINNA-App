@@ -39,7 +39,6 @@ import androidx.compose.ui.unit.sp
 import com.example.sippina_aplicacion.R
 import com.example.sippina_aplicacion.ui.theme.SIPPINAAplicacionTheme
 
-//import com.example.sippina_aplicacion.viewmodel.ReporteVM
 val colorMorado = Color(0xFF381DC3)
 
 /**
@@ -282,7 +281,7 @@ fun PantallaInicio(
                     )
                 ) {
                     Text(
-                        text = "Generar un reporte anónimo",
+                        text = if(usuarioAutenticado) "Generar un reporte " else "Generar un reporte anónimo",
                         color = Color.White,
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold
