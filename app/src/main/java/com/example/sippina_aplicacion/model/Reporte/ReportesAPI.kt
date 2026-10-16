@@ -22,9 +22,7 @@ interface ReportesAPI {
 
     @GET("api/v1/reportes")
     suspend fun obtenerListaReportes(
-        @Query("estado") estado: String? = null,
-        @Query("limite") limite: Int = 20,
-        @Query("pagina") pagina: Int = 1
+        @Query("estado") estado: String? = null
     ): Response<List<ReporteResponse>>
 
     @GET("api/v1/reportes/folio/{folio}")
@@ -43,4 +41,6 @@ interface ReportesAPI {
         @Path("reporteId") reporteId: String,
         @Part archivos: List<MultipartBody.Part>
     ): Response<ReporteResponse>
+
+
 }

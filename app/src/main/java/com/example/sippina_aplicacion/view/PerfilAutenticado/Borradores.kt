@@ -36,6 +36,7 @@ import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -50,10 +51,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.sippina_aplicacion.R
-import com.example.sippina_aplicacion.ui.theme.SIPPINAAplicacionTheme
 import com.example.sippina_aplicacion.model.BorradorGuardado
 import com.example.sippina_aplicacion.model.EstadoReporte
+import com.example.sippina_aplicacion.viewmodel.ReporteVM
 
 
 /**
@@ -65,39 +67,48 @@ import com.example.sippina_aplicacion.model.EstadoReporte
  * @param onAtras Callback para regresar a la vista anterior.
  * @param onContinuar Callback ejecutado para retomar la captura del reporte borrador.
  */
+
+/**
+ * Pantalla contenedora (Stateful) para la gestión de borradores.
+ * Se encarga de cargar el estado desde SharedPreferences cada vez que se compone la pantalla.
+ */
 @Composable
 fun BorradoresScreen(
+    viewModel: ReporteVM = viewModel(),
     onAtras: () -> Unit = {},
     onContinuar: () -> Unit = {}
 ) {
     val context = LocalContext.current
     val borradorStorage = remember { BorradorGuardado(context) }
 
-    // Se obtiene  el borrador guardado localmente
-    var borradorActual by remember { mutableStateOf(borradorStorage.obtenerBorradorLocal()) }
+    // Estado local reactivo para representar el borrador cargado
+    var borradorActual by remember { mutableStateOf<EstadoReporte?>(null) }
+
+    // LaunchedEffect(Unit) garantiza que el borrador se vuelva a leer de disco CADA VEZ que se entra a esta pantalla
+    LaunchedEffect(Unit) {
+        viewModel.iniciarlizarBorradorStorage(context)
+        borradorActual = borradorStorage.obtenerBorradorLocal()
+    }
 
     Borradores(
         borrador = borradorActual,
         onAtras = onAtras,
-        onContinuar = onContinuar,
+        onContinuar = {
+            // Carga los datos del borrador en el StateFlow del ViewModel antes de navegar
+            viewModel.cargarBorradorExistente()
+            onContinuar()
+        },
         onEliminar = {
+            // Elimina el registro local y resetea la interfaz a estado vacío
             borradorStorage.eliminarBorradorLocal()
-            borradorActual = null // Actualiza la UI para mostrar una pantalla vacia
+            viewModel.descartarBorrador()
+            borradorActual = null
         }
     )
 }
 
 /**
- * Componente stateless que presenta la interfaz para consultar o descartar borradores guardados.
- *
- * Despliega la tarjeta [BorradorCard] si existe un [EstadoReporte] borrador activo, o un mensaje informativo
- * si no hay reportes pendientes por completar.
- *
- * @param modifier [Modifier] opcional para el contenedor principal.
- * @param borrador Instancia de [EstadoReporte] con los datos del borrador guardado; `null` si no existe ninguno.
- * @param onAtras Callback invocado al pulsar el botón de regresar.
- * @param onContinuar Callback invocado para reanudar el borrador.
- * @param onEliminar Callback invocado para purgar el borrador almacenado.
+ * Componente stateless que presenta la interfaz visual para consultar o descartar borradores guardados.
  */
 @Composable
 fun Borradores(
@@ -136,7 +147,7 @@ fun Borradores(
                 )
             }
             Image(
-                painter = painterResource(id = R.drawable.imagensippina),
+                painter = painterResource(id = R.drawable.logorieti),
                 contentDescription = "Logo SIPINNA",
                 modifier = Modifier.size(120.dp)
             )
@@ -156,7 +167,7 @@ fun Borradores(
         Spacer(modifier = Modifier.height(20.dp))
 
         Text(
-            text = "Si tiene un reporte en progreso, puedes continuar desde donde lo dejaste",
+            text = "Si tienes un reporte en progreso, puedes continuar desde donde lo dejaste",
             color = Color.Gray,
             fontSize = 15.sp,
             lineHeight = 19.sp,
@@ -184,9 +195,9 @@ fun Borradores(
             )
         } else {
             Box(
-                modifier = modifier
+                modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 16.dp),
+                    .padding(vertical = 40.dp),
                 contentAlignment = Alignment.Center
             ) {
                 Text(
@@ -195,27 +206,16 @@ fun Borradores(
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Medium,
                     textAlign = TextAlign.Center
-
                 )
             }
-            }
-        Spacer(modifier = modifier.height(20.dp))
-
         }
 
+        Spacer(modifier = Modifier.height(20.dp))
     }
+}
 
 /**
  * Tarjeta gráfica que muestra el resumen visual del estado de un borrador guardado.
- *
- * Presenta una barra con iconos representativos de las 5 etapas del reporte destacando los pasos completados
- * según [pasoActual], además de botones para eliminar o continuar el proceso.
- *
- * @param paso Nombre descriptivo de la etapa en la que se interrumpió el reporte.
- * @param fecha Texto descriptivo sobre el almacenamiento o fecha del borrador.
- * @param pasoActual Índice entero del paso activo dentro del flujo.
- * @param onContinuar Callback ejecutado al presionar el botón "Continuar".
- * @param onEliminar Callback ejecutado al presionar el botón "Eliminar".
  */
 @Composable
 fun BorradorCard(
@@ -224,8 +224,7 @@ fun BorradorCard(
     pasoActual: Int,
     onContinuar: () -> Unit = {},
     onEliminar: () -> Unit = {}
-)
-{
+) {
     val morado = Color(0xFF3D27C9)
 
     val iconos = listOf(
@@ -282,9 +281,10 @@ fun BorradorCard(
             Spacer(modifier = Modifier.height(22.dp))
 
             Text(
-                text = "Continuar en $paso",
+                text = "Continuar en: $paso",
                 color = Color.DarkGray,
-                fontSize = 11.sp
+                fontSize = 12.sp,
+                fontWeight = FontWeight.SemiBold
             )
 
             Spacer(modifier = Modifier.height(14.dp))
@@ -299,7 +299,7 @@ fun BorradorCard(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(2.dp)
-                        .background(Color.Gray)
+                        .background(Color.LightGray)
                 )
 
                 Row(
@@ -323,7 +323,7 @@ fun BorradorCard(
                                 imageVector = icono,
                                 contentDescription = "Etapa ${index + 1}",
                                 tint = if (completado) Color.White else morado,
-                                modifier = Modifier.size(22.dp)
+                                modifier = Modifier.size(20.dp)
                             )
                         }
                     }
@@ -384,22 +384,12 @@ fun BorradorCard(
             }
         }
     }
-
 }
 
-
-/**
- * Previsualización de la pantalla [Borradores] en el entorno de desarrollo de Android Studio.
- */
-@Preview(
-    showBackground = true,
-    showSystemUi = true
-)
+@Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun BorradoresPreview() {
-
-    SIPPINAAplicacionTheme {
-        Borradores(
-        )
-    }
+    Borradores(
+        borrador = EstadoReporte(pasoActual = 1)
+    )
 }

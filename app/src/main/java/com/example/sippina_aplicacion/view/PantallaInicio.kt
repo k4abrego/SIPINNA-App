@@ -116,7 +116,7 @@ fun PantallaInicio(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Image(
-                    painter = painterResource(id = R.drawable.imagensippina),
+                    painter = painterResource(id = R.drawable.logorieti),
                     contentDescription = "Logo Sippinna",
                     modifier = Modifier.size(130.dp)
                 )
@@ -169,9 +169,7 @@ fun PantallaInicio(
             Text(
                 text = "Gracias por ayudar a proteger a\nlos niños, niñas y adolescentes.",
                 textAlign = TextAlign.Left,
-                //fontWeight = FontWeight.Bold,
                 fontSize = 20.sp
-                //color = colorMorado
             )
 
             Spacer(modifier = Modifier.weight(1f))
@@ -333,15 +331,6 @@ fun PantallaInicio(
                             color = Color(0xFFDDEEFB),
                             fontWeight = FontWeight.Bold
                         )
-//
-//                        Spacer(modifier = Modifier.height(-1.dp))
-//
-//                        Text(
-//                            text = "Contacto de emergencia de SIPINNA",
-//                            fontSize = 12.sp,
-//                            color = Color(0xFFDDEEFB),
-//                            fontWeight = FontWeight.Bold
-//                        )
                     }
                 }
             }

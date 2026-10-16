@@ -11,10 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Save
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -43,7 +40,7 @@ fun EncabezadoReporte(
     ) {
         // Logo SIPINNA en la esquina superior izquierda
         Image(
-            painter = painterResource(id = R.drawable.imagensippina),
+            painter = painterResource(id = R.drawable.logorieti),
             contentDescription = "Logo SIPINNA",
             modifier = Modifier.size(120.dp)
         )

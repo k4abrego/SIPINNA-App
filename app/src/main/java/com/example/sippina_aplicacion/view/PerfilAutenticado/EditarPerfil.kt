@@ -6,7 +6,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -31,8 +30,6 @@ import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -56,8 +53,6 @@ import com.example.sippina_aplicacion.R
 import com.example.sippina_aplicacion.ui.theme.SIPPINAAplicacionTheme
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.graphics.SolidColor
 
@@ -193,7 +188,7 @@ fun EditarPerfil(
                     )
                 }
                 Image(
-                    painter = painterResource(id = R.drawable.imagensippina),
+                    painter = painterResource(id = R.drawable.logorieti),
                     contentDescription = "Logo SIPINNA",
                     modifier = Modifier.size(120.dp)
                 )

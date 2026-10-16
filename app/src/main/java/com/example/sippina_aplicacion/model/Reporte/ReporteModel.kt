@@ -32,6 +32,17 @@ data class ReporteResponse(
     val fechaEnvio: String? = null
 )
 
+data class RespuestaPaginadaReportes(
+    @SerializedName("pagina")
+    val pagina: Int? = null,
+    @SerializedName("limite")
+    val limite: Int? = null,
+    @SerializedName("total")
+    val total: Int? = null,
+    @SerializedName("data")
+    val reportes: List<ReporteResponse> = emptyList()
+)
+
 data class ReporteState(
     val tipoReporte: String = "",
     val descripcion: String = "",

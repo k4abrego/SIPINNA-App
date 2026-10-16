@@ -59,6 +59,7 @@ android {
 dependencies {
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.activity.compose)
+    implementation(libs.androidx.annotation)
     implementation(libs.androidx.benchmark.traceprocessor)
     implementation(libs.androidx.compose.foundation)
     implementation(libs.androidx.compose.foundation.layout)
@@ -77,6 +78,7 @@ dependencies {
     implementation(libs.androidx.navigation.runtime.ktx)
     implementation(libs.androidx.ui)
     implementation(libs.androidx.ui.graphics)
+    implementation(libs.firebase.crashlytics.buildtools)
     implementation(libs.play.services.cast.framework)
     testImplementation(libs.junit)
     androidTestImplementation(platform(libs.androidx.compose.bom))

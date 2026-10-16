@@ -30,6 +30,8 @@ playServicesCastFramework = "22.3.1"
 googlePSVer = "21.4.0"
 remoteCreationCore = "1.0.0-alpha21"
 benchmarkTraceprocessor = "1.5.0"
+firebaseCrashlyticsBuildtools = "3.0.8"
+annotation = "1.11.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -69,6 +71,8 @@ play-services-cast-framework = { group = "com.google.android.gms", name = "play-
 google-services = { group = "com.google.gms", name = "google-services", version.ref = "googlePSVer" }
 androidx-compose-remote-creation-core = { group = "androidx.compose.remote", name = "remote-creation-core", version.ref = "remoteCreationCore" }
 androidx-benchmark-traceprocessor = { group = "androidx.benchmark", name = "benchmark-traceprocessor", version.ref = "benchmarkTraceprocessor" }
+firebase-crashlytics-buildtools = { group = "com.google.firebase", name = "firebase-crashlytics-buildtools", version.ref = "firebaseCrashlyticsBuildtools" }
+androidx-annotation = { group = "androidx.annotation", name = "annotation", version.ref = "annotation" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

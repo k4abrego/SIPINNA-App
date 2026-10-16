@@ -3,10 +3,17 @@ package com.example.sippina_aplicacion.view.VistasExtra
 import android.content.Intent
 import androidx.compose.ui.layout.ContentScale
 import android.net.Uri
+import androidx.annotation.DrawableRes
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -14,6 +21,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -21,9 +29,12 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButtonDefaults
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -33,6 +44,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -44,29 +56,39 @@ import androidx.compose.ui.unit.sp
 import com.example.sippina_aplicacion.ui.theme.SIPPINAAplicacionTheme
 import com.example.sippina_aplicacion.R
 
-@Composable
-fun ConoceSIPINNA (
-    onAtras: () -> Unit = {}
-){
-    var mostrarInformacion by remember {
-        mutableStateOf(false)
-    }
-    val context = LocalContext.current
-    val urlSipinna = "https://www.facebook.com/GobAtizapan"
+data class RedSocioformador(
+    val nombre: String,
+    val url: String
+)
 
-    Box(modifier = Modifier.fillMaxSize())
-    {
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+fun ConoceSIPINNA(
+    onAtras: () -> Unit = {}
+) {
+    val context = LocalContext.current
+
+    fun abrirEnlace(url: String) {
+        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+        context.startActivity(intent)
+    }
+
+    val redesSocioformadores = listOf(
+        RedSocioformador("Facebook", "https://www.facebook.com/GobAtizapan"),
+        RedSocioformador("Instagram", "https://www.instagram.com/gob_atizapan/"),
+    )
+
+    Box(modifier = Modifier.fillMaxSize()) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .background(Color(0xFFEAF4FC))
                 .verticalScroll(rememberScrollState())
-                .padding(horizontal = 24.dp, 10.dp),
+                .padding(horizontal = 24.dp, vertical = 10.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Box(
-                modifier = Modifier
-                    .fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth(),
                 contentAlignment = Alignment.Center
             ) {
                 FilledIconButton(
@@ -86,11 +108,12 @@ fun ConoceSIPINNA (
                     )
                 }
                 Image(
-                    painter = painterResource(id = com.example.sippina_aplicacion.R.drawable.imagensippina),
+                    painter = painterResource(id = R.drawable.logorieti),
                     contentDescription = "Logo SIPINNA",
                     modifier = Modifier.size(120.dp)
                 )
             }
+
             Spacer(modifier = Modifier.height(0.dp))
 
             Text(
@@ -99,6 +122,7 @@ fun ConoceSIPINNA (
                 fontWeight = FontWeight.Bold,
                 color = Color(0xFF3D27C9)
             )
+
             Spacer(modifier = Modifier.height(15.dp))
 
             Text(
@@ -109,6 +133,7 @@ fun ConoceSIPINNA (
                 color = Color.DarkGray,
                 modifier = Modifier.fillMaxWidth()
             )
+
             Spacer(modifier = Modifier.height(20.dp))
 
             Text(
@@ -119,6 +144,7 @@ fun ConoceSIPINNA (
                 modifier = Modifier.fillMaxWidth(),
                 textAlign = TextAlign.End
             )
+
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
@@ -130,17 +156,66 @@ fun ConoceSIPINNA (
                 modifier = Modifier.fillMaxWidth(),
                 textAlign = TextAlign.End
             )
-            Spacer(modifier = Modifier.height(8.dp))
+
+            Spacer(modifier = Modifier.height(20.dp))
+
+            Text(
+                text = "¿Qué es la Ruta RIETI?",
+                fontSize = 25.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color(0xFF3D27C9),
+                modifier = Modifier.fillMaxWidth(),
+                textAlign = TextAlign.Left
+            )
+
+            Spacer(modifier = Modifier.height(10.dp))
+
+
+            Text(
+                text = "La ruta RIETI es la Ruta Intermunicipal para la Erradicación del Trabajo Infantil. Es una iniciativa regional surgida principalmente en los municipios del Valle de México (Estado de México).",
+                fontSize = 17.sp,
+                lineHeight = 20.sp,
+                fontWeight = FontWeight.SemiBold,
+                color = Color.DarkGray,
+                modifier = Modifier.fillMaxWidth(),
+                textAlign = TextAlign.Left
+            )
+            Spacer(modifier = Modifier.height(10.dp))
 
             Image(
-                painter = painterResource(id = R.drawable.gobatizapan),
-                contentDescription = "Logo Atizapan",
+                painter = painterResource(id = R.drawable.logo_rieti_2),
+                contentDescription = "Imagen Ruta RIETI",
                 contentScale = ContentScale.Fit,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(100.dp)
+                    .height(120.dp)
+                    .clip(RoundedCornerShape(14.dp))
             )
+
+            Spacer(modifier = Modifier.height(20.dp))
+
+            Text(
+                text = "Relación con SIPINNA",
+                fontSize = 25.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color(0xFF3D27C9),
+                modifier = Modifier.fillMaxWidth(),
+                textAlign = TextAlign.End
+            )
+
             Spacer(modifier = Modifier.height(10.dp))
+
+            Text(
+                text = "La ruta RIETI opera bajo el paraguas y los principios de SIPINNA, los municipios en conjunto con los sistemas DIF locales ejecutan las acciones de rescate, atención psicológica, reintegración escolar y apoyo a familias en situación de vulnerabilidad económica.",
+                fontSize = 17.sp,
+                lineHeight = 20.sp,
+                fontWeight = FontWeight.SemiBold,
+                color = Color.DarkGray,
+                modifier = Modifier.fillMaxWidth(),
+                textAlign = TextAlign.End
+            )
+
+            Spacer(modifier = Modifier.height(20.dp))
 
             Text(
                 text = "¿Cómo ayudamos?",
@@ -149,6 +224,7 @@ fun ConoceSIPINNA (
                 color = Color(0xFF3D27C9),
                 modifier = Modifier.fillMaxWidth()
             )
+
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
@@ -159,81 +235,73 @@ fun ConoceSIPINNA (
                 color = Color.DarkGray,
                 modifier = Modifier.fillMaxWidth()
             )
-            Spacer(modifier = Modifier.height(25.dp))
 
-            Button(
-                onClick = { mostrarInformacion = true },
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Image(
+                painter = painterResource(id = R.drawable.sippina_logo_3),
+                contentDescription = "Imagen de apoyo",
+                contentScale = ContentScale.Fit,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(52.dp),
-                shape = RoundedCornerShape(15.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF3D27C9))
-            ) {
-                Text(
-                    text = "Conoce más",
-                    fontSize = 22.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.White
-                )
-            }
-            Spacer(modifier = Modifier.height(15.dp))
-        }
-        if (mostrarInformacion) {
-            AlertDialog(onDismissRequest = {
-                    mostrarInformacion = false
-                }, title = {
-                    Text(
-                        text = "Conoce más sobre SIPINNA",
-                        fontWeight = FontWeight.Bold,
-                        color = Color(0xFF3D27C9)
-                    )
-                }, text = {
-                    Text(
-                        text = "Se abrirá una página en tu navegador para que puedas conocer más sobre SIPINNA.",
-                        color = Color.DarkGray
-                    )
-                },
+                    .height(120.dp)
+                    .clip(RoundedCornerShape(14.dp))
+            )
 
-                confirmButton = {
-                    TextButton(
-                        onClick = { mostrarInformacion = false
-                            val intent = Intent(
-                                Intent.ACTION_VIEW,
-                                Uri.parse(urlSipinna)
-                            )
-                            context.startActivity(intent)
-                        }
+            Spacer(modifier = Modifier.height(35.dp))
+
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 12.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                FlowRow(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center,
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(6.dp),
+                        modifier = Modifier.padding(end = 12.dp)
                     ) {
+                        Image(
+                            painter = painterResource(id = R.drawable.sippina_logo_3),
+                            contentDescription = "Logo Footer",
+                            modifier = Modifier.size(20.dp)
+                        )
                         Text(
-                            text = "Continuar",
-                            color = Color(0xFF3D27C9),
-                            fontWeight = FontWeight.Bold
+                            text = "SIPINNA",
+                            fontSize = 12.sp,
+                            color = Color.Gray,
+                            fontWeight = FontWeight.Normal
                         )
                     }
-                },
-                dismissButton = {
-                    TextButton(
-                        onClick = { mostrarInformacion = false }
-                    ) {
+
+                    redesSocioformadores.forEach { red ->
                         Text(
-                            text = "Cancelar",
-                            color = Color.DarkGray
+                            text = red.nombre,
+                            fontSize = 12.sp,
+                            color = Color(0xFF3D27C9),
+                            fontWeight = FontWeight.SemiBold,
+                            modifier = Modifier
+                                .padding(horizontal = 6.dp)
+                                .clickable { abrirEnlace(red.url) }
                         )
                     }
                 }
-            )
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
         }
     }
 }
 
-@Preview (
-    showBackground = true,
-    showSystemUi = true
-)
-
+@Preview(showBackground = true, showSystemUi = true)
 @Composable
-fun ConocePreview (){
-    SIPPINAAplicacionTheme() {
+fun ConocePreview() {
+    SIPPINAAplicacionTheme {
         ConoceSIPINNA()
     }
 }

@@ -1,6 +1,5 @@
 package com.example.sippina_aplicacion.view.VistasExtra
 
-import android.media.Image
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -29,7 +28,6 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButtonColors
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
@@ -44,7 +42,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.sippina_aplicacion.ui.theme.SIPPINAAplicacionTheme
-import com.example.sippina_aplicacion.view.Pantalla
 
 @Composable
 fun AvisoPrivacidad(
@@ -81,7 +78,7 @@ fun AvisoPrivacidad(
                     )
                 }
                 Image(
-                    painter = painterResource(id = com.example.sippina_aplicacion.R.drawable.imagensippina),
+                    painter = painterResource(id = com.example.sippina_aplicacion.R.drawable.logorieti),
                     contentDescription = "Logo SIPINNA",
                     modifier = Modifier.size(120.dp)
                 )

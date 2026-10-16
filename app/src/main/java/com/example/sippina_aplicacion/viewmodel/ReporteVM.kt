@@ -13,14 +13,20 @@ import com.example.sippina_aplicacion.model.Reporte.ReporteRepository
 import com.example.sippina_aplicacion.model.Reporte.ReporteRequest
 import com.example.sippina_aplicacion.model.ReporteModel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
+import org.json.JSONObject
 import java.io.File
+import retrofit2.HttpException
+
 
 /**
  * ViewModel principal encargado de administrar la lógica de negocio, el flujo de asistente en 5 pasos,
@@ -44,6 +50,18 @@ class ReporteVM(
     private val _misReportes = MutableStateFlow<List<ReporteModel>>(emptyList())
     val misReportes: StateFlow<List<ReporteModel>> = _misReportes.asStateFlow()
 
+    /**
+     * Expone automáticamente el REPORTE MÁS RECIENTE (primer elemento de la lista).
+     * Como MariaDB los ordena DESC, .firstOrNull() siempre devolverá el último creado.
+     */
+    val ultimoReporte: StateFlow<ReporteModel?> = _misReportes
+        .map { lista -> lista.firstOrNull() }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = null
+        )
+
     private val _detalleReporte = MutableStateFlow<ReporteModel?>(null)
     val detalleReporte: StateFlow<ReporteModel?> = _detalleReporte.asStateFlow()
 
@@ -60,8 +78,6 @@ class ReporteVM(
 
     /**
      * Inicializa el almacenamiento local de borradores y carga cualquier progreso guardado previamente.
-     *
-     * @param context Contexto [Context] de Android para inicializar [BorradorGuardado].
      */
     fun iniciarlizarBorradorStorage(context: Context) {
         if (borradorStorage == null) {
@@ -151,8 +167,6 @@ class ReporteVM(
 
     /**
      * Actualiza la opción seleccionada para establecer la ubicación del incidente.
-     *
-     * @param opcion Cadena que representa la modalidad elegida.
      */
     fun seleccionarOpcionUbicacion(opcion: String) {
         _uiState.update { it.copy(opcionUbicacion = opcion, ubicacionConfirmada = false) }
@@ -160,10 +174,6 @@ class ReporteVM(
 
     /**
      * Establece las coordenadas geográficas y la dirección del incidente en el estado del reporte.
-     *
-     * @param lat Coordenada de latitud.
-     * @param lng Coordenada de longitud.
-     * @param direccion Texto descriptivo de la dirección.
      */
     fun setUbicacion(lat: Double, lng: Double, direccion: String = "") {
         _uiState.update {
@@ -173,8 +183,6 @@ class ReporteVM(
 
     /**
      * Establece el horario aproximado en que ocurrieron los hechos.
-     *
-     * @param horario Cadena con el formato de hora (ej. `"12:30"`).
      */
     fun setHorarioAprox(horario: String) {
         _uiState.update { it.copy(horarioAprox = horario) }
@@ -182,8 +190,6 @@ class ReporteVM(
 
     /**
      * Actualiza la cantidad de menores involucrados en el incidente y ajusta el listado correspondiente.
-     *
-     * @param delta Valor entero positivo o negativo para incrementar o decrementar la cantidad.
      */
     fun cambiarCantidadMenores(delta: Int) {
         _uiState.update { estado ->
@@ -208,8 +214,6 @@ class ReporteVM(
 
     /**
      * Indica si hubo adultos involucrados en la situación reportada.
-     *
-     * @param opcion Respuesta seleccionada (ej. `"Sí"`, `"No"`, `"No sé"`).
      */
     fun setAdultoInvolucrado(opcion: String) {
         _uiState.update { it.copy(adultoInvolucrados = opcion) }
@@ -217,8 +221,6 @@ class ReporteVM(
 
     /**
      * Establece la descripción narrativa de los hechos del incidente.
-     *
-     * @param texto Relato de la situación observada.
      */
     fun setDescripcionHechos(texto: String) {
         _uiState.update { it.copy(descripcionHechos = texto) }
@@ -226,8 +228,6 @@ class ReporteVM(
 
     /**
      * Establece el rango de edad estimado para el menor en edición actual.
-     *
-     * @param rango Rango de edad seleccionado.
      */
     fun setRangoEdad(rango: String) {
         _uiState.update { estado ->
@@ -243,8 +243,6 @@ class ReporteVM(
 
     /**
      * Establece el género del menor en edición actual.
-     *
-     * @param genero Género seleccionado.
      */
     fun setGenero(genero: String) {
         _uiState.update { estado ->
@@ -260,8 +258,6 @@ class ReporteVM(
 
     /**
      * Establece la descripción física del menor en edición actual.
-     *
-     * @param texto Rasgos particulares o vestimenta del menor.
      */
     fun setDescripcionFisica(texto: String) {
         _uiState.update { estado ->
@@ -277,8 +273,6 @@ class ReporteVM(
 
     /**
      * Selecciona el índice del menor activo dentro del flujo iterativo de captura.
-     *
-     * @param indice Índice de base cero del menor.
      */
     private fun seleccionarMenor(indice: Int) {
         _uiState.update { estado ->
@@ -300,8 +294,6 @@ class ReporteVM(
 
     /**
      * Avanza al siguiente menor en la lista de menores involucrados.
-     *
-     * @return `true` si avanzó exitosamente a otro menor; `false` si ya se encontraba en el último menor.
      */
     fun avanzarAlSiguienteMenor(): Boolean {
         val estado = _uiState.value
@@ -313,8 +305,6 @@ class ReporteVM(
 
     /**
      * Retrocede al menor anterior en la lista de menores involucrados.
-     *
-     * @return `true` si retrocedió exitosamente; `false` si ya estaba en el primer menor.
      */
     fun regresarAlMenorAnterior(): Boolean {
         val indiceAnterior = _uiState.value.indiceMenorActual - 1
@@ -325,8 +315,6 @@ class ReporteVM(
 
     /**
      * Selecciona el tipo de evidencia multimedia que se va a adjuntar.
-     *
-     * @param tipo Categoría del archivo (ej. `"imagen"`, `"video"`).
      */
     fun seleccionarTipoEvidencia(tipo: String) {
         _uiState.update { it.copy(tipoEvidenciaSeleccionada = tipo) }
@@ -334,10 +322,6 @@ class ReporteVM(
 
     /**
      * Agrega un archivo de evidencia a la lista de archivos adjuntos del reporte.
-     *
-     * @param uri Ubicación [Uri] del archivo multimedia.
-     * @param tipo Categoría o tipo de archivo.
-     * @param nombre Nombre original o descriptivo del archivo.
      */
     fun agregarEvidencia(uri: Uri, tipo: String, nombre: String = "") {
         _uiState.update { estado ->
@@ -356,9 +340,7 @@ class ReporteVM(
     }
 
     /**
-     * Elimina un archivo de evidencia adjunto de la lista según su [Uri].
-     *
-     * @param uri [Uri] del archivo a remover.
+     * Elimina un archivo de evidencia adjunto de la lista según su Uri.
      */
     fun eliminarEvidencia(uri: Uri) {
         _uiState.update { estado ->
@@ -368,18 +350,14 @@ class ReporteVM(
     }
 
     /**
-     * Actualiza la [Uri] temporal de la evidencia en selección.
-     *
-     * @param uri [Uri] del archivo multimedia.
+     * Actualiza la Uri temporal de la evidencia en selección.
      */
     fun actualizarEvidenciaUri(uri: Uri?) {
         _uiState.update { it.copy(evidenciaUri = uri) }
     }
 
     /**
-     * Actualiza la modalidad de privacidad seleccionada para el reporte (`"anonimo"` o `"actualizaciones"`).
-     *
-     * @param nuevaOpcion Opción de privacidad elegida.
+     * Actualiza la modalidad de privacidad seleccionada para el reporte ("anonimo" o "actualizaciones").
      */
     fun actualizarOpcionPrivacidad(nuevaOpcion: String) {
         val opcionNormalizada = if (nuevaOpcion == "anónimo") "anonimo" else nuevaOpcion
@@ -389,8 +367,6 @@ class ReporteVM(
 
     /**
      * Establece si el reporte debe procesarse bajo la modalidad anónima.
-     *
-     * @param valor `true` para anónimo, `false` para seguimiento con actualizaciones.
      */
     fun setEsAnonimo(valor: Boolean) {
         actualizarOpcionPrivacidad(if (valor) "anonimo" else "actualizaciones")
@@ -398,8 +374,6 @@ class ReporteVM(
 
     /**
      * Establece el correo electrónico para recibir actualizaciones de seguimiento del reporte.
-     *
-     * @param correo Dirección de correo electrónico.
      */
     fun setCorreoSeguimiento(correo: String) {
         _uiState.update { it.copy(correoSeguimiento = correo) }
@@ -407,29 +381,21 @@ class ReporteVM(
 
     /**
      * Valida que la descripción narrativa de los hechos no esté vacía.
-     *
-     * @return `true` si es válida, `false` en caso contrario.
      */
     fun descripcionHechosValida(): Boolean = _uiState.value.descripcionHechos.trim().isNotEmpty()
 
     /**
      * Valida que la descripción física del menor actual no esté vacía.
-     *
-     * @return `true` si es válida, `false` en caso contrario.
      */
     fun descripcionFisicaValida(): Boolean = _uiState.value.descripcionFisica.trim().isNotEmpty()
 
     /**
      * Valida que la ubicación geográfica haya sido confirmada por el usuario.
-     *
-     * @return `true` si está confirmada, `false` en caso contrario.
      */
     fun ubicacionValida(): Boolean = _uiState.value.ubicacionConfirmada
 
     /**
      * Valida el correo de seguimiento según la modalidad de privacidad elegida.
-     *
-     * @return `true` si es válido o si el reporte es anónimo; `false` si falta un correo válido en modo actualizaciones.
      */
     fun correoSeguimientoValido(): Boolean {
         val estado = _uiState.value
@@ -453,8 +419,6 @@ class ReporteVM(
 
     /**
      * Obtiene el detalle completo de un reporte específico a partir de su folio.
-     *
-     * @param folio Folio único del reporte a consultar.
      */
     fun obtenerDetalleReportePorFolio(folio: String) {
         viewModelScope.launch {
@@ -478,9 +442,6 @@ class ReporteVM(
 
     /**
      * Busca un reporte existente en el servidor utilizando su folio y código privado de acceso.
-     *
-     * @param folio Folio único del reporte.
-     * @param codigo Código privado de seguridad asignado.
      */
     fun buscarReportePorFolio(folio: String, codigo: String) {
         if (folio.isBlank() || codigo.isBlank()) {
@@ -523,9 +484,7 @@ class ReporteVM(
 
     /**
      * Envía el reporte completo al servidor backend, incluyendo la serialización de los datos del formulario
-     * y la posterior subida de archivos multimedia adjuntos si existen.
-     *
-     * @param context Contexto [Context] de Android requerido para procesar las evidencias multimedia.
+     * y la posterior subida de archivos multimedia adjuntos si existen. Captura y parsea los mensajes de error del body de la API.
      */
     fun enviarReporteAlBackEnd(context: Context) {
         viewModelScope.launch {
@@ -544,7 +503,6 @@ class ReporteVM(
                 }
             }
 
-            // Se usa ReporteRequest con nombres unificados y latitud/longitud
             val peticion = ReporteRequest(
                 tipoReporte = if (estadoActual.tipoEvidenciaSeleccionada.isNotBlank()) estadoActual.tipoEvidenciaSeleccionada else "General",
                 descripcion = detallesFormulario,
@@ -571,11 +529,30 @@ class ReporteVM(
                     )
                 }
                 borradorStorage?.eliminarBorradorLocal()
+
+                // Refresca la lista de reportes inmediatamente al crear uno nuevo
+                obtenerMisReportesDelBackEnd()
             }.onFailure { error ->
+                val mensajeDetallado = when (error) {
+                    is HttpException -> {
+                        try {
+                            val jsonError = error.response()?.errorBody()?.string()
+                            val json = JSONObject(jsonError ?: "")
+                            json.optString(
+                                "mensaje",
+                                json.optString("error", json.optString("message", "Error en el servidor (${error.code()})"))
+                            )
+                        } catch (e: Exception) {
+                            "Error del servidor (${error.code()})"
+                        }
+                    }
+                    else -> error.localizedMessage ?: "No se pudo conectar con el servidor."
+                }
+
                 _uiState.update {
                     it.copy(
                         enviando = false,
-                        errorEnvio = error.localizedMessage ?: "No se pudo conectar con el servidor."
+                        errorEnvio = mensajeDetallado
                     )
                 }
             }
@@ -583,10 +560,7 @@ class ReporteVM(
     }
 
     /**
-     * Prepara los archivos de evidencia adjuntos convirtiéndolos en partes [MultipartBody.Part] para su envío HTTP.
-     *
-     * @param context Contexto [Context] para resolver los flujos de datos de las URIs.
-     * @return Lista de objetos [MultipartBody.Part] listos para la petición multipart.
+     * Prepara los archivos de evidencia adjuntos convirtiéndolos en partes MultipartBody.Part para su envío HTTP.
      */
     fun prepararEvidenciasParaBackend(context: Context): List<MultipartBody.Part> {
         val listaParts = mutableListOf<MultipartBody.Part>()
@@ -604,11 +578,7 @@ class ReporteVM(
     }
 
     /**
-     * Copia el contenido de una [Uri] multimedia a un archivo temporal local en caché para su transmisión.
-     *
-     * @param context Contexto [Context] de Android.
-     * @param uri [Uri] del archivo multimedia origen.
-     * @return Archivo [File] temporal creado, o `null` en caso de error.
+     * Copia el contenido de una Uri multimedia a un archivo temporal local en caché para su transmisión.
      */
     private fun obtenerArchivoDesdeUri(context: Context, uri: Uri): File? {
         return try {
@@ -628,8 +598,4 @@ class ReporteVM(
         borradorStorage?.eliminarBorradorLocal()
         _uiState.value = EstadoReporte()
     }
-
-
-
-
 }

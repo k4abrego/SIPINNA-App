@@ -116,7 +116,7 @@ fun BuscarReporteExistente(
                     )
                 }
                 Image(
-                    painter = painterResource(id = com.example.sippina_aplicacion.R.drawable.imagensippina),
+                    painter = painterResource(id = com.example.sippina_aplicacion.R.drawable.logorieti),
                     contentDescription = "Logo SIPINNA",
                     modifier = Modifier.size(120.dp)
                 )

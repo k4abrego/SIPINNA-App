@@ -47,7 +47,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.sippina_aplicacion.R
 import com.example.sippina_aplicacion.ui.theme.SIPPINAAplicacionTheme
-import com.example.sippina_aplicacion.view.PantallasReporte.BarraDePasos
 
 /**
  * Pantalla que muestra el detalle y el seguimiento del estado de un reporte específico.
@@ -121,7 +120,7 @@ fun DetalleReporte(
                     )
                 }
                 Image(
-                    painter = painterResource(id = R.drawable.imagensippina),
+                    painter = painterResource(id = R.drawable.logorieti),
                     contentDescription = "Logo SIPINNA",
                     modifier = Modifier.size(120.dp)
                 )

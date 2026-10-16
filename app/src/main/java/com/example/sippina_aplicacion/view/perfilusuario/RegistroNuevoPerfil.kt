@@ -27,7 +27,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.width
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.unit.dp
@@ -154,7 +153,7 @@ fun RegistroNuevoPerfil(
                 )
             }
             Image(
-                painter = painterResource(id = R.drawable.imagensippina),
+                painter = painterResource(id = R.drawable.logorieti),
                 contentDescription = "Logo SIPINNA",
                 modifier = Modifier.size(170.dp)
             )

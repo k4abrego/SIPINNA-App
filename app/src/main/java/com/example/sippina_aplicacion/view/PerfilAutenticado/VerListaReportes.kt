@@ -1,5 +1,6 @@
-package com.example.sippina_aplicacion.view.PerfilAutenticado
+package com.example.sippina_aplicacion.view.PantallasReporte
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
@@ -40,6 +41,8 @@ import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -55,26 +58,47 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.sippina_aplicacion.R
-import com.example.sippina_aplicacion.ui.theme.SIPPINAAplicacionTheme
 import com.example.sippina_aplicacion.model.ReporteModel
+import com.example.sippina_aplicacion.ui.theme.SIPPINAAplicacionTheme
+import com.example.sippina_aplicacion.viewmodel.ReporteVM
 
 /**
- * Pantalla que lista los reportes registrados por el usuario con soporte para filtrado en tiempo real.
- *
- * Incluye un buscador dinámico ([OutlinedTextField]) que filtra por folio o estatus, y presenta
- * el listado mediante un [LazyColumn] estilizado. En la parte inferior cuenta con una sección de leyenda
- * que explica el significado de los iconos de estatus ("Enviado", "En proceso", "En revisión" y "Cerrado").
- *
- * @param listaReportes Colección de objetos [ReporteModel] recuperados desde la fuente de datos.
- * @param cargando Flag que indica si los datos están siendo descargados del servidor backend.
- * @param onAtras Callback invocado para regresar a la vista previa del perfil.
- * @param onReporteClick Callback ejecutado al hacer clic en un reporte, entregando su `folio`.
+ * Pantalla contenedora con estado (Stateful)
+ * Se suscribe a los flujos del ViewModel y solicita los reportes al backend.
  */
 @Composable
 fun VerListaReportes(
+    viewModel: ReporteVM = viewModel(),
+    onAtras: () -> Unit = {},
+    onReporteClick: (String) -> Unit = {}
+) {
+    val listaReportes by viewModel.misReportes.collectAsState()
+    val cargando by viewModel.cargando.collectAsState()
+
+    // Solicita los reportes al servidor backend al entrar a la pantalla
+    LaunchedEffect(Unit) {
+        viewModel.obtenerMisReportesDelBackEnd()
+    }
+
+    BackHandler { onAtras() }
+
+    VerListaReportesContent(
+        listaReportes = listaReportes,
+        cargando = cargando,
+        onAtras = onAtras,
+        onReporteClick = onReporteClick
+    )
+}
+
+/**
+ * Componente visual sin estado (Stateless)
+ * Recibe los datos filtrados e hipervincula las acciones a la interfaz.
+ */
+@Composable
+fun VerListaReportesContent(
     listaReportes: List<ReporteModel> = emptyList(),
-    // Estado de carga para el backend
     cargando: Boolean = false,
     onAtras: () -> Unit = {},
     onReporteClick: (String) -> Unit = {}
@@ -82,16 +106,20 @@ fun VerListaReportes(
     val morado = Color(0xFF381DC3)
     val fondo = Color(0xFFEAF4FC)
 
-    // Estado del buscador
+    // Estado del buscador local
     var textoBusqueda by remember { mutableStateOf("") }
 
-    // Filtrado automatico para la busqueda
+    // Filtrado automático para la búsqueda por Folio o Estatus
     val reportesFiltrados = listaReportes.filter {
         it.folio.contains(textoBusqueda, ignoreCase = true) ||
                 it.estatus.contains(textoBusqueda, ignoreCase = true)
     }
 
-    Box(modifier = Modifier.fillMaxSize().background(fondo)) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(fondo)
+    ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -119,7 +147,7 @@ fun VerListaReportes(
                     )
                 }
                 Image(
-                    painter = painterResource(id = R.drawable.imagensippina),
+                    painter = painterResource(id = R.drawable.logorieti),
                     contentDescription = "Logo SIPINNA",
                     modifier = Modifier.size(120.dp)
                 )
@@ -136,7 +164,6 @@ fun VerListaReportes(
             )
 
             Spacer(modifier = Modifier.height(20.dp))
-            // Este es el buscador
 
             OutlinedTextField(
                 value = textoBusqueda,
@@ -214,7 +241,7 @@ fun VerListaReportes(
                     verticalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
                     items(reportesFiltrados) { reporte ->
-                        val icono= obtenerIconoPorEstatus(reporte.estatus)
+                        val icono = obtenerIconoPorEstatus(reporte.estatus)
 
                         ItemReporteCard(
                             folio = reporte.folio,
@@ -246,7 +273,6 @@ fun VerListaReportes(
 
             Spacer(modifier = Modifier.height(15.dp))
 
-            // LEYENDA DE ESTADOS
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceAround,
@@ -254,7 +280,7 @@ fun VerListaReportes(
             ) {
                 ItemEstadoLeyenda("Enviado", Icons.AutoMirrored.Filled.Send, morado)
                 ItemEstadoLeyenda("En proceso", Icons.Default.History, morado)
-                ItemEstadoLeyenda("En revisión", Icons.Default.Flag, morado )
+                ItemEstadoLeyenda("En revisión", Icons.Default.Flag, morado)
                 ItemEstadoLeyenda("Cerrado", Icons.Default.Check, morado)
             }
 
@@ -264,10 +290,7 @@ fun VerListaReportes(
 }
 
 /**
- * Mapea la cadena del estado devuelto por el servidor al icono vectorial ([ImageVector]) correspondiente.
- *
- * @param estatus Texto que indica el estado del reporte (ej. "Enviado", "En proceso", "En revisión", "Cerrado").
- * @return [ImageVector] asociativo para representar visualmente el estado.
+ * Mapea la cadena del estado devuelto por el servidor al icono vectorial correspondiente.
  */
 private fun obtenerIconoPorEstatus(estatus: String): ImageVector {
     return when (estatus.lowercase().trim()) {
@@ -281,15 +304,6 @@ private fun obtenerIconoPorEstatus(estatus: String): ImageVector {
 
 /**
  * Tarjeta individual para mostrar el folio y el icono descriptivo del estado de un reporte.
- *
- * Anima el cambio de color de fondo al ser presionada (`animateColorAsState`).
- *
- * @param folio Identificador único del reporte a mostrar.
- * @param icono Icono vectorial que representa el estado del reporte.
- * @param colorIcono Color del círculo contenedor del icono.
- * @param bordeColor Color del borde de la tarjeta.
- * @param grosorBorde Ancho del borde de la tarjeta.
- * @param onClick Callback ejecutado al seleccionar la tarjeta.
  */
 @Composable
 private fun ItemReporteCard(
@@ -355,11 +369,7 @@ private fun ItemReporteCard(
 }
 
 /**
- * Elemento gráfico de la leyenda que explica el significado de cada estado de reporte en la aplicación.
- *
- * @param etiqueta Texto explicativo del estado (ej. "Enviado").
- * @param icono Icono asociativo del estado.
- * @param colorFondo Color de fondo del contenedor circular del icono.
+ * Elemento gráfico de la leyenda explicativa de estados.
  */
 @Composable
 private fun ItemEstadoLeyenda(
@@ -394,12 +404,11 @@ private fun ItemEstadoLeyenda(
 }
 
 /**
- * Previsualización de la pantalla [VerListaReportes] en el entorno de desarrollo de Android Studio.
+ * Previsualización en el entorno de desarrollo Android Studio.
  */
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun ListaReportesPreview() {
-    // Ejemplo de prueba con datos simulados
     val listaEjemplo = listOf(
         ReporteModel("REP-1234-1234", "Enviado"),
         ReporteModel("REP-1234-1235", "En proceso"),
@@ -407,6 +416,6 @@ fun ListaReportesPreview() {
         ReporteModel("REP-1234-1237", "Cerrado")
     )
     SIPPINAAplicacionTheme {
-        VerListaReportes(listaReportes = listaEjemplo)
+        VerListaReportesContent(listaReportes = listaEjemplo)
     }
 }

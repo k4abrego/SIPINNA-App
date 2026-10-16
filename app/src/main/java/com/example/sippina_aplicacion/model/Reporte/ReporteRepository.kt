@@ -42,6 +42,7 @@ class ReporteRepository(
                 Result.failure(Exception("Error al obtener reportes: ${response.code()}"))
             }
         } catch (e: Exception) {
+            android.util.Log.e("DEBUG_SIPINNA", "Excepción al consultar reportes:", e)
             Result.failure(e)
         }
     }

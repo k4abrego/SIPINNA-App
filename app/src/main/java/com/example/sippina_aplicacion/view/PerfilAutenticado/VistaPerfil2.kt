@@ -8,7 +8,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -21,11 +20,9 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -52,7 +49,6 @@ import com.example.sippina_aplicacion.R
 import com.example.sippina_aplicacion.ui.theme.SIPPINAAplicacionTheme
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.window.Dialog
 
 /**
@@ -126,7 +122,7 @@ fun VistaPerfil2(
                 )
             }
             Image(
-                painter = painterResource(id = R.drawable.imagensippina),
+                painter = painterResource(id = R.drawable.logorieti),
                 contentDescription = "Logo SIPINNA",
                 modifier = Modifier.size(120.dp)
             )

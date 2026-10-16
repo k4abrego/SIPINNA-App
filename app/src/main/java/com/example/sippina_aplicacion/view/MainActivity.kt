@@ -36,7 +36,6 @@ import com.example.sippina_aplicacion.view.perfilusuario.RegistroNuevoPerfil
 import com.example.sippina_aplicacion.view.SinAutenticacion.VistaPerfil1
 import com.example.sippina_aplicacion.view.PerfilAutenticado.VistaPerfil2
 import com.example.sippina_aplicacion.view.PerfilAutenticado.EditarPerfil
-import com.example.sippina_aplicacion.view.PerfilAutenticado.VerListaReportes
 import com.example.sippina_aplicacion.view.PerfilAutenticado.Notificaciones
 import com.example.sippina_aplicacion.view.perfilusuario.BuscarReporteExistente
 import com.example.sippina_aplicacion.view.perfilusuario.DetalleReporte
@@ -51,6 +50,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.sippina_aplicacion.view.PantallasReporte.VerListaReportes
+import com.example.sippina_aplicacion.view.PerfilAutenticado.BorradoresScreen
 import com.example.sippina_aplicacion.view.perfilusuario.mapearEstatusAInt
 import com.example.sippina_aplicacion.viewmodel.AuthVM
 import com.example.sippina_aplicacion.viewmodel.ReporteVM
@@ -114,8 +115,6 @@ fun AppNavHost(
     val authViewModel: AuthVM = viewModel()
 
     val authState by authViewModel.state.collectAsState()
-
-    // Estado temporal hasta implementar la autenticación
     val usuarioAutenticado = authState.autenticado
 
     fun abrirDetalleReporte(folio: String) {
@@ -141,7 +140,6 @@ fun AppNavHost(
         }
 
         composable(route = Pantalla.PantallaInicio.ruta) {
-
             val context = LocalContext.current
 
             LaunchedEffect(usuarioAutenticado) {
@@ -150,22 +148,19 @@ fun AppNavHost(
                 }
             }
             val listaReportes by reporteViewModel.misReportes.collectAsState()
-            val ultimoReporte = listaReportes.lastOrNull()
+            val ultimoReporte = listaReportes.firstOrNull()
 
             PantallaInicio(
                 usuarioAutenticado = usuarioAutenticado,
                 mostrarNotificaciones = usuarioAutenticado,
                 ultimoReporteFolio = ultimoReporte?.folio,
                 ultimoReporteEstatus = ultimoReporte?.estatus,
-
                 accionBoton = {
                     val intent = Intent(Intent.ACTION_DIAL).apply {
-                        data = Uri.parse("tel:911")
+                        data = Uri.parse("tel:55591484607")
                     }
                     context.startActivity(intent)
                 },
-
-
                 onNavegarALogin = {
                     if (usuarioAutenticado) {
                         authViewModel.cerrarSesion()
@@ -210,16 +205,13 @@ fun AppNavHost(
             )
         }
 
-        // Definición única de RegistroNuevoPerfil
         composable(Pantalla.RegistroNuevoPerfil.ruta) {
             RegistroNuevoPerfil(
                 authVM = authViewModel,
                 onAtras = { navController.popBackStack() },
                 onSiguiente = {
                     navController.navigate(Pantalla.PantallaInicio.ruta) {
-                        popUpTo(Pantalla.RegistroNuevoPerfil.ruta) {
-                            inclusive = true
-                        }
+                        popUpTo(Pantalla.RegistroNuevoPerfil.ruta) { inclusive = true }
                         launchSingleTop = true
                     }
                 }
@@ -280,23 +272,26 @@ fun AppNavHost(
         }
 
         composable(Pantalla.Borradores.ruta) {
-            Borradores(
+            BorradoresScreen(
+                viewModel = reporteViewModel,
                 onAtras = { navController.popBackStack() },
-                onContinuar = { /* Pendiente */ },
-                onEliminar = { /* Pendiente */ }
+                onContinuar = {
+                    val paso = reporteViewModel.uiState.value.pasoActual
+                    when (paso) {
+                        0 -> navController.navigate(Pantalla.DondeOcurrio.ruta)
+                        1 -> navController.navigate(Pantalla.Detalles.ruta)
+                        2 -> navController.navigate(Pantalla.Detalles2.ruta)
+                        3 -> navController.navigate(Pantalla.Evidencia.ruta)
+                        4 -> navController.navigate(Pantalla.PrivacidadSeguimiento.ruta)
+                        else -> navController.navigate(Pantalla.DondeOcurrio.ruta)
+                    }
+                }
             )
         }
 
         composable(Pantalla.MisReportes.ruta) {
-            LaunchedEffect(Unit) {
-                reporteViewModel.obtenerMisReportesDelBackEnd()
-            }
-            val listaReportesState by reporteViewModel.misReportes.collectAsState()
-            val cargandoState by reporteViewModel.cargando.collectAsState()
-
             VerListaReportes(
-                listaReportes = listaReportesState,
-                cargando = cargandoState,
+                viewModel = reporteViewModel,
                 onAtras = { navController.popBackStack() },
                 onReporteClick = { folio -> abrirDetalleReporte(folio) }
             )
@@ -311,10 +306,7 @@ fun AppNavHost(
                 onAtras = { navController.popBackStack() },
                 onVerDetalleReporte = { folio -> abrirDetalleReporte(folio) },
                 onBuscar = { folio, codigo ->
-                    reporteViewModel.buscarReportePorFolio(
-                        folio,
-                        codigo
-                    )
+                    reporteViewModel.buscarReportePorFolio(folio, codigo)
                 },
                 reporteEncontrado = reporteEncontradoState,
                 buscando = buscando,
@@ -322,7 +314,6 @@ fun AppNavHost(
             )
         }
 
-        // Definición única de DetallesReporte conecta lo que es el viewModel con el BackEnd
         composable(
             route = "${Pantalla.DetallesReporte.ruta}/{folio}",
             arguments = listOf(
@@ -369,7 +360,10 @@ fun AppNavHost(
         composable(Pantalla.DondeOcurrio.ruta) {
             DondeOcurrio(
                 viewModel = reporteViewModel,
-                onSiguiente = { navController.navigate(Pantalla.Detalles.ruta) },
+                onSiguiente = {
+                    reporteViewModel.siguientePaso()
+                    navController.navigate(Pantalla.Detalles.ruta)
+                },
                 onAtras = { navController.popBackStack() }
             )
         }
@@ -378,6 +372,7 @@ fun AppNavHost(
             Detalles(
                 viewModel = reporteViewModel,
                 onSiguiente = {
+                    reporteViewModel.siguientePaso()
                     reporteViewModel.irAlPrimerMenor()
                     navController.navigate(Pantalla.Detalles2.ruta)
                 },
@@ -391,6 +386,7 @@ fun AppNavHost(
                 onSiguiente = {
                     val hayOtroMenor = reporteViewModel.avanzarAlSiguienteMenor()
                     if (!hayOtroMenor) {
+                        reporteViewModel.siguientePaso()
                         navController.navigate(Pantalla.Evidencia.ruta)
                     }
                 },
@@ -406,7 +402,10 @@ fun AppNavHost(
         composable(Pantalla.Evidencia.ruta) {
             Evidencia(
                 viewModel = reporteViewModel,
-                onSiguiente = { navController.navigate(Pantalla.PrivacidadSeguimiento.ruta) },
+                onSiguiente = {
+                    reporteViewModel.siguientePaso()
+                    navController.navigate(Pantalla.PrivacidadSeguimiento.ruta)
+                },
                 onAtras = { navController.popBackStack() }
             )
         }

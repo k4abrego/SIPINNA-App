@@ -95,6 +95,7 @@ fun Detalles2(
 
     val opcionesEdad = listOf("0-4", "5-9", "10-14", "15-18")
     val opcionesGenero = listOf("Masculino", "Femenino", "Desconocido")
+    val opcionesRiesgo = listOf("Si", "No")
 
     // Asignaciones por defecto
     val edadActual = state.rangoEdad
@@ -199,6 +200,9 @@ fun Detalles2(
 
             Spacer(modifier = Modifier.height(25.dp))
 
+
+
+
             // GÉNERO
             Column(modifier = Modifier.fillMaxWidth()) {
                 Text(
@@ -236,7 +240,18 @@ fun Detalles2(
 
             Spacer(modifier = Modifier.height(25.dp))
 
-            // DESCRIPCIÓN FÍSICA
+            Column(modifier = modifier.fillMaxWidth()){
+
+                Text(text = "Existe una situación de riesgo ?",
+                    color = if (tieneError) Color.Red else colorMorado,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 18.sp)
+
+                Spacer(modifier = Modifier.height(10.dp))
+            }
+
+            Spacer(modifier = Modifier.height(25.dp))
+
             Column(modifier = Modifier.fillMaxWidth()) {
                 Text(
                     text = "Descripción Física",
@@ -289,10 +304,8 @@ fun Detalles2(
             }
         }
 
-        // MARGEN FIJO CON RESPECTO A LOS BOTONES
         Spacer(modifier = Modifier.height(10.dp))
 
-        // --- 2. BOTONES FIJOS EN EL BORDE INFERIOR ---
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(16.dp)
@@ -315,7 +328,6 @@ fun Detalles2(
                 onClick = {
                     if (state.descripcionFisica.trim().isNotBlank()) {
                         mostrarError = false
-                        // Si era el último menor entonces  avanza a la siguiente pantalla
                         if (!viewModel.avanzarAlSiguienteMenor()) {
                             onSiguiente()
                         }
