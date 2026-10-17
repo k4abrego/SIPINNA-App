@@ -19,11 +19,11 @@ interface AutenticacionAPI {
         @Path("correo") correo: String
     ): Response<ChallengeResponse>
 
-    // Paso 2 de inicio de sesión
+    // Paso 2 de inicio de sesión (Devuelve TokenResponse en lugar de ResponseBody)
     @POST("Login/")
     suspend fun verificarReto(
         @Body request: VerifyChallengeInput
-    ): Response<ResponseBody>
+    ): Response<TokenResponse>
 
     // Registro de usuario
     @POST("Registro/")
@@ -37,5 +37,34 @@ interface AutenticacionAPI {
         @Path("correo") correo: String,
         @Header("Authorization") token: String,
         @Body request: CambiarContrasenaInput
+    ): Response<RespuestaBase>
+
+    // Cerrar sesión / Invalidar token por ID de usuario
+    @DELETE("Login/{id}")
+    suspend fun logout(
+        @Path("id") userId: Long,
+        @Header("Authorization") token: String
+    ): Response<RespuestaBase>
+
+    // Consultar datos del perfil
+    @GET("Usuario/{correo}")
+    suspend fun obtenerUsuario(
+        @Path("correo") correo: String,
+        @Header("Authorization") token: String
+    ): Response<UsuarioResponse>
+
+    // Editar perfil
+    @PATCH("Usuario/{correo}")
+    suspend fun editarUsuario(
+        @Path("correo") correo: String,
+        @Header("Authorization") token: String,
+        @Body request: EditarUsuarioInput
+    ): Response<RespuestaBase>
+
+    // Cambiar correo electrónico
+    @PATCH("Correo/")
+    suspend fun cambiarCorreo(
+        @Header("Authorization") token: String,
+        @Body request: CambiarCorreoInput
     ): Response<RespuestaBase>
 }

@@ -82,6 +82,7 @@ import com.example.sippina_aplicacion.viewmodel.ReporteVM
 fun PrivacidadSeguimiento(
     viewModel: ReporteVM = viewModel(),
     modifier: Modifier = Modifier,
+    estaAutenticado: Boolean = false, // <-- Parámetro para saber si la sesión está activa
     onSiguiente: () -> Unit = {},
     onAtras: () -> Unit = {},
     onAvisoPrivacidad: () -> Unit = {}
@@ -95,20 +96,30 @@ fun PrivacidadSeguimiento(
     val colorTextoBotonAtras = Color(0xFF5A5A5A)
 
     val state by viewModel.uiState.collectAsState()
-    var correo by remember { mutableStateOf(state.correoSeguimiento) }
+    var correo by remember(state.correoSeguimiento) { mutableStateOf(state.correoSeguimiento) }
     val opcionSeleccionada = state.opcionPrivacidad
 
     // Estado para controlar la visualización de errores
     var mostrarErrorCorreo by remember { mutableStateOf(false) }
 
-    // Evaluaciones de estado para la validación
-    val requiereCorreo = opcionSeleccionada == "actualizaciones"
+    // Evaluaciones de estado para la validación (Solo requiere correo si NO está autenticado)
+    val requiereCorreo = !estaAutenticado && opcionSeleccionada == "actualizaciones"
     val correoVacio = correo.trim().isEmpty()
-    val tieneError = mostrarErrorCorreo && requiereCorreo && correoVacio
+    val esFormatoValido = android.util.Patterns.EMAIL_ADDRESS.matcher(correo.trim()).matches()
+    val tieneError = mostrarErrorCorreo && requiereCorreo && (!esFormatoValido || correoVacio)
 
     val context = LocalContext.current
 
-    LaunchedEffect(Unit) {viewModel.iniciarlizarBorradorStorage(context) }
+    LaunchedEffect(Unit) {
+        viewModel.iniciarlizarBorradorStorage(context)
+    }
+
+    // Si el usuario está autenticado, aseguramos que la opción se mantenga como "anónimo"
+    LaunchedEffect(estaAutenticado) {
+        if (estaAutenticado && opcionSeleccionada == "actualizaciones") {
+            viewModel.actualizarOpcionPrivacidad("anónimo")
+        }
+    }
 
     BackHandler { onAtras() }
 
@@ -129,8 +140,12 @@ fun PrivacidadSeguimiento(
                 .padding(top = 8.dp, bottom = 12.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            EncabezadoReporte(onGuardarBorrador = {viewModel.guardarBorrador()
-            Toast.makeText(context, "Borrador guardado exitosamente", Toast.LENGTH_SHORT).show()})
+            EncabezadoReporte(
+                onGuardarBorrador = {
+                    viewModel.guardarBorrador()
+                    Toast.makeText(context, "Borrador guardado exitosamente", Toast.LENGTH_SHORT).show()
+                }
+            )
 
             Spacer(modifier = Modifier.height(4.dp))
 
@@ -161,6 +176,7 @@ fun PrivacidadSeguimiento(
 
             Spacer(modifier = Modifier.height(18.dp))
 
+            // Tarjeta de Reporte Anónimo (Siempre visible)
             TarjetaOpcionPrivacidad(
                 titulo = "Reporte anónimo",
                 descripcion = "Podrás consultar tu reporte con el folio y el código privado, sin proporcionar tus datos de contacto.",
@@ -172,64 +188,72 @@ fun PrivacidadSeguimiento(
                 }
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
-
-            TarjetaOpcionPrivacidad(
-                titulo = "Me interesa recibir actualizaciones",
-                descripcion = "En esta modalidad podrás proporcionar un correo para recibir información sobre el seguimiento de tu reporte.",
-                icon = Icons.Default.Email,
-                seleccionado = opcionSeleccionada == "actualizaciones",
-                onClick = {
-                    viewModel.actualizarOpcionPrivacidad("actualizaciones")
-                }
-            )
-
-            if (opcionSeleccionada == "actualizaciones") {
+            // MOSTRAR SOLO SI EL USUARIO NO ESTÁ AUTENTICADO
+            if (!estaAutenticado) {
                 Spacer(modifier = Modifier.height(16.dp))
-                Text(
-                    text = "Correo para recibir actualizaciones",
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = if (tieneError) Color.Red else colorMorado,
-                    modifier = Modifier.fillMaxWidth()
+
+                TarjetaOpcionPrivacidad(
+                    titulo = "Me interesa recibir actualizaciones",
+                    descripcion = "En esta modalidad podrás proporcionar un correo para recibir información sobre el seguimiento de tu reporte.",
+                    icon = Icons.Default.Email,
+                    seleccionado = opcionSeleccionada == "actualizaciones",
+                    onClick = {
+                        viewModel.actualizarOpcionPrivacidad("actualizaciones")
+                    }
                 )
 
-                Spacer(modifier = Modifier.height(8.dp))
+                if (opcionSeleccionada == "actualizaciones") {
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Text(
+                        text = "Correo para recibir actualizaciones",
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = if (tieneError) Color.Red else colorMorado,
+                        modifier = Modifier.fillMaxWidth()
+                    )
 
-                OutlinedTextField(
-                    value = correo,
-                    onValueChange = { nuevoTexto ->
-                        correo = nuevoTexto
-                        viewModel.setCorreoSeguimiento(nuevoTexto)
-                        if (nuevoTexto.trim().isNotBlank()) {
-                            mostrarErrorCorreo = false
-                        }
-                    },
-                    modifier = Modifier.fillMaxWidth(),
-                    placeholder = { Text("correo@ejemplo.com") },
-                    singleLine = true,
-                    isError = tieneError,
-                    supportingText = {
-                        if (tieneError) {
-                            Text(
-                                text = "* Por favor ingresa un correo para recibir actualizaciones",
-                                color = Color.Red,
-                                fontSize = 12.sp,
-                                fontWeight = FontWeight.Medium
-                            )
-                        }
-                    },
-                    trailingIcon = {
-                        if (tieneError) {
-                            Icon(
-                                imageVector = Icons.Default.Error,
-                                contentDescription = "Error de correo",
-                                tint = Color.Red
-                            )
-                        }
-                    },
-                    shape = RoundedCornerShape(14.dp)
-                )
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    OutlinedTextField(
+                        value = correo,
+                        onValueChange = { nuevoTexto ->
+                            correo = nuevoTexto
+                            viewModel.setCorreoSeguimiento(nuevoTexto)
+                            if (nuevoTexto.trim().isNotBlank()) {
+                                mostrarErrorCorreo = false
+                            }
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                        placeholder = { Text("correo@ejemplo.com") },
+                        singleLine = true,
+                        isError = tieneError,
+                        supportingText = {
+                            if (tieneError) {
+                                val mensajeError = if (correoVacio) {
+                                    "* Por favor ingresa un correo para recibir actualizaciones"
+                                } else {
+                                    "* Ingresa un correo electrónico válido"
+                                }
+                                Text(
+                                    text = mensajeError,
+                                    color = Color.Red,
+                                    fontSize = 12.sp,
+                                    fontWeight = FontWeight.Medium
+                                )
+                            }
+                        },
+                        trailingIcon = {
+                            if (tieneError) {
+                                Icon(
+                                    imageVector = Icons.Default.Error,
+                                    contentDescription = "Error de correo",
+                                    tint = Color.Red
+                                )
+                            }
+                        },
+                        shape = RoundedCornerShape(14.dp)
+                    )
+                }
             }
 
             Spacer(modifier = Modifier.height(22.dp))
@@ -299,7 +323,7 @@ fun PrivacidadSeguimiento(
 
             Button(
                 onClick = {
-                    val esInvalido = requiereCorreo && correoVacio
+                    val esInvalido = requiereCorreo && (!esFormatoValido || correoVacio)
 
                     if (esInvalido) {
                         mostrarErrorCorreo = true
@@ -328,7 +352,6 @@ fun PrivacidadSeguimiento(
         }
     }
 }
-
 /**
  * Tarjeta interactiva para la selección de las opciones de modalidad de privacidad del reporte.
  *

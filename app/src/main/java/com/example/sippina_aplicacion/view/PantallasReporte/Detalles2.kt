@@ -91,7 +91,7 @@ fun Detalles2(
     val colorFondoBotonAtras = Color(0xFFE2E2E2)
     val colorTextoBotonAtras = Color(0xFF5A5A5A)
 
-    val opcionesEdad = listOf("0-4", "5-9", "10-14", "15-18")
+    val opcionesEdad = listOf("0-5", "6-11", "12-14", "15-17" , "No Sé" )
     val opcionesGenero = listOf("Masculino", "Femenino", "Desconocido")
     val opcionesPeligro = listOf("Sí", "No", "No sé")
 
@@ -240,7 +240,6 @@ fun Detalles2(
 
             Spacer(modifier = Modifier.height(25.dp))
 
-            // PELIGRO INMEDIATO
             Column(modifier = Modifier.fillMaxWidth()) {
                 Text(
                     text = "¿El menor se encuentra en peligro inmediato?",
@@ -277,7 +276,6 @@ fun Detalles2(
 
             Spacer(modifier = Modifier.height(25.dp))
 
-            // DESCRIPCIÓN FÍSICA
             Column(modifier = Modifier.fillMaxWidth()) {
                 Text(
                     text = "Descripción Física",

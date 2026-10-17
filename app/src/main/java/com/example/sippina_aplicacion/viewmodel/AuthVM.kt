@@ -28,12 +28,6 @@ class AuthVM(
 
     /**
      * Inicia sesión en la plataforma de forma asíncrona utilizando el repositorio de autenticación.
-     *
-     * Actualiza el estado de carga y, en caso de éxito, almacena el token JWT, marca al usuario como autenticado
-     * y consulta la información detallada de su perfil con [obtenerPerfil]. En caso de error, registra la incidencia.
-     *
-     * @param correo Correo electrónico introducido por el usuario.
-     * @param contrasena Contraseña asociada a la cuenta.
      */
     fun iniciarSesion(correo: String, contrasena: String) {
         val correoLimpio = correo.trim().lowercase()
@@ -53,7 +47,7 @@ class AuthVM(
                         cargando = false
                     )
                 }
-                // Una vez que se tiene el token entonces se consultan los datos del perfil
+                // Consulta los datos del perfil con el token obtenido
                 obtenerPerfil()
             }.onFailure { error ->
                 _state.update {
@@ -69,12 +63,6 @@ class AuthVM(
 
     /**
      * Registra una nueva cuenta de usuario en el servidor y ejecuta el inicio de sesión automático al finalizar.
-     *
-     * @param correo Dirección de correo electrónico única para la nueva cuenta.
-     * @param contrasena Contraseña de acceso.
-     * @param nombre Nombre(s) del usuario.
-     * @param apellidos Apellidos paterno y materno del usuario.
-     * @param telefono Número de teléfono de contacto opcional.
      */
     fun registrarUsuario(
         correo: String,
@@ -124,8 +112,6 @@ class AuthVM(
 
     /**
      * Obtiene la información detallada del perfil del usuario autenticado desde el servidor.
-     *
-     * @param correoTarget Correo electrónico del perfil a consultar (por defecto toma el correo actual del estado).
      */
     fun obtenerPerfil(correoTarget: String = _state.value.correo) {
         val correoLimpio = correoTarget.trim().lowercase()
@@ -135,15 +121,15 @@ class AuthVM(
         viewModelScope.launch {
             _state.update { it.copy(cargando = true, error = null) }
 
-            val resultado = repository.obtenerPerfil(token,correoLimpio)
+            val resultado = repository.obtenerPerfil(token, correoLimpio)
 
             resultado.onSuccess { usuario ->
                 _state.update {
                     it.copy(
-                        usuarioId = usuario.idUsuario.toString(),
+                        usuarioId = usuario.userId.toString(),
                         nombre = usuario.nombre,
-                        apellidos = usuario.apellidos,
-                        correo = usuario.correo,
+                        apellidos = usuario.apellido,
+                        correo = correoLimpio,
                         telefono = usuario.telefono,
                         cargando = false
                     )
@@ -161,10 +147,6 @@ class AuthVM(
 
     /**
      * Actualiza la información personal del usuario autenticado en la plataforma.
-     *
-     * @param nombre Nombre(s) actualizados del usuario.
-     * @param apellidos Apellidos actualizados del usuario.
-     * @param telefono Número telefónico actualizado opcional.
      */
     fun actualizarPerfil(nombre: String, apellidos: String, telefono: String?) {
         val token = _state.value.token
@@ -175,16 +157,22 @@ class AuthVM(
         viewModelScope.launch {
             _state.update { it.copy(cargando = true, error = null, mensajeExito = null) }
 
-            val resultado = repository.actualizarPerfil(token , nombre, apellidos, telefono)
+            val resultado = repository.actualizarPerfil(
+                token = token,
+                correoTarget = correo,
+                nombre = nombre.ifBlank { null },
+                apellidos = apellidos.ifBlank { null },
+                telefono = telefono?.ifBlank { null }
+            )
 
-            resultado.onSuccess { usuario ->
+            resultado.onSuccess { respuesta ->
                 _state.update {
                     it.copy(
-                        nombre = usuario.nombre,
-                        apellidos = usuario.apellidos,
-                        telefono = usuario.telefono,
+                        nombre = nombre,
+                        apellidos = apellidos,
+                        telefono = telefono,
                         cargando = false,
-                        mensajeExito = "Perfil actualizado con éxito"
+                        mensajeExito = respuesta.mensaje ?: "Perfil actualizado con éxito"
                     )
                 }
             }.onFailure { error ->
@@ -200,8 +188,6 @@ class AuthVM(
 
     /**
      * Solicita la recuperación de contraseña para el correo electrónico indicado.
-     *
-     * @param correo Dirección de correo electrónico asociada a la cuenta a recuperar.
      */
     fun recuperarContrasena(correo: String) {
         viewModelScope.launch {
@@ -229,8 +215,6 @@ class AuthVM(
 
     /**
      * Elimina permanentemente la cuenta del usuario en el servidor y purga el estado local.
-     *
-     * @param onExito Callback ejecutado al completarse exitosamente la baja de la cuenta.
      */
     fun eliminarCuenta(onExito: () -> Unit) {
         val token = _state.value.token
@@ -265,16 +249,18 @@ class AuthVM(
      */
     fun cerrarSesion() {
         val token = _state.value.token
+        val userId = _state.value.usuarioId?.toLongOrNull() ?: 0L
+
         if (token.isNotBlank()) {
             viewModelScope.launch {
-                repository.cerrarSesion(token)
+                repository.cerrarSesion(userId = userId, token = token)
             }
         }
         limpiarEstadoLocal()
     }
 
     /**
-     * Restablece el estado de autenticación a su valor predeterminado (vacío / no autenticado).
+     * Restablece el estado de autenticación a su valor predeterminado.
      */
     private fun limpiarEstadoLocal() {
         _state.value = EstadoAuth()

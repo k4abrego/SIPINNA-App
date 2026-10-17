@@ -62,6 +62,7 @@ import com.example.sippina_aplicacion.view.PantallasReporte.BarraDePasos
 import com.example.sippina_aplicacion.view.PantallasReporte.EncabezadoReporte
 import com.example.sippina_aplicacion.viewmodel.ReporteVM
 import java.util.Locale
+import kotlin.math.roundToInt
 
 /**
  * Pantalla de captura de los detalles del incidente (Paso 2 del flujo de generación de reporte).
@@ -182,15 +183,13 @@ fun Detalles(
 
                 Slider(
                     value = horaSlider,
-                    onValueChange = {
-                        horaSlider = it
-                        viewModel.setHorarioAprox(
-                            formatearHora(it)
-                        )
+                    onValueChange = { nuevoValor ->
+                        val horaRedondeada = (nuevoValor * 2).roundToInt() / 2f
+                        horaSlider = horaRedondeada
+                        viewModel.setHorarioAprox(formatearHora(horaRedondeada))
                     },
 
                     valueRange = 0f..24f,
-
                     colors = SliderDefaults.colors(
                         thumbColor = colorMorado,
                         activeTrackColor = colorBarra,

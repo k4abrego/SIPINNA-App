@@ -1,5 +1,7 @@
 package com.example.sippina_aplicacion.model.Autenticacion
 
+import com.google.gson.annotations.SerializedName
+
 /**
  * Modelo genérico que representa la estructura base de respuesta devuelta por la API REST del backend.
  *
@@ -12,9 +14,6 @@ package com.example.sippina_aplicacion.model.Autenticacion
  * @property idUsuario Identificador del usuario retornado opcionalmente como cadena de texto.
  */
 data class RespuestaBase(
-    val status:Int? = null,
-    val mensaje:String? = null,
-    val token: String? = null,
-    val idUsuario: String? = null
-
+    @SerializedName("mensaje") val mensaje: String? = null,
+    @SerializedName("error") val error: String? = null
 )
