@@ -27,6 +27,7 @@ import androidx.compose.material.icons.filled.MyLocation
 import androidx.compose.material.icons.outlined.Description
 import androidx.compose.material.icons.outlined.LocationOn
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -35,8 +36,10 @@ import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
@@ -47,39 +50,32 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.sippina_aplicacion.R
 import com.example.sippina_aplicacion.ui.theme.SIPPINAAplicacionTheme
+import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.model.CameraPosition
+import com.google.android.gms.maps.model.LatLng
+import com.google.maps.android.compose.GoogleMap
+import com.google.maps.android.compose.MapUiSettings
+import com.google.maps.android.compose.Marker
+import com.google.maps.android.compose.MarkerState
+import com.google.maps.android.compose.rememberCameraPositionState
+import com.google.maps.android.compose.rememberMarkerState
 
-/**
- * Pantalla que muestra el detalle y el seguimiento del estado de un reporte específico.
- *
- * Presenta la información general del trámite (Folio y fecha de envío), una barra gráfica de estatus
- * ([BarraEstadoReporte]), un mensaje descriptivo del estado actual, y tarjetas detalladas con
- * la descripción del incidente y la ubicación geográfica del lugar de los hechos.
- *
- * @param folio Identificador único del reporte (ej. `"REP-1234-1234"`).
- * @param fechaEnvio Fecha y hora formateada en que se registró el reporte.
- * @param estadoActual Nivel numérico de avance del trámite (0 = Recibido, 1 = En revisión, 2 = En atención, 3 = Cerrado).
- * @param descripcion Narrativa detallada de la situación reportada.
- * @param direccion Dirección física o referencia del lugar de los hechos.
- * @param onAtras Callback invocado al presionar el botón de regresar al listado de reportes.
- */
+
 @Composable
 fun DetalleReporte(
-    folio: String = "REP-1234-1234",
-    fechaEnvio: String = "24/08/2026, 10:59:00 am",
-
-    // 0 = Recibido
-    // 1 = En revisión
-    // 2 = En atención
-    // 3 = Cerrado
-    estadoActual: Int = 0,
-    descripcion: String = "Menor de edad encontrado solo en la vía pública, sin la supervisión de una persona adulta.",
-    direccion: String = "Calle Flop, Av. Ware s/n, Col. Papu, C.P. 6767",
+    folio: String,
+    fechaEnvio: String,
+    estadoActual: Int,
+    descripcion: String,
+    direccion: String,
+    latitud: Double,
+    longitud: Double,
     onAtras: () -> Unit = {}
 ) {
-
     val morado = Color(0xFF381DC3)
     val fondo = Color(0xFFEAF4FC)
     val gris = Color(0xFF777777)
+
     val mensajeEstado = when (estadoActual) {
         0 -> "Su caso fue recibido, estamos revisando el reporte"
         1 -> "Su reporte se encuentra en revisión"
@@ -87,6 +83,7 @@ fun DetalleReporte(
         3 -> "Su reporte ha sido cerrado"
         else -> "Consulta el estado de tu reporte"
     }
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -128,27 +125,21 @@ fun DetalleReporte(
 
             Spacer(modifier = Modifier.height(5.dp))
 
-            Column(
-                modifier = Modifier.fillMaxWidth()
-            ) {
+            Column(modifier = Modifier.fillMaxWidth()) {
                 Text(
                     text = "Reporte",
                     fontSize = 16.sp,
                     fontWeight = FontWeight.SemiBold,
                     color = gris
                 )
-
                 Spacer(modifier = Modifier.height(2.dp))
-
                 Text(
                     text = folio,
                     fontSize = 28.sp,
                     fontWeight = FontWeight.Bold,
                     color = morado
                 )
-
                 Spacer(modifier = Modifier.height(4.dp))
-
                 Text(
                     text = "Enviado: $fechaEnvio",
                     fontSize = 14.sp,
@@ -175,6 +166,7 @@ fun DetalleReporte(
 
             Spacer(modifier = Modifier.height(20.dp))
 
+            // TARJETA 1: DESCRIPCIÓN DEL INCIDENTE
             OutlinedCard(
                 shape = RoundedCornerShape(14.dp),
                 border = BorderStroke(width = 1.5.dp, color = morado),
@@ -186,67 +178,16 @@ fun DetalleReporte(
                         .fillMaxWidth()
                         .padding(14.dp)
                 ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(
                             imageVector = Icons.Outlined.Description,
                             contentDescription = null,
                             tint = morado,
                             modifier = Modifier.size(22.dp)
                         )
-
                         Spacer(modifier = Modifier.width(10.dp))
-
                         Text(
                             text = "Descripción del incidente",
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Color.DarkGray
-                        )
-                    }
-
-                    Spacer(modifier = Modifier.height(6.dp))
-
-                    Text(
-                        text = descripcion,
-                        fontSize = 13.sp,
-                        lineHeight = 17.sp,
-                        color = gris,
-                        modifier = Modifier.padding(start = 32.dp)
-                    )
-
-                    Spacer(modifier = Modifier.height(10.dp))
-                }
-            }
-
-            Spacer(modifier = Modifier.height(22.dp))
-
-            OutlinedCard(
-                shape = RoundedCornerShape(14.dp),
-                border = BorderStroke(width = 1.5.dp, color = morado),
-                colors = CardDefaults.outlinedCardColors(containerColor = fondo),
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(14.dp)
-                ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.MyLocation,
-                            contentDescription = null,
-                            tint = morado,
-                            modifier = Modifier.size(22.dp)
-                        )
-
-                        Spacer(modifier = Modifier.width(10.dp))
-
-                        Text(
-                            text = "Ubicación",
                             fontSize = 16.sp,
                             fontWeight = FontWeight.Bold,
                             color = Color.DarkGray
@@ -256,38 +197,96 @@ fun DetalleReporte(
                     Spacer(modifier = Modifier.height(8.dp))
 
                     Text(
-                        text = direccion,
-                        fontSize = 13.sp,
-                        lineHeight = 17.sp,
-                        color = gris,
+                        text = descripcion.ifBlank { "Sin descripción disponible" },
+                        fontSize = 14.sp,
+                        lineHeight = 18.sp,
+                        color = Color.DarkGray,
+                        modifier = Modifier.padding(start = 32.dp)
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(22.dp))
+
+            // TARJETA 2: DIRECCIÓN Y MAPA REAL
+            OutlinedCard(
+                shape = RoundedCornerShape(14.dp),
+                border = BorderStroke(width = 1.5.dp, color = morado),
+                colors = CardDefaults.outlinedCardColors(containerColor = fondo),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(14.dp)
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(
+                            imageVector = Icons.Default.MyLocation,
+                            contentDescription = null,
+                            tint = morado,
+                            modifier = Modifier.size(22.dp)
+                        )
+                        Spacer(modifier = Modifier.width(10.dp))
+                        Text(
+                            text = "Ubicación del reporte",
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.DarkGray
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    Text(
+                        text = direccion.ifBlank { "Sin dirección especificada" },
+                        fontSize = 14.sp,
+                        lineHeight = 18.sp,
+                        color = Color.DarkGray,
                         modifier = Modifier.padding(start = 32.dp)
                     )
 
                     Spacer(modifier = Modifier.height(16.dp))
 
+                    val posicionInicial = LatLng(
+                        if (latitud != 0.0) latitud else 19.5583,
+                        if (longitud != 0.0) longitud else -99.2483
+                    )
+
+                    val cameraPositionState = rememberCameraPositionState {
+                        position = CameraPosition.fromLatLngZoom(posicionInicial, 16f)
+                    }
+
+                    val markerState = rememberMarkerState(position = posicionInicial)
+
+                    LaunchedEffect(latitud, longitud) {
+                        if (latitud != 0.0 && longitud != 0.0) {
+                            val nuevaUbicacion = LatLng(latitud, longitud)
+                            markerState.position = nuevaUbicacion
+                            cameraPositionState.animate(
+                                CameraUpdateFactory.newLatLngZoom(nuevaUbicacion, 16f)
+                            )
+                        }
+                    }
+
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(150.dp)
-                            .background(color = Color(0xFFDDE9F2), shape = RoundedCornerShape(10.dp)),
-                        contentAlignment = Alignment.Center
+                            .height(180.dp)
+                            .clip(RoundedCornerShape(10.dp))
                     ) {
-                        Column(
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
-                            Icon(
-                                imageVector = Icons.Outlined.LocationOn,
-                                contentDescription = "Ubicación del reporte",
-                                tint = morado,
-                                modifier = Modifier.size(32.dp)
+                        GoogleMap(
+                            modifier = Modifier.fillMaxSize(),
+                            cameraPositionState = cameraPositionState,
+                            uiSettings = MapUiSettings(
+                                zoomControlsEnabled = false,
+                                myLocationButtonEnabled = false
                             )
-                            Spacer(modifier = Modifier.height(8.dp))
-
-                            Text(
-                                text = "Mapa de ubicación",
-                                fontSize = 13.sp,
-                                color = gris,
-                                textAlign = TextAlign.Center
+                        ) {
+                            Marker(
+                                state = markerState,
+                                title = "Lugar del incidente",
+                                snippet = direccion.ifBlank { "Ubicación del reporte" }
                             )
                         }
                     }
@@ -299,13 +298,6 @@ fun DetalleReporte(
     }
 }
 
-/**
- * Componente gráfico que muestra la barra de progreso de estatus del reporte a lo largo de 4 etapas principales.
- *
- * Combina nodos ([PasoEstado]) y conectores horizontales ([LineaEstado]) según el [estadoActual].
- *
- * @param estadoActual Nivel de avance actual (0 = Recibido, 1 = En revisión, 2 = En atención, 3 = Cerrado).
- */
 @Composable
 fun BarraEstadoReporte(
     estadoActual: Int = 0
@@ -325,31 +317,26 @@ fun BarraEstadoReporte(
             activa = estadoActual >= 1,
             modifier = Modifier.weight(0.35f)
         )
-
         PasoEstado(
             etiqueta = "En\nrevisión",
             icono = Icons.Default.History,
             activo = estadoActual >= 1,
             modifier = Modifier.weight(1f)
         )
-
         LineaEstado(
             activa = estadoActual >= 2,
             modifier = Modifier.weight(0.35f)
         )
-
         PasoEstado(
             etiqueta = "En\natención",
             icono = Icons.Default.Flag,
             activo = estadoActual >= 2,
             modifier = Modifier.weight(1f)
         )
-
         LineaEstado(
             activa = estadoActual >= 3,
             modifier = Modifier.weight(0.35f)
         )
-
         PasoEstado(
             etiqueta = "Cerrado",
             icono = Icons.Default.Flag,
@@ -359,15 +346,6 @@ fun BarraEstadoReporte(
     }
 }
 
-
-/**
- * Subcomponente Composable que dibuja un paso individual de la barra de estado de un reporte.
- *
- * @param etiqueta Texto descriptivo de la etapa.
- * @param icono Icono vectorial [ImageVector] correspondiente a la etapa.
- * @param activo Flag que indica si la etapa ha sido alcanzada o superada.
- * @param modifier [Modifier] opcional para el diseño.
- */
 @Composable
 private fun PasoEstado(
     etiqueta: String,
@@ -383,24 +361,14 @@ private fun PasoEstado(
     ) {
         Surface(
             shape = CircleShape,
-            color = if (activo) {
-                morado
-            } else {
-                Color(0xFFE0E0E0)
-            },
+            color = if (activo) morado else Color(0xFFE0E0E0),
             modifier = Modifier.size(38.dp)
         ) {
-            Box(
-                contentAlignment = Alignment.Center
-            ) {
+            Box(contentAlignment = Alignment.Center) {
                 Icon(
                     imageVector = icono,
                     contentDescription = etiqueta.replace("\n", " "),
-                    tint = if (activo) {
-                        Color.White
-                    } else {
-                        morado
-                    },
+                    tint = if (activo) Color.White else morado,
                     modifier = Modifier.size(23.dp)
                 )
             }
@@ -412,23 +380,13 @@ private fun PasoEstado(
             text = etiqueta,
             fontSize = 11.sp,
             fontWeight = FontWeight.SemiBold,
-            color = if (activo) {
-                Color.DarkGray
-            } else {
-                Color.Gray
-            },
+            color = if (activo) Color.DarkGray else Color.Gray,
             textAlign = TextAlign.Center,
             lineHeight = 13.sp
         )
     }
 }
 
-/**
- * Línea conectora horizontal empleada para unir los nodos de la barra de estado.
- *
- * @param activa Flag que indica si la línea se ilumina en color morado o se mantiene gris.
- * @param modifier [Modifier] opcional para el diseño.
- */
 @Composable
 private fun LineaEstado(
     activa: Boolean,
@@ -440,41 +398,11 @@ private fun LineaEstado(
     ) {
         HorizontalDivider(
             thickness = 1.5.dp,
-            color = if (activa) {
-                Color(0xFF381DC3)
-            } else {
-                Color.Gray
-            }
+            color = if (activa) Color(0xFF381DC3) else Color.Gray
         )
     }
 }
 
-/**
- * Previsualización del detalle de reporte en estado "Recibido".
- */
-@Preview(
-    showBackground = true,
-    showSystemUi = true,
-    name = "Detalle de reporte - Recibido"
-)
-@Composable
-fun DetalleReportePreview() {
-
-    SIPPINAAplicacionTheme {
-
-        DetalleReporte(
-            estadoActual = 0
-        )
-    }
-}
-
-/**
- * Mapea una cadena de texto de estatus proveniente del backend a un valor entero de 0 a 3
- * compatible con los componentes de la barra de estado.
- *
- * @param estatus Cadena textual del estado (ej. "Enviado", "En revisión", "Cerrado").
- * @return Valor entero (0..3) representando el estado normalizado.
- */
 fun mapearEstatusAInt(estatus: String): Int {
     return when (estatus.lowercase().trim()) {
         "enviado", "recibido" -> 0
@@ -485,67 +413,21 @@ fun mapearEstatusAInt(estatus: String): Int {
     }
 }
 
-
-
-
-/**
- * Previsualización del detalle de reporte en estado "En revisión".
- */
-
 @Preview(
     showBackground = true,
     showSystemUi = true,
-    name = "Detalle de reporte - En revisión"
+    name = "Detalle Reporte - Cargando Backend"
 )
 @Composable
-fun DetalleReporteRevisionPreview() {
-
+fun DetalleReporteCargandoPreview() {
     SIPPINAAplicacionTheme {
-
-        DetalleReporte(
-            estadoActual = 1
-        )
-    }
-}
-
-
-/**
- * Previsualización del detalle de reporte en estado "En atención".
- */
-
-@Preview(
-    showBackground = true,
-    showSystemUi = true,
-    name = "Detalle de reporte - En atención"
-)
-@Composable
-fun DetalleReporteAtencionPreview() {
-
-    SIPPINAAplicacionTheme {
-
-        DetalleReporte(
-            estadoActual = 2
-        )
-    }
-}
-
-
-/**
- * Previsualización del detalle de reporte en estado "Cerrado".
- */
-
-@Preview(
-    showBackground = true,
-    showSystemUi = true,
-    name = "Detalle de reporte - Cerrado"
-)
-@Composable
-fun DetalleReporteCerradoPreview() {
-
-    SIPPINAAplicacionTheme {
-
-        DetalleReporte(
-            estadoActual = 3
-        )
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color(0xFFEAF4FC)),
+            contentAlignment = Alignment.Center
+        ) {
+            CircularProgressIndicator(color = Color(0xFF381DC3))
+        }
     }
 }

@@ -82,9 +82,7 @@ fun Detalles2(
     onSiguiente: () -> Unit = {},
     onAtras: () -> Unit = {}
 ) {
-
     val appContext = LocalContext.current
-    // Escuchar el estado centralizado
     val state by viewModel.uiState.collectAsState()
 
     val colorMorado = Color(0xFF381EBD)
@@ -95,28 +93,28 @@ fun Detalles2(
 
     val opcionesEdad = listOf("0-4", "5-9", "10-14", "15-18")
     val opcionesGenero = listOf("Masculino", "Femenino", "Desconocido")
-    val opcionesRiesgo = listOf("Si", "No")
+    val opcionesPeligro = listOf("Sí", "No", "No sé")
 
-    // Asignaciones por defecto
+    // Asignaciones de valores desde el estado
     val edadActual = state.rangoEdad
     val generoActual = state.genero
+    val peligroActual = state.peligroInmediato
 
-    // Validación sobre el estado de la descripción física
     var mostrarError by remember { mutableStateOf(false) }
     val tieneError = mostrarError && state.descripcionFisica.trim().isEmpty()
 
     val manejarAtras = {
         mostrarError = false
-        if(!viewModel.regresarAlMenorAnterior()){
+        if (!viewModel.regresarAlMenorAnterior()) {
             onAtras()
         }
-
     }
 
-    LaunchedEffect(Unit ) {viewModel.iniciarlizarBorradorStorage(appContext) }
+    LaunchedEffect(Unit) {
+        viewModel.iniciarlizarBorradorStorage(appContext)
+    }
 
-    BackHandler{manejarAtras()}
-
+    BackHandler { manejarAtras() }
 
     Column(
         modifier = modifier
@@ -128,14 +126,18 @@ fun Detalles2(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Column(
-            modifier = modifier
+            modifier = Modifier
                 .weight(1f)
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            EncabezadoReporte(onGuardarBorrador = {viewModel.guardarBorrador()
-            Toast.makeText(appContext, "Borrador guardado exitosamente", Toast.LENGTH_SHORT).show()})
+            EncabezadoReporte(
+                onGuardarBorrador = {
+                    viewModel.guardarBorrador()
+                    Toast.makeText(appContext, "Borrador guardado exitosamente", Toast.LENGTH_SHORT).show()
+                }
+            )
 
             Spacer(modifier = Modifier.height(8.dp))
 
@@ -164,6 +166,7 @@ fun Detalles2(
 
             Spacer(modifier = Modifier.height(25.dp))
 
+            // EDAD APROXIMADA
             Column(modifier = Modifier.fillMaxWidth()) {
                 Text(
                     text = "Edad aprox.",
@@ -171,7 +174,7 @@ fun Detalles2(
                     fontWeight = FontWeight.Bold,
                     fontSize = 18.sp
                 )
-                Spacer(modifier = Modifier.height(20.dp))
+                Spacer(modifier = Modifier.height(10.dp))
 
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -180,7 +183,7 @@ fun Detalles2(
                     opcionesEdad.forEach { rango ->
                         val seleccionado = edadActual == rango
                         OutlinedButton(
-                            onClick = { viewModel.setRangoEdad(rango)},
+                            onClick = { viewModel.setRangoEdad(rango) },
                             shape = RoundedCornerShape(10.dp),
                             border = if (seleccionado) null else BorderStroke(1.5.dp, colorMorado),
                             colors = ButtonDefaults.outlinedButtonColors(
@@ -199,9 +202,6 @@ fun Detalles2(
             }
 
             Spacer(modifier = Modifier.height(25.dp))
-
-
-
 
             // GÉNERO
             Column(modifier = Modifier.fillMaxWidth()) {
@@ -240,18 +240,44 @@ fun Detalles2(
 
             Spacer(modifier = Modifier.height(25.dp))
 
-            Column(modifier = modifier.fillMaxWidth()){
-
-                Text(text = "Existe una situación de riesgo ?",
-                    color = if (tieneError) Color.Red else colorMorado,
+            // PELIGRO INMEDIATO
+            Column(modifier = Modifier.fillMaxWidth()) {
+                Text(
+                    text = "¿El menor se encuentra en peligro inmediato?",
+                    color = colorMorado,
                     fontWeight = FontWeight.Bold,
-                    fontSize = 18.sp)
-
+                    fontSize = 18.sp
+                )
                 Spacer(modifier = Modifier.height(10.dp))
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(6.dp)
+                ) {
+                    opcionesPeligro.forEach { opcion ->
+                        val seleccionado = peligroActual == opcion
+                        OutlinedButton(
+                            onClick = { viewModel.setPeligroInmediato(opcion) },
+                            shape = RoundedCornerShape(10.dp),
+                            border = if (seleccionado) null else BorderStroke(1.5.dp, colorMorado),
+                            colors = ButtonDefaults.outlinedButtonColors(
+                                containerColor = if (seleccionado) colorMorado else Color.Transparent,
+                                contentColor = if (seleccionado) Color.White else colorMorado
+                            ),
+                            contentPadding = PaddingValues(horizontal = 4.dp),
+                            modifier = Modifier
+                                .weight(1f)
+                                .height(34.dp)
+                        ) {
+                            Text(text = opcion, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                        }
+                    }
+                }
             }
 
             Spacer(modifier = Modifier.height(25.dp))
 
+            // DESCRIPCIÓN FÍSICA
             Column(modifier = Modifier.fillMaxWidth()) {
                 Text(
                     text = "Descripción Física",
@@ -306,6 +332,7 @@ fun Detalles2(
 
         Spacer(modifier = Modifier.height(10.dp))
 
+        // BOTONES ATRÁS / SIGUIENTE
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(16.dp)
@@ -344,11 +371,8 @@ fun Detalles2(
                     .weight(1f)
                     .height(46.dp)
             ) {
-                //por si hay más de 1 menor o se va a la otra pantalla
                 Text(
-                    text = if (
-                        state.indiceMenorActual < state.cantidadMenores - 1
-                    ) {
+                    text = if (state.indiceMenorActual < state.cantidadMenores - 1) {
                         "Siguiente menor"
                     } else {
                         "Siguiente"
@@ -361,9 +385,6 @@ fun Detalles2(
     }
 }
 
-/**
- * Previsualización de la pantalla [Detalles2] en el entorno de desarrollo de Android Studio.
- */
 @Preview(
     showBackground = true,
     showSystemUi = true,

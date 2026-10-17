@@ -6,10 +6,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.benchmark.traceprocessor.Row
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.CircularProgressIndicator
@@ -17,7 +14,12 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -30,29 +32,21 @@ import com.example.sippina_aplicacion.view.PantallasReporte.DondeOcurrio
 import com.example.sippina_aplicacion.view.PantallasReporte.Evidencia
 import com.example.sippina_aplicacion.view.PantallasReporte.PrivacidadSeguimiento
 import com.example.sippina_aplicacion.view.PantallasReporte.ReporteGenerado
-import com.example.sippina_aplicacion.view.reportes.Detalles
-import com.example.sippina_aplicacion.view.PerfilAutenticado.Borradores
-import com.example.sippina_aplicacion.view.perfilusuario.RegistroNuevoPerfil
-import com.example.sippina_aplicacion.view.SinAutenticacion.VistaPerfil1
-import com.example.sippina_aplicacion.view.PerfilAutenticado.VistaPerfil2
+import com.example.sippina_aplicacion.view.PantallasReporte.VerListaReportes
+import com.example.sippina_aplicacion.view.PerfilAutenticado.BorradoresScreen
 import com.example.sippina_aplicacion.view.PerfilAutenticado.EditarPerfil
 import com.example.sippina_aplicacion.view.PerfilAutenticado.Notificaciones
-import com.example.sippina_aplicacion.view.perfilusuario.BuscarReporteExistente
-import com.example.sippina_aplicacion.view.perfilusuario.DetalleReporte
+import com.example.sippina_aplicacion.view.PerfilAutenticado.VistaPerfil2
+import com.example.sippina_aplicacion.view.SinAutenticacion.VistaPerfil1
 import com.example.sippina_aplicacion.view.VistasExtra.AvisoPrivacidad
 import com.example.sippina_aplicacion.view.VistasExtra.ConoceSIPINNA
 import com.example.sippina_aplicacion.view.VistasExtra.QueSituacionesReportar
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.sippina_aplicacion.view.PantallasReporte.VerListaReportes
-import com.example.sippina_aplicacion.view.PerfilAutenticado.BorradoresScreen
+import com.example.sippina_aplicacion.view.perfilusuario.BuscarReporteExistente
+import com.example.sippina_aplicacion.view.perfilusuario.DetalleReporte
+import com.example.sippina_aplicacion.view.perfilusuario.PantallaInicioSesion
+import com.example.sippina_aplicacion.view.perfilusuario.RegistroNuevoPerfil
 import com.example.sippina_aplicacion.view.perfilusuario.mapearEstatusAInt
+import com.example.sippina_aplicacion.view.reportes.Detalles
 import com.example.sippina_aplicacion.viewmodel.AuthVM
 import com.example.sippina_aplicacion.viewmodel.ReporteVM
 
@@ -164,12 +158,14 @@ fun AppNavHost(
                 onNavegarALogin = {
                     if (usuarioAutenticado) {
                         authViewModel.cerrarSesion()
-                    } else {
-                        navController.navigate(Pantalla.RegistroNuevoPerfil.ruta)
                     }
+                    navController.navigate(Pantalla.PantallaInicioSesion.ruta)
                 },
                 onCerrarSesion = {
                     authViewModel.cerrarSesion()
+                    navController.navigate(Pantalla.PantallaInicioSesion.ruta) {
+                        popUpTo(Pantalla.PantallaInicio.ruta) { inclusive = false }
+                    }
                 },
                 onNavegarAReporte = {
                     reporteViewModel.limpiarFormulario()
@@ -205,6 +201,24 @@ fun AppNavHost(
             )
         }
 
+        // PANTALLA DE INICIO DE SESIÓN
+        composable(Pantalla.PantallaInicioSesion.ruta) {
+            PantallaInicioSesion(
+                authVM = authViewModel,
+                onAtras = { navController.popBackStack() },
+                onRegistrarse = {
+                    navController.navigate(Pantalla.RegistroNuevoPerfil.ruta)
+                },
+                onSiguiente = {
+                    navController.navigate(Pantalla.PantallaInicio.ruta) {
+                        popUpTo(Pantalla.PantallaInicioSesion.ruta) { inclusive = true }
+                        launchSingleTop = true
+                    }
+                }
+            )
+        }
+
+        // PANTALLA DE REGISTRO DE NUEVA CUENTA
         composable(Pantalla.RegistroNuevoPerfil.ruta) {
             RegistroNuevoPerfil(
                 authVM = authViewModel,
@@ -243,7 +257,7 @@ fun AppNavHost(
                 onBorradores = { navController.navigate(Pantalla.Borradores.ruta) },
                 onBuscarReporte = { navController.navigate(Pantalla.BuscarReporteExis.ruta) },
                 onAvisoPrivacidad = { navController.navigate(Pantalla.AvisoPrivacidad.ruta) },
-                onCrearCuenta = { navController.navigate(Pantalla.RegistroNuevoPerfil.ruta) }
+                onCrearCuenta = { navController.navigate(Pantalla.PantallaInicioSesion.ruta) }
             )
         }
 
@@ -344,6 +358,8 @@ fun AppNavHost(
                         estadoActual = mapearEstatusAInt(reporte.estatus),
                         descripcion = reporte.descripcion,
                         direccion = reporte.direccion,
+                        latitud = reporte.latitud,
+                        longitud = reporte.longitud,
                         onAtras = { navController.popBackStack() }
                     )
                 }

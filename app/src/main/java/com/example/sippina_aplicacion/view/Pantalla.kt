@@ -13,16 +13,14 @@ import androidx.compose.ui.graphics.vector.ImageVector
  * @property icono Icono vectorial [ImageVector] opcional asociado a la pantalla.
  */
 sealed class Pantalla(
-    val ruta:String,
-    val etiqueta:String = "",
+    val ruta: String,
+    val etiqueta: String = "",
     val icono: ImageVector? = null
-)
-{
+) {
     /**
      * Contenedor de constantes de rutas de navegación y listados globales de pantallas.
      */
-    // Rutas
-    companion object{
+    companion object {
         val listaPantallas = listOf(
             PantallaCarga,
             PantallaInicio,
@@ -34,6 +32,7 @@ sealed class Pantalla(
             ReporteGenerado,
             VistaPerfil1,
             RegistroNuevoPerfil,
+            PantallaInicioSesion, // <-- Agregado a la lista global
             VistaPerfil2,
             Borradores,
             MisReportes,
@@ -46,8 +45,9 @@ sealed class Pantalla(
             ConoceSIPINNA,
             QueSituacionesReportar
         )
-        const val  RUTA_PANTALLA_CARGA = "PantallaCarga"
-        const val  RUTA_PANTALLA_INICIO = "PantallaInicio"
+
+        const val RUTA_PANTALLA_CARGA = "PantallaCarga"
+        const val RUTA_PANTALLA_INICIO = "PantallaInicio"
         const val RUTA_DONDE_OCURRIO = "DondeOcurrio"
         const val RUTA_DETALLES = "Detalles"
         const val RUTA_DETALLES2 = "Detalles2"
@@ -56,6 +56,7 @@ sealed class Pantalla(
         const val RUTA_REPORTE_GENERADO = "ReporteGenerado"
         const val RUTA_VISTA_PERFIL1 = "VistaPerfil1"
         const val RUTA_REGISTRO_NUEVO_PERFIL = "RegistroNuevoPerfil"
+        const val RUTA_PANTALLA_INICIO_SESION = "PantallaInicioSesion" // <-- Constante agregada
         const val RUTA_VISTA_PERFIL2 = "VistaPerfil2"
         const val RUTA_BORRADORES = "Borradores"
         const val RUTA_MIS_REPORTES = "MisReportes"
@@ -69,9 +70,9 @@ sealed class Pantalla(
     }
 
     /** Pantalla de carga inicial (Splash Screen). */
-    data object PantallaCarga: Pantalla(RUTA_PANTALLA_CARGA,"Carga")
+    data object PantallaCarga : Pantalla(RUTA_PANTALLA_CARGA, "Carga")
     /** Pantalla principal de inicio. */
-    data object PantallaInicio: Pantalla(RUTA_PANTALLA_INICIO, "Inicio")
+    data object PantallaInicio : Pantalla(RUTA_PANTALLA_INICIO, "Inicio")
     /** Paso 1 del reporte: Selección de ubicación geográfica. */
     data object DondeOcurrio : Pantalla(RUTA_DONDE_OCURRIO, "Ubicación")
     /** Paso 2 del reporte: Detalles del incidente y descripción de hechos. */
@@ -88,14 +89,16 @@ sealed class Pantalla(
     data object VistaPerfil1 : Pantalla(RUTA_VISTA_PERFIL1, "Perfil")
     /** Pantalla de registro de nueva cuenta de usuario. */
     data object RegistroNuevoPerfil : Pantalla(RUTA_REGISTRO_NUEVO_PERFIL, "Crear cuenta")
+    /** Pantalla de inicio de sesión para usuarios existentes. */
+    data object PantallaInicioSesion : Pantalla(RUTA_PANTALLA_INICIO_SESION, "Iniciar sesión") // <-- Objeto agregado
     /** Pantalla de perfil para usuarios autenticados. */
     data object VistaPerfil2 : Pantalla(RUTA_VISTA_PERFIL2, "Perfil")
     /** Pantalla de gestión de borradores de reportes guardados localmente. */
     data object Borradores : Pantalla(RUTA_BORRADORES, "Borradores")
     /** Pantalla de historial de reportes enviados por el usuario. */
-    data object MisReportes : Pantalla(RUTA_MIS_REPORTES,"Mis reportes")
+    data object MisReportes : Pantalla(RUTA_MIS_REPORTES, "Mis reportes")
     /** Pantalla con las políticas y aviso de privacidad de SIPINNA. */
-    data object AvisoPrivacidad : Pantalla(RUTA_AVISO_PRIVACIDAD,"Aviso de privacidad")
+    data object AvisoPrivacidad : Pantalla(RUTA_AVISO_PRIVACIDAD, "Aviso de privacidad")
     /** Pantalla del centro de notificaciones de la cuenta. */
     data object Notificaciones : Pantalla(RUTA_NOTIFICACIONES, "Notificaciones")
     /** Pantalla de búsqueda general de reportes. */
@@ -109,6 +112,5 @@ sealed class Pantalla(
     /** Pantalla de edición de datos de perfil y contraseña. */
     data object EditarPerfil : Pantalla(RUTA_EDITAR_PERFIL, "EditarPerfil")
     /** Pantalla de búsqueda de un reporte existente mediante folio y código privado. */
-    data object BuscarReporteExis : Pantalla("BuscarReporteExis","Buscar reporte existente")
-
+    data object BuscarReporteExis : Pantalla("BuscarReporteExis", "Buscar reporte existente")
 }
