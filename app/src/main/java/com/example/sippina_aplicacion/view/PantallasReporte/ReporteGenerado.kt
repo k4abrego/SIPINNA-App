@@ -81,6 +81,9 @@ import com.example.sippina_aplicacion.viewmodel.ReporteVM
 fun ReporteGenerado(
     viewModel: ReporteVM = viewModel(),
     modifier: Modifier = Modifier,
+    token: String? = null,
+    userIdString: String? = null,
+
     onVolverInicio: () -> Unit = {},
     setPrimaryClip: ClipboardManager.(ClipData) -> Unit = ClipboardManager::setPrimaryClip
 ) {
@@ -96,7 +99,7 @@ fun ReporteGenerado(
 
     LaunchedEffect(Unit) {
         if (state.folio.isEmpty() && !state.enviando) {
-            viewModel.enviarReporteAlBackEnd(context)
+            viewModel.enviarReporteAlBackEnd(context, token = token, userId = userIdString?.toLongOrNull())
         }
     }
 

@@ -71,6 +71,7 @@ import com.example.sippina_aplicacion.viewmodel.ReporteVM
 @Composable
 fun VerListaReportes(
     viewModel: ReporteVM = viewModel(),
+    token:String? = null,
     onAtras: () -> Unit = {},
     onReporteClick: (String) -> Unit = {}
 ) {
@@ -79,7 +80,7 @@ fun VerListaReportes(
 
     // Solicita los reportes al servidor backend al entrar a la pantalla
     LaunchedEffect(Unit) {
-        viewModel.obtenerMisReportesDelBackEnd()
+        viewModel.obtenerMisReportesDelBackEnd(token = token)
     }
 
     BackHandler { onAtras() }

@@ -330,11 +330,10 @@ class ReporteVM(
         _uiState.value = EstadoReporte()
     }
 
-    fun obtenerDetalleReportePorFolio(folio: String) {
+    fun obtenerDetalleReportePorFolio(folio: String, token: String? = null) {
         viewModelScope.launch {
             _cargando.value = true
-            val resultado = repository.obtenerReportePorFolio(folio)
-
+            val resultado = repository.obtenerReportePorFolio(folio, token)
             resultado.onSuccess { res ->
                 _detalleReporte.value = ReporteModel(
                     folio = res.folio ?: "",
@@ -352,37 +351,7 @@ class ReporteVM(
         }
     }
 
-    fun buscarReportePorFolio(folio: String, codigo: String) {
-        if (folio.isBlank() || codigo.isBlank()) {
-            _reporteEncontrado.value = null
-            _errorBusqueda.value = null
-            return
-        }
 
-        viewModelScope.launch {
-            _buscandoReporte.value = true
-            _reporteEncontrado.value = null
-            _errorBusqueda.value = null
-
-            val resultado = repository.consultarConCodigo(folio.trim(), codigo.trim())
-
-            resultado.onSuccess { res ->
-                _reporteEncontrado.value = ReporteModel(
-                    folio = res.folio ?: "",
-                    estatus = res.estatus ?: "Pendiente",
-                    fechaEnvio = res.fechaEnvio ?: "",
-                    descripcion = res.descripcion ?: res.mensaje ?: "",
-                    direccion = res.direccion ?: "",
-                    latitud = res.latitud ?: 0.0,
-                    longitud = res.longitud ?: 0.0
-                )
-            }.onFailure { error ->
-                _errorBusqueda.value = error.localizedMessage ?: "Sin reportes encontrados."
-            }
-
-            _buscandoReporte.value = false
-        }
-    }
 
     fun limpiarBusqueda() {
         _reporteEncontrado.value = null
@@ -390,7 +359,7 @@ class ReporteVM(
         _buscandoReporte.value = false
     }
 
-    fun enviarReporteAlBackEnd(context: Context, token: String? = null) {
+    fun enviarReporteAlBackEnd(context: Context, token: String? = null, userId:Long? = null) {
         viewModelScope.launch {
             _uiState.update { it.copy(enviando = true, errorEnvio = null) }
 
@@ -438,6 +407,7 @@ class ReporteVM(
 
             // 5. Construcción de la petición
             val peticion = ReporteRequest(
+                idUsuario = userId,
                 descripcion = estadoActual.descripcionHechos.ifBlank { "Reporte ciudadano" },
                 horarioAproximado = horarioFormatoGo, // 👈 Formato HH:MM
                 esAnonimo = estadoActual.opcionPrivacidad == "anonimo",

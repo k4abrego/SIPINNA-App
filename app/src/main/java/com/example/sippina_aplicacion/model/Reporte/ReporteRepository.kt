@@ -71,9 +71,10 @@ class ReporteRepository(
     /**
      * Consulta el detalle de un reporte utilizando únicamente su folio (usuario autenticado).
      */
-    suspend fun obtenerReportePorFolio(folio: String): Result<ReporteResponse> {
+    suspend fun obtenerReportePorFolio(folio: String, token: String? = null): Result<ReporteResponse> {
         return try {
-            val response = api.obtenerReportePorFolio(folio)
+            val authHeader = token?.let { if (it.startsWith("Bearer ")) it else "Bearer $it" }
+            val response = api.obtenerReportePorFolio(folio = folio, token = authHeader)
             val body = response.body()
             if (response.isSuccessful && body != null) {
                 Result.success(body)

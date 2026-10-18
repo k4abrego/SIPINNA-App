@@ -215,7 +215,6 @@ fun AppNavHost(
             )
         }
 
-        // PANTALLA DE REGISTRO DE NUEVA CUENTA
         composable(Pantalla.RegistroNuevoPerfil.ruta) {
             RegistroNuevoPerfil(
                 authVM = authViewModel,
@@ -301,15 +300,9 @@ fun AppNavHost(
         }
 
         composable(Pantalla.MisReportes.ruta) {
-            // 2. Refresca la lista enviando el token al abrir la vista de mis reportes
-            LaunchedEffect(usuarioAutenticado) {
-                if (usuarioAutenticado) {
-                    reporteViewModel.obtenerMisReportesDelBackEnd(token = authState.token)
-                }
-            }
-
             VerListaReportes(
                 viewModel = reporteViewModel,
+                token = authState.token,
                 onAtras = { navController.popBackStack() },
                 onReporteClick = { folio -> abrirDetalleReporte(folio) }
             )
@@ -324,7 +317,7 @@ fun AppNavHost(
                 onAtras = { navController.popBackStack() },
                 onVerDetalleReporte = { folio -> abrirDetalleReporte(folio) },
                 onBuscar = { folio, codigo ->
-                    reporteViewModel.buscarReportePorFolio(folio, codigo)
+                    reporteViewModel.obtenerDetalleReportePorFolio(folio, codigo)
                 },
                 reporteEncontrado = reporteEncontradoState,
                 buscando = buscando,
@@ -341,7 +334,7 @@ fun AppNavHost(
             val folioSeleccionado = backStackEntry.arguments?.getString("folio").orEmpty()
 
             LaunchedEffect(folioSeleccionado) {
-                reporteViewModel.obtenerDetalleReportePorFolio(folioSeleccionado)
+                reporteViewModel.obtenerDetalleReportePorFolio(folioSeleccionado, token = authState.token)
             }
 
             val reporteState by reporteViewModel.detalleReporte.collectAsState()
@@ -431,19 +424,30 @@ fun AppNavHost(
         }
 
         composable(route = Pantalla.PrivacidadSeguimiento.ruta) {
+            val context = LocalContext.current
+
             PrivacidadSeguimiento(
                 viewModel = reporteViewModel,
                 estaAutenticado = usuarioAutenticado,
                 token = authState.token,
                 onAtras = { navController.popBackStack() },
-                onSiguiente = { navController.navigate(Pantalla.ReporteGenerado.ruta) },
+                onSiguiente = {
+                    reporteViewModel.enviarReporteAlBackEnd(
+                        context = context,
+                        token = authState.token,
+                        userId = authState.usuarioId?.toLongOrNull()
+                    )
+                    navController.navigate(Pantalla.ReporteGenerado.ruta)
+                },
                 onAvisoPrivacidad = { navController.navigate(Pantalla.AvisoPrivacidad.ruta) }
             )
         }
 
-        composable(Pantalla.ReporteGenerado.ruta) {
+            composable(Pantalla.ReporteGenerado.ruta) {
             ReporteGenerado(
                 viewModel = reporteViewModel,
+                token = authState.token,
+                userIdString = authState.usuarioId,
                 onVolverInicio = {
                     navController.navigate(Pantalla.PantallaInicio.ruta) {
                         popUpTo(Pantalla.PantallaInicio.ruta) { inclusive = false }
