@@ -19,6 +19,10 @@ import okhttp3.RequestBody.Companion.asRequestBody
 import org.json.JSONObject
 import retrofit2.HttpException
 import java.io.File
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
+import kotlin.time.Instant
+
 
 
 
@@ -108,7 +112,7 @@ class ReporteVM(
                     ReporteModel(
                         folio = res.folio ?: "",
                         estatus = res.estatus ?: "Pendiente",
-                        fechaEnvio = res.fechaEnvio ?: "",
+                        fechaEnvio =formatearFechaLocal(res.fechaEnvio),
                         descripcion = res.descripcion ?: res.mensaje ?: "",
                         direccion = res.direccion ?: "",
                         latitud = res.latitud ?: 0.0,
@@ -338,7 +342,7 @@ class ReporteVM(
                 _detalleReporte.value = ReporteModel(
                     folio = res.folio ?: "",
                     estatus = res.estatus ?: "Pendiente",
-                    fechaEnvio = res.fechaEnvio ?: "",
+                    fechaEnvio = formatearFechaLocal(res.fechaEnvio),
                     descripcion = res.descripcion ?: res.mensaje ?: "",
                     direccion = res.direccion ?: "",
                     latitud = res.latitud ?: 0.0,
@@ -521,4 +525,19 @@ class ReporteVM(
         borradorStorage?.eliminarBorradorLocal()
         _uiState.value = EstadoReporte()
     }
+
+    // Función auxiliar para formatear la fecha UTC a hora local legible:
+
+    fun formatearFechaLocal(fechaIso: String?): String {
+        if (fechaIso.isNullOrBlank()) return ""
+        return try {
+            val instant = java.time.Instant.parse(fechaIso)
+            val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")
+                .withZone(ZoneId.systemDefault())
+            formatter.format(instant)
+        } catch (e: Exception) {
+            fechaIso
+        }
+    }
 }
+
