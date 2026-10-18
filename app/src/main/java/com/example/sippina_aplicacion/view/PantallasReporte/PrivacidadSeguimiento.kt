@@ -82,7 +82,8 @@ import com.example.sippina_aplicacion.viewmodel.ReporteVM
 fun PrivacidadSeguimiento(
     viewModel: ReporteVM = viewModel(),
     modifier: Modifier = Modifier,
-    estaAutenticado: Boolean = false, // <-- Parámetro para saber si la sesión está activa
+    estaAutenticado: Boolean = false,
+    token: String? = null, // Token de autenticación para enviar al backend
     onSiguiente: () -> Unit = {},
     onAtras: () -> Unit = {},
     onAvisoPrivacidad: () -> Unit = {}
@@ -329,7 +330,7 @@ fun PrivacidadSeguimiento(
                         mostrarErrorCorreo = true
                     } else {
                         mostrarErrorCorreo = false
-                        viewModel.enviarReporteAlBackEnd(context = context)
+                        viewModel.enviarReporteAlBackEnd(context = context, token = token)
                         onSiguiente()
                     }
                 },
@@ -352,16 +353,9 @@ fun PrivacidadSeguimiento(
         }
     }
 }
+
 /**
  * Tarjeta interactiva para la selección de las opciones de modalidad de privacidad del reporte.
- *
- * Muestra el título, descripción e icono de la opción, destacando visualmente cuando está seleccionada.
- *
- * @param titulo Título de la opción de privacidad (ej. "Reporte anónimo").
- * @param descripcion Explicación sobre el manejo de datos y seguimiento de dicha modalidad.
- * @param icon Icono vectorial [ImageVector] asociativo.
- * @param seleccionado Flag que indica si la opción se encuentra activa actualmente.
- * @param onClick Acción ejecutada al seleccionar la tarjeta.
  */
 @Composable
 private fun TarjetaOpcionPrivacidad(

@@ -92,13 +92,9 @@ fun AppPrincipal(
 
 /**
  * Define el grafo de navegación ([NavHost]) y las rutas de la aplicación SIPINNA.
- *
  * Conecta los distintos flujos de usuario incluyendo la pantalla de carga, inicio, asistente de reportes en 5 pasos,
  * autenticación, perfiles (invitado y autenticado), notificaciones, historial de reportes y vistas informativas extra.
  * Administra instancias compartidas de [ReporteVM] y [AuthVM] para la gestión de estados globales y llamadas de red.
- *
- * @param navController Controlador de navegación [NavHostController] encargado de la pila de pantallas.
- * @param modifier [Modifier] opcional para personalizar el contenedor de navegación.
  */
 @Composable
 fun AppNavHost(
@@ -136,9 +132,10 @@ fun AppNavHost(
         composable(route = Pantalla.PantallaInicio.ruta) {
             val context = LocalContext.current
 
+            // 1. Pasa authState.token al consultar los reportes en el inicio
             LaunchedEffect(usuarioAutenticado) {
                 if (usuarioAutenticado) {
-                    reporteViewModel.obtenerMisReportesDelBackEnd()
+                    reporteViewModel.obtenerMisReportesDelBackEnd(token = authState.token)
                 }
             }
             val listaReportes by reporteViewModel.misReportes.collectAsState()
@@ -304,6 +301,13 @@ fun AppNavHost(
         }
 
         composable(Pantalla.MisReportes.ruta) {
+            // 2. Refresca la lista enviando el token al abrir la vista de mis reportes
+            LaunchedEffect(usuarioAutenticado) {
+                if (usuarioAutenticado) {
+                    reporteViewModel.obtenerMisReportesDelBackEnd(token = authState.token)
+                }
+            }
+
             VerListaReportes(
                 viewModel = reporteViewModel,
                 onAtras = { navController.popBackStack() },
@@ -429,6 +433,8 @@ fun AppNavHost(
         composable(route = Pantalla.PrivacidadSeguimiento.ruta) {
             PrivacidadSeguimiento(
                 viewModel = reporteViewModel,
+                estaAutenticado = usuarioAutenticado,
+                token = authState.token,
                 onAtras = { navController.popBackStack() },
                 onSiguiente = { navController.navigate(Pantalla.ReporteGenerado.ruta) },
                 onAvisoPrivacidad = { navController.navigate(Pantalla.AvisoPrivacidad.ruta) }

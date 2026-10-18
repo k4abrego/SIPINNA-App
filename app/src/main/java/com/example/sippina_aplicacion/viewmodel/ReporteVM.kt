@@ -1,31 +1,24 @@
 package com.example.sippina_aplicacion.viewmodel
 
+import com.example.sippina_aplicacion.model.Autenticacion.EtiquetaInput
+import com.example.sippina_aplicacion.model.Autenticacion.MenorInput
+import com.example.sippina_aplicacion.model.Autenticacion.ReporteRequest
+import com.example.sippina_aplicacion.model.Autenticacion.UbicacionInput
+import com.example.sippina_aplicacion.model.Reporte.ReporteRepository
 import android.content.Context
 import android.net.Uri
 import android.util.Patterns
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.sippina_aplicacion.model.BorradorGuardado
-import com.example.sippina_aplicacion.model.DatosMenor
-import com.example.sippina_aplicacion.model.EstadoReporte
-import com.example.sippina_aplicacion.model.EvidenciaReporte
-import com.example.sippina_aplicacion.model.Reporte.ReporteRepository
-import com.example.sippina_aplicacion.model.Reporte.ReporteRequest
-import com.example.sippina_aplicacion.model.ReporteModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.flow.update
+import com.example.sippina_aplicacion.model.*
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import org.json.JSONObject
-import java.io.File
 import retrofit2.HttpException
+import java.io.File
 
 
 
@@ -105,16 +98,16 @@ class ReporteVM(
         _uiState.value = EstadoReporte()
     }
 
-    fun obtenerMisReportesDelBackEnd() {
+    fun obtenerMisReportesDelBackEnd(token: String? = null) {
         viewModelScope.launch {
             _cargando.value = true
-            val resultado = repository.obtenerListaReportes()
+            val resultado = repository.obtenerListaReportes(token = token)
 
             resultado.onSuccess { lista ->
                 _misReportes.value = lista.map { res ->
                     ReporteModel(
-                        folio = res.folio,
-                        estatus = res.estatus,
+                        folio = res.folio ?: "",
+                        estatus = res.estatus ?: "Pendiente",
                         fechaEnvio = res.fechaEnvio ?: "",
                         descripcion = res.descripcion ?: res.mensaje ?: "",
                         direccion = res.direccion ?: "",
@@ -141,12 +134,18 @@ class ReporteVM(
         _uiState.update { it.copy(opcionUbicacion = opcion, ubicacionConfirmada = false) }
     }
 
-    fun setUbicacion(lat: Double, lng: Double, direccion: String = "") {
+    fun setUbicacion(
+        lat: Double,
+        lng: Double,
+        direccion: String = "",
+        idTerritorio: Int = 1
+    ) {
         _uiState.update {
             it.copy(
                 latitud = lat,
                 longitud = lng,
                 direccion = direccion,
+                idTerritorio = idTerritorio,
                 ubicacionConfirmada = true
             )
         }
@@ -210,7 +209,6 @@ class ReporteVM(
         }
     }
 
-    // NUEVO MÉTODO
     fun setPeligroInmediato(opcion: String) {
         _uiState.update { estado ->
             val menoresActualizados = estado.menores.toMutableList()
@@ -339,8 +337,8 @@ class ReporteVM(
 
             resultado.onSuccess { res ->
                 _detalleReporte.value = ReporteModel(
-                    folio = res.folio,
-                    estatus = res.estatus,
+                    folio = res.folio ?: "",
+                    estatus = res.estatus ?: "Pendiente",
                     fechaEnvio = res.fechaEnvio ?: "",
                     descripcion = res.descripcion ?: res.mensaje ?: "",
                     direccion = res.direccion ?: "",
@@ -366,12 +364,12 @@ class ReporteVM(
             _reporteEncontrado.value = null
             _errorBusqueda.value = null
 
-            val resultado = repository.obtenerReportePorFolio(folio.trim())
+            val resultado = repository.consultarConCodigo(folio.trim(), codigo.trim())
 
             resultado.onSuccess { res ->
                 _reporteEncontrado.value = ReporteModel(
-                    folio = res.folio,
-                    estatus = res.estatus,
+                    folio = res.folio ?: "",
+                    estatus = res.estatus ?: "Pendiente",
                     fechaEnvio = res.fechaEnvio ?: "",
                     descripcion = res.descripcion ?: res.mensaje ?: "",
                     direccion = res.direccion ?: "",
@@ -392,53 +390,100 @@ class ReporteVM(
         _buscandoReporte.value = false
     }
 
-    fun enviarReporteAlBackEnd(context: Context) {
+    fun enviarReporteAlBackEnd(context: Context, token: String? = null) {
         viewModelScope.launch {
             _uiState.update { it.copy(enviando = true, errorEnvio = null) }
 
             val estadoActual = _uiState.value
 
-            val detallesFormulario = buildString {
-                append("Hechos: ${estadoActual.descripcionHechos}\n")
-                append("Horario aprox: ${estadoActual.horarioAprox}\n")
-                append("Adultos involucrados: ${estadoActual.adultoInvolucrados}\n")
-                append("Direccion: ${estadoActual.direccion}\n")
-                append("Menores involucrados (${estadoActual.cantidadMenores}):\n")
-                estadoActual.menores.forEachIndexed { i, m ->
-                    append(" - Menor ${i + 1}: Genero=${m.genero}, Edad=${m.rangoEdad}, Peligro Inmediato=${m.peligroInmediato}, Desc=${m.descripcionFisica}\n")
+            // 1. Mapeo de menores cumpliendo la regla de Go:
+            // "Masculino", "Femenino" o "No identificado" (convierte "Desconocido" a "No identificado")
+            val listaMenores = if (estadoActual.menores.isNotEmpty()) {
+                estadoActual.menores.mapIndexed { index, m ->
+                    val generoValido = when (m.genero.trim()) {
+                        "Masculino" -> "Masculino"
+                        "Femenino" -> "Femenino"
+                        else -> "No identificado" // "Desconocido" o vacío se convierte a "No identificado"
+                    }
+                    MenorInput(
+                        contador = index + 1,
+                        genero = generoValido,
+                        descripcionFisica = m.descripcionFisica.take(255) // Máximo 255 caracteres
+                    )
                 }
+            } else {
+                listOf(
+                    MenorInput(
+                        contador = 1,
+                        genero = "No identificado",
+                        descripcionFisica = estadoActual.descripcionFisica.take(255)
+                    )
+                )
             }
 
+            // 2. Formato estricto para Go: "HH:MM" (time.Parse("15:04"))
+            val horarioFormatoGo = estadoActual.horarioAprox.trim().takeIf { it.isNotBlank() }?.let {
+                if (it.length > 5) it.substring(0, 5) else it
+            }
+
+            // 3. Peligro inmediato requerido por Go: "Sí", "No" o "No sé" (con acento)
+            val peligroValido = when (estadoActual.peligroInmediato.trim().lowercase()) {
+                "sí", "si" -> "Sí"
+                "no" -> "No"
+                else -> "No sé"
+            }
+
+            // 4. Territorio: ID positivo (> 0). Se usa 13 por defecto si no viene establecido
+            val territorioValido = if (estadoActual.idTerritorio <= 1) 126 else estadoActual.idTerritorio
+
+            // 5. Construcción de la petición
             val peticion = ReporteRequest(
-                tipoReporte = if (estadoActual.tipoEvidenciaSeleccionada.isNotBlank()) estadoActual.tipoEvidenciaSeleccionada else "General",
-                descripcion = detallesFormulario,
-                opcionPrivacidad = estadoActual.opcionPrivacidad,
-                telefono = if (!estadoActual.esAnonimo && estadoActual.correoSeguimiento.isNotBlank()) estadoActual.correoSeguimiento else null,
-                direccion = if (estadoActual.ubicacionConfirmada) estadoActual.direccion else null,
-                latitud = if (estadoActual.ubicacionConfirmada) estadoActual.latitud else null,
-                longitud = if (estadoActual.ubicacionConfirmada) estadoActual.longitud else null,
-                peligroInmediato = estadoActual.peligroInmediato
+                descripcion = estadoActual.descripcionHechos.ifBlank { "Reporte ciudadano" },
+                horarioAproximado = horarioFormatoGo, // 👈 Formato HH:MM
+                esAnonimo = estadoActual.opcionPrivacidad == "anonimo",
+                deseaSeguimiento = estadoActual.opcionPrivacidad != "anonimo",
+                hayAdultoInvolucrado = estadoActual.adultoInvolucrados.equals("si", ignoreCase = true) ||
+                        estadoActual.adultoInvolucrados.equals("sí", ignoreCase = true),
+                peligroInmediato = peligroValido, // 👈 "Sí", "No" o "No sé"
+                correoContacto = estadoActual.correoSeguimiento.trim().takeIf { it.isNotBlank() },
+                ubicacion = UbicacionInput(
+                    latitud = estadoActual.latitud,
+                    longitud = estadoActual.longitud,
+                    direccionTexto = estadoActual.direccion.ifBlank { "Sin dirección exacta" },
+                    idTerritorio = territorioValido
+                ),
+                menores = listaMenores,
+                etiquetas = listOf(
+                    EtiquetaInput(
+                        nombreEtiqueta = "Trabajo infantil",
+                        tipo = "Categoria"
+                    )
+                )
             )
 
-            val resultado = repository.crearReporte(peticion)
+            // 6. Enviar al backend
+            val resultado = repository.crearReporte(peticion, token)
 
             resultado.onSuccess { respuesta ->
-                if (estadoActual.evidencias.isNotEmpty()) {
+                val folioGenerado = respuesta.folio ?: ""
+                val codigoGenerado = respuesta.codigoPrivado ?: ""
+
+                if (estadoActual.evidencias.isNotEmpty() && folioGenerado.isNotBlank()) {
                     val partes = prepararEvidenciasParaBackend(context)
-                    repository.subirEvidencias(respuesta.folio, partes)
+                    repository.subirEvidencias(folioGenerado, partes)
                 }
 
                 _uiState.update {
                     it.copy(
                         enviando = false,
                         reporteExitoso = true,
-                        folio = respuesta.folio,
-                        codigoPrivado = respuesta.codigoPrivado ?: ""
+                        folio = folioGenerado,
+                        codigoPrivado = codigoGenerado
                     )
                 }
                 borradorStorage?.eliminarBorradorLocal()
 
-                obtenerMisReportesDelBackEnd()
+                obtenerMisReportesDelBackEnd(token)
             }.onFailure { error ->
                 val mensajeDetallado = when (error) {
                     is HttpException -> {
@@ -459,7 +504,6 @@ class ReporteVM(
                             "Error del servidor (${error.code()})"
                         }
                     }
-
                     else -> error.localizedMessage ?: "No se pudo conectar con el servidor."
                 }
 
@@ -482,7 +526,7 @@ class ReporteVM(
                 val mimeType =
                     context.contentResolver.getType(evidencia.uri) ?: "multipart/form-data"
                 val requestFile = it.asRequestBody(mimeType.toMediaTypeOrNull())
-                val part = MultipartBody.Part.createFormData("evidencias", it.name, requestFile)
+                val part = MultipartBody.Part.createFormData("archivos", it.name, requestFile)
                 listaParts.add(part)
             }
         }

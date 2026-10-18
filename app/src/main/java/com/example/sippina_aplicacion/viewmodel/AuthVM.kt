@@ -47,7 +47,6 @@ class AuthVM(
                         cargando = false
                     )
                 }
-                // Consulta los datos del perfil con el token obtenido
                 obtenerPerfil()
             }.onFailure { error ->
                 _state.update {
@@ -127,8 +126,8 @@ class AuthVM(
                 _state.update {
                     it.copy(
                         usuarioId = usuario.userId.toString(),
-                        nombre = usuario.nombre,
-                        apellidos = usuario.apellido,
+                        nombre = usuario.nombre ?: "",
+                        apellidos = usuario.apellido ?: "",
                         correo = correoLimpio,
                         telefono = usuario.telefono,
                         cargando = false
@@ -144,7 +143,6 @@ class AuthVM(
             }
         }
     }
-
     /**
      * Actualiza la información personal del usuario autenticado en la plataforma.
      */
@@ -165,14 +163,14 @@ class AuthVM(
                 telefono = telefono?.ifBlank { null }
             )
 
-            resultado.onSuccess { respuesta ->
+            resultado.onSuccess {
                 _state.update {
                     it.copy(
                         nombre = nombre,
                         apellidos = apellidos,
                         telefono = telefono,
                         cargando = false,
-                        mensajeExito = respuesta.mensaje ?: "Perfil actualizado con éxito"
+                        mensajeExito = "Perfil actualizado con éxito"
                     )
                 }
             }.onFailure { error ->

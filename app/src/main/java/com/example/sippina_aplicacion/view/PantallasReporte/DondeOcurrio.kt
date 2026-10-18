@@ -87,6 +87,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.Locale
 import com.google.android.gms.maps.MapsInitializer
+import java.text.Normalizer
 
 /**
  * Pantalla principal del inicio del reporte (Paso 1: Ubicación).
@@ -148,10 +149,10 @@ fun DondeOcurrio(
     val ejecutarBusqueda = {
         if (textoBusqueda.isNotBlank()) {
             coroutineScope.launch(Dispatchers.IO) {
-                val coords = obtenerCoordenadasDeTexto(appContext, textoBusqueda)
+                val u = obtenerCoordenadasDeTexto(appContext, textoBusqueda)
                 withContext(Dispatchers.Main) {
-                    if (coords != null) {
-                        viewModel.setUbicacion(coords.first, coords.second, coords.third)
+                    if (u != null) {
+                        viewModel.setUbicacion(u.latitud, u.longitud, u.direccionTexto, u.idTerritorio)
                     } else {
                         Toast.makeText(
                             appContext,
@@ -231,8 +232,8 @@ fun DondeOcurrio(
                     MapaInteractivo(
                         context = appContext,
                         state = state,
-                        onUbicacionCambiada = { lat, lng, direccion ->
-                            viewModel.setUbicacion(lat, lng, direccion)
+                        onUbicacionCambiada = { lat, lng, direccion, idTerritorio ->
+                            viewModel.setUbicacion(lat, lng, direccion, idTerritorio)
                         }
                     )
                 }
@@ -297,7 +298,7 @@ fun DondeOcurrio(
                         )
                         Spacer(modifier = Modifier.height(4.dp))
                         Text(
-                            text = "Coordenadas: Lat ${String.format(Locale.US, "%.5f", state.latitud)}, Lng ${String.format(Locale.US, "%.5f", state.longitud)}",
+                            text = "Coordenadas: Lat ${String.format(Locale.US, "%.5f", state.latitud)}, Lng ${String.format(Locale.US, "%.5f", state.longitud)} | Territorio ID: ${state.idTerritorio}",
                             fontSize = 12.sp,
                             color = Color.Gray
                         )
@@ -333,9 +334,9 @@ fun DondeOcurrio(
                                         .addOnSuccessListener { location ->
                                             if (location != null) {
                                                 coroutineScope.launch(Dispatchers.IO) {
-                                                    val direccion = obtenerDireccionTexto(appContext, location.latitude, location.longitude)
+                                                    val u = obtenerUbicacionDetallada(appContext, location.latitude, location.longitude)
                                                     withContext(Dispatchers.Main) {
-                                                        viewModel.setUbicacion(location.latitude, location.longitude, direccion)
+                                                        viewModel.setUbicacion(u.latitud, u.longitud, u.direccionTexto, u.idTerritorio)
                                                     }
                                                 }
                                             } else {
@@ -345,9 +346,9 @@ fun DondeOcurrio(
                                                 ).addOnSuccessListener { currentLocation ->
                                                     if (currentLocation != null) {
                                                         coroutineScope.launch(Dispatchers.IO) {
-                                                            val direccion = obtenerDireccionTexto(appContext, currentLocation.latitude, currentLocation.longitude)
+                                                            val u = obtenerUbicacionDetallada(appContext, currentLocation.latitude, currentLocation.longitude)
                                                             withContext(Dispatchers.Main) {
-                                                                viewModel.setUbicacion(currentLocation.latitude, currentLocation.longitude, direccion)
+                                                                viewModel.setUbicacion(u.latitud, u.longitud, u.direccionTexto, u.idTerritorio)
                                                             }
                                                         }
                                                     } else {
@@ -468,12 +469,12 @@ fun DondeOcurrio(
                     onClick = {
                         if (campoDireccionManual.isNotBlank()) {
                             coroutineScope.launch(Dispatchers.IO) {
-                                val coords = obtenerCoordenadasDeTexto(appContext, campoDireccionManual)
+                                val u = obtenerCoordenadasDeTexto(appContext, campoDireccionManual)
                                 withContext(Dispatchers.Main) {
-                                    if (coords != null) {
-                                        viewModel.setUbicacion(coords.first, coords.second, coords.third)
+                                    if (u != null) {
+                                        viewModel.setUbicacion(u.latitud, u.longitud, u.direccionTexto, u.idTerritorio)
                                     } else {
-                                        viewModel.setUbicacion(0.0, 0.0, campoDireccionManual)
+                                        viewModel.setUbicacion(0.0, 0.0, campoDireccionManual, 13)
                                     }
                                     mostrarDialogoDireccionManual = false
                                 }
@@ -538,17 +539,8 @@ fun DondeOcurrio(
 fun MapaInteractivo(
     context: Context,
     state: EstadoReporte,
-    onUbicacionCambiada: (Double, Double, String) -> Unit
+    onUbicacionCambiada: (Double, Double, String, Int) -> Unit
 ) {
-    // Inicialización explícita del SDK de mapas para evitar NullPointerException en CameraUpdateFactory
-    LaunchedEffect(Unit) {
-        try {
-            MapsInitializer.initialize(context, MapsInitializer.Renderer.LATEST) {}
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-    }
-
     val hayConexion = remember(context) { esRedDisponible(context) }
     val apiMapasDisponible = remember(context) { ServicioDisponible(context) }
 
@@ -570,9 +562,9 @@ fun MapaInteractivo(
                 if (!cameraPositionState.isMoving && cameraPositionState.cameraMoveStartedReason == CameraMoveStartedReason.GESTURE) {
                     val centroActual = cameraPositionState.position.target
                     coroutineScope.launch(Dispatchers.IO) {
-                        val direccion = obtenerDireccionTexto(context, centroActual.latitude, centroActual.longitude)
+                        val u = obtenerUbicacionDetallada(context, centroActual.latitude, centroActual.longitude)
                         withContext(Dispatchers.Main) {
-                            onUbicacionCambiada(centroActual.latitude, centroActual.longitude, direccion)
+                            onUbicacionCambiada(u.latitud, u.longitud, u.direccionTexto, u.idTerritorio)
                         }
                     }
                 }
@@ -673,32 +665,58 @@ fun MapaInteractivo(
     }
 }
 
-private fun obtenerDireccionTexto(context: Context, lat: Double, lng: Double): String {
+data class DatosUbicacion(
+    val latitud: Double,
+    val longitud: Double,
+    val direccionTexto: String,
+    val idTerritorio: Int
+)
+
+private fun obtenerUbicacionDetallada(context: Context, lat: Double, lng: Double): DatosUbicacion {
     return try {
         val geocoder = Geocoder(context, Locale.getDefault())
         @Suppress("DEPRECATION")
         val direcciones = geocoder.getFromLocation(lat, lng, 1)
-        if (!direcciones.isNullOrEmpty()) {
-            direcciones[0].getAddressLine(0) ?: "Ubicación sin nombre"
+        val primera = direcciones?.firstOrNull()
+
+        if (primera != null) {
+            val direccion = primera.getAddressLine(0) ?: "Ubicación seleccionada"
+            val municipio = primera.subAdminArea ?: primera.locality ?: ""
+            val estado = primera.adminArea ?: ""
+            val idTerritorio = MapeadorTerritorio.resolverIdTerritorio(municipio, estado)
+            DatosUbicacion(lat, lng, direccion, idTerritorio)
         } else {
-            "Lat: ${String.format(Locale.US, "%.4f", lat)}, Lng: ${String.format(Locale.US, "%.4f", lng)}"
+            DatosUbicacion(
+                lat, lng,
+                "Lat: ${String.format(Locale.US, "%.4f", lat)}, Lng: ${String.format(Locale.US, "%.4f", lng)}",
+                13
+            )
         }
     } catch (e: Exception) {
-        "Lat: ${String.format(Locale.US, "%.4f", lat)}, Lng: ${String.format(Locale.US, "%.4f", lng)}"
+        DatosUbicacion(
+            lat, lng,
+            "Lat: ${String.format(Locale.US, "%.4f", lat)}, Lng: ${String.format(Locale.US, "%.4f", lng)}",
+            13
+        )
     }
 }
 
 private fun obtenerCoordenadasDeTexto(
     context: Context,
     direccionTexto: String
-): Triple<Double, Double, String>? {
+): DatosUbicacion? {
     return try {
         val geocoder = Geocoder(context, Locale.getDefault())
         @Suppress("DEPRECATION")
         val direcciones = geocoder.getFromLocationName(direccionTexto, 1)
         val primera = direcciones?.firstOrNull()
+
         if (primera != null) {
-            Triple(primera.latitude, primera.longitude, primera.getAddressLine(0) ?: direccionTexto)
+            val direccion = primera.getAddressLine(0) ?: direccionTexto
+            val municipio = primera.subAdminArea ?: primera.locality ?: ""
+            val estado = primera.adminArea ?: ""
+            val idTerritorio = MapeadorTerritorio.resolverIdTerritorio(municipio, estado)
+            DatosUbicacion(primera.latitude, primera.longitude, direccion, idTerritorio)
         } else null
     } catch (e: Exception) {
         null
@@ -717,6 +735,127 @@ private fun ServicioDisponible(context: Context): Boolean {
     val googleApiAvailability = GoogleApiAvailability.getInstance()
     val resultCode = googleApiAvailability.isGooglePlayServicesAvailable(context)
     return resultCode == ConnectionResult.SUCCESS
+}
+
+object MapeadorTerritorio {
+    /**
+     * Mapea el municipio devuelto por Geocoder/GPS al id_territorio exacto
+     * registrado en la tabla 'territorio' de MySQL (IDs 2 a 101).
+     */
+    fun resolverIdTerritorio(municipio: String?, estado: String?): Int {
+        if (municipio.isNullOrBlank()) return 13 // Atizapán por defecto
+
+        val m = normalizarTexto(municipio)
+
+        return when {
+            m.contains("acambay") -> 2
+            m.contains("acolman") -> 3
+            m.contains("aculco") -> 4
+            m.contains("alquisiras") -> 5
+            m.contains("almoloya de juarez") -> 6
+            m.contains("almoloya del rio") -> 7
+            m.contains("amanalco") -> 8
+            m.contains("amatepec") -> 9
+            m.contains("amecameca") -> 10
+            m.contains("apaxco") -> 11
+            m.contains("atenco") && !m.contains("san mateo") -> 12
+            m.contains("atizapan") -> 126
+            m.contains("atlacomulco") -> 14
+            m.contains("atlautla") -> 15
+            m.contains("axapusco") -> 16
+            m.contains("ayapango") -> 17
+            m.contains("calimaya") -> 18
+            m.contains("capulhuac") -> 19
+            m.contains("coacalco") -> 20
+            m.contains("coatepec harinas") -> 21
+            m.contains("cocotitlan") -> 22
+            m.contains("coyotepec") -> 23
+            m.contains("cuautitlan") -> 24
+            m.contains("chalco") && !m.contains("valle de chalco") -> 25
+            m.contains("chapa de mota") -> 26
+            m.contains("chapultepec") -> 27
+            m.contains("chiautla") -> 28
+            m.contains("chicoloapan") -> 29
+            m.contains("chiconcuac") -> 30
+            m.contains("chimalhuacan") -> 31
+            m.contains("donato guerra") -> 32
+            m.contains("ecatepec") -> 33
+            m.contains("ecatzingo") -> 34
+            m.contains("huehuetoca") -> 35
+            m.contains("hueypoxtla") -> 36
+            m.contains("huixquilucan") -> 37
+            m.contains("isidro fabela") -> 38
+            m.contains("ixtapaluca") -> 39
+            m.contains("ixtapan de la sal") -> 40
+            m.contains("ixtapan del oro") -> 41
+            m.contains("ixtlahuaca") -> 42
+            m.contains("xalatlaco") -> 43
+            m.contains("jaltenco") -> 44
+            m.contains("jilotepec") -> 45
+            m.contains("jilotzingo") -> 46
+            m.contains("jiquipilco") -> 47
+            m.contains("jocotitlan") -> 48
+            m.contains("joquicingo") -> 49
+            m.contains("juchitepec") -> 50
+            m.contains("lerma") -> 51
+            m.contains("malinalco") -> 52
+            m.contains("melchor ocampo") -> 53
+            m.contains("metepec") -> 54
+            m.contains("mexicaltzingo") -> 55
+            m.contains("morelos") -> 56
+            m.contains("naucalpan") -> 57
+            m.contains("nezahualcoyotl") -> 58
+            m.contains("nextlalpan") -> 59
+            m.contains("nicolas romero") -> 60
+            m.contains("nopaltepec") -> 61
+            m.contains("ocoyoacac") -> 62
+            m.contains("ocuilan") -> 63
+            m.contains("el oro") -> 64
+            m.contains("otumba") -> 65
+            m.contains("otzoloapan") -> 66
+            m.contains("otzolotepec") -> 67
+            m.contains("ozumba") -> 68
+            m.contains("papalotla") -> 69
+            m.contains("la paz") -> 70
+            m.contains("polotitlan") -> 71
+            m.contains("rayon") -> 72
+            m.contains("san antonio la isla") -> 73
+            m.contains("san felipe del progreso") -> 74
+            m.contains("piramides") -> 75
+            m.contains("san mateo atenco") -> 76
+            m.contains("san simon de guerrero") -> 77
+            m.contains("santo tomas") -> 78
+            m.contains("soyaniquilpan") -> 79
+            m.contains("sultepec") -> 80
+            m.contains("tecamac") -> 81
+            m.contains("tejupilco") -> 82
+            m.contains("temamatla") -> 83
+            m.contains("temascalapa") -> 84
+            m.contains("temascalcingo") -> 85
+            m.contains("temascaltepec") -> 86
+            m.contains("temoaya") -> 87
+            m.contains("tenancingo") -> 88
+            m.contains("tenango del aire") -> 89
+            m.contains("tenango del valle") -> 90
+            m.contains("teoloyucan") -> 91
+            m.contains("teotihuacan") -> 92
+            m.contains("tepetlaoxtoc") -> 93
+            m.contains("tepetlixpa") -> 94
+            m.contains("tepotzotlan") -> 95
+            m.contains("tequixquiac") -> 96
+            m.contains("texcaltitlan") -> 97
+            m.contains("texcalyacac") -> 98
+            m.contains("texcoco") -> 99
+            m.contains("tezoyuca") -> 100
+            m.contains("tianguistenco") -> 101
+            else -> 13
+        }
+    }
+
+    private fun normalizarTexto(texto: String): String {
+        val normalizado = Normalizer.normalize(texto, Normalizer.Form.NFD)
+        return normalizado.replace("\\p{InCombiningDiacriticalMarks}+".toRegex(), "").lowercase()
+    }
 }
 
 @Preview(

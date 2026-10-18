@@ -121,53 +121,51 @@ data class DatosMenor(
  */
 data class EstadoReporte(
     val pasoActual: Int = 0,
+
+    // Ubicación
     val opcionUbicacion: String = "",
     val latitud: Double = 0.0,
     val longitud: Double = 0.0,
     val direccion: String = "",
+    val idTerritorio: Int = 1, // 👈 Agregar esta propiedad
     val ubicacionConfirmada: Boolean = false,
 
+    // Detalles generales
     val horarioAprox: String = "",
     val cantidadMenores: Int = 1,
     val adultoInvolucrados: String = "",
     val descripcionHechos: String = "",
 
+    // Menores involucrados
     val menores: List<DatosMenor> = listOf(DatosMenor()),
     val indiceMenorActual: Int = 0,
 
     val rangoEdad: String = "",
     val genero: String = "",
     val descripcionFisica: String = "",
-    val peligroInmediato: String = "", // <-- Agregar este campo
+    val peligroInmediato: String = "",
 
+    // Evidencias adjuntas
     val tipoEvidenciaSeleccionada: String = "",
     val evidencias: List<EvidenciaReporte> = emptyList(),
     val evidenciaUri: Uri? = null,
 
+    // Privacidad
     val opcionPrivacidad: String = "anonimo",
     val correoSeguimiento: String = "",
 
+    // Respuesta del backend
     val folio: String = "",
     val codigoPrivado: String = "",
 
+    // Estados de envío
     val enviando: Boolean = false,
     val reporteExitoso: Boolean = false,
     val errorEnvio: String? = null
 ) {
-    /**
-     * Obtiene los datos del menor en edición actual según el [indiceMenorActual].
-     *
-     * @return La instancia de [DatosMenor] en la posición [indiceMenorActual] de la lista [menores],
-     * o una nueva instancia vacía de [DatosMenor] si el índice se encuentra fuera de los límites.
-     */
     val menorActual: DatosMenor
         get() = menores.getOrNull(indiceMenorActual) ?: DatosMenor()
 
-    /**
-     * Indica si la solicitud de reporte está configurada para procesarse de manera anónima.
-     *
-     * @return `true` si la [opcionPrivacidad] es igual a `"anonimo"`, o `false` en caso contrario.
-     */
     val esAnonimo: Boolean
         get() = opcionPrivacidad == "anonimo"
 }

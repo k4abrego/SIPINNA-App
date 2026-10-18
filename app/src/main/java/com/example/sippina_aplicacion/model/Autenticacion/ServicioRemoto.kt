@@ -18,7 +18,7 @@ import retrofit2.converter.scalars.ScalarsConverterFactory
  */
 object ServicioRemoto {
     private const val BASE_URL_AUTH= "http://localhost:8080/"
-    private const val BASE_URL_REPORTES= "http://localhost:8081/"
+    private const val BASE_URL_REPORTES= "http://localhost:8085/"
 
     private val httpClient = OkHttpClient.Builder().build()
 

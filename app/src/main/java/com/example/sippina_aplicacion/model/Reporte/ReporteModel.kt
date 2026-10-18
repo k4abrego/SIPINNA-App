@@ -16,11 +16,20 @@ data class DatosMenor(
     val descripcionFisica: String = "",
 
     @SerializedName("peligro_inmediato")
-    val peligroInmediato: String = "" // <-- Parámetro agregado
+    val peligroInmediato: String = ""
 )
 
 /**
- * Estado UI completo del formulario de reportes.
+ * Representa una evidencia multimedia local elegida por el usuario.
+ */
+data class EvidenciaReporte(
+    val uri: Uri,
+    val tipo: String,
+    val nombre: String = ""
+)
+
+/**
+ * Estado completo de la interfaz de usuario para el asistente de creación de reportes (UI State).
  */
 data class EstadoReporte(
     val pasoActual: Int = 0,
@@ -42,11 +51,11 @@ data class EstadoReporte(
     val menores: List<DatosMenor> = listOf(DatosMenor()),
     val indiceMenorActual: Int = 0,
 
-    // Propiedades individuales para edición actual
+    // Propiedades individuales para la edición del menor activo
     val rangoEdad: String = "",
     val genero: String = "",
     val descripcionFisica: String = "",
-    val peligroInmediato: String = "", // <-- Parámetro agregado
+    val peligroInmediato: String = "",
 
     // Evidencias
     val tipoEvidenciaSeleccionada: String = "",
@@ -57,6 +66,7 @@ data class EstadoReporte(
     val opcionPrivacidad: String = "anonimo",
     val correoSeguimiento: String = "",
 
+    // Datos devueltos por el backend tras un envío exitoso
     val folio: String = "",
     val codigoPrivado: String = "",
 
@@ -73,77 +83,7 @@ data class EstadoReporte(
 }
 
 /**
- * DTO enviado en la petición HTTP POST hacia la API en Go.
- */
-data class ReporteRequest(
-    @SerializedName("tipo_reporte")
-    val tipoReporte: String,
-
-    @SerializedName("descripcion")
-    val descripcion: String,
-
-    @SerializedName("opcion_privacidad")
-    val opcionPrivacidad: String,
-
-    @SerializedName("telefono")
-    val telefono: String? = null,
-
-    @SerializedName("direccion")
-    val direccion: String? = null,
-
-    @SerializedName("latitud")
-    val latitud: Double? = null,
-
-    @SerializedName("longitud")
-    val longitud: Double? = null,
-
-    @SerializedName("peligro_inmediato")
-    val peligroInmediato: String? = null, // <-- Parámetro agregado
-
-    @SerializedName("menores")
-    val menores: List<DatosMenor> = emptyList()
-)
-
-/**
- * DTO de respuesta proveniente de la API en Go.
- */
-data class ReporteResponse(
-    @SerializedName("exito")
-    val exito: Boolean = true,
-
-    @SerializedName("mensaje")
-    val mensaje: String? = null,
-
-    @SerializedName("folio")
-    val folio: String = "",
-
-    @SerializedName("codigo_privacidad")
-    val codigoPrivado: String? = null,
-
-    @SerializedName("estatus")
-    val estatus: String = "",
-
-    @SerializedName("fecha_envio")
-    val fechaEnvio: String? = null,
-
-    @SerializedName("descripcion")
-    val descripcion: String? = null,
-
-    @SerializedName("direccion")
-    val direccion: String? = null,
-
-    @SerializedName("latitud")
-    val latitud: Double? = null,
-
-    @SerializedName("longitud")
-    val longitud: Double? = null,
-
-    @SerializedName("peligro_inmediato")
-    val peligroInmediato: String? = null
-)
-
-/**
- * Modelo de reporte utilizado en la UI y vistas de historial/detalle.
+ * Modelo de presentación utilizado en las vistas de listado, mapa y detalle (UI).
  */
 data class ReporteModel(
     val folio: String = "",
@@ -154,32 +94,4 @@ data class ReporteModel(
     val latitud: Double = 0.0,
     val longitud: Double = 0.0,
     val peligroInmediato: String = ""
-)
-
-/**
- * Modelo que representa una categoría de reporte.
- */
-data class CategoriaModel(
-    @SerializedName("id")
-    val id: String = "",
-
-    @SerializedName("nombre")
-    val nombre: String = "",
-
-    @SerializedName("descripcion")
-    val descripcion: String? = null
-)
-
-/**
- * Modelo que representa el historial de cambios de estado de un reporte.
- */
-data class HistorialEstadoModel(
-    @SerializedName("estatus")
-    val estatus: String = "",
-
-    @SerializedName("fecha")
-    val fecha: String = "",
-
-    @SerializedName("comentario")
-    val comentario: String? = null
 )

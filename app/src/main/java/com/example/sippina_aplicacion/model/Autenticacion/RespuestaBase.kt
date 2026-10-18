@@ -13,7 +13,8 @@ import com.google.gson.annotations.SerializedName
  * @property token Token de autenticación o sesión (JWT) opcional devuelto tras procesar la petición.
  * @property idUsuario Identificador del usuario retornado opcionalmente como cadena de texto.
  */
+
 data class RespuestaBase(
-    @SerializedName("mensaje") val mensaje: String? = null,
+    @SerializedName("message") val mensaje: String? = null,
     @SerializedName("error") val error: String? = null
 )
