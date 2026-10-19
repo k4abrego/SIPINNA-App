@@ -8,6 +8,7 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -285,46 +286,60 @@ fun Detalles2(
                 )
                 Spacer(modifier = Modifier.height(10.dp))
 
-                OutlinedTextField(
-                    value = state.descripcionFisica,
-                    onValueChange = { texto ->
-                        viewModel.setDescripcionFisica(texto)
-                        if (texto.trim().isNotBlank()) mostrarError = false
-                    },
-                    isError = tieneError,
-                    shape = RoundedCornerShape(12.dp),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .heightIn(min = 160.dp),
-                    placeholder = { Text("Escribe aquí la descripción física") },
-                    trailingIcon = {
-                        if (tieneError) {
-                            Icon(
-                                imageVector = Icons.Default.Error,
-                                contentDescription = "Campo requerido",
-                                tint = Color.Red
-                            )
-                        }
-                    },
-                    supportingText = {
-                        if (tieneError) {
-                            Text(
-                                text = "* Campo obligatorio para poder continuar",
-                                color = Color.Red,
-                                fontSize = 12.sp,
-                                fontWeight = FontWeight.Medium
-                            )
-                        }
-                    },
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = colorMorado,
-                        unfocusedBorderColor = Color.LightGray,
-                        errorBorderColor = Color.Red,
-                        errorContainerColor = Color(0xFFFFF5F5),
-                        focusedContainerColor = Color.White,
-                        unfocusedContainerColor = Color.White
+                /**
+                 * Descripción con límite de 100 caracteres y contador en la esquina inferior.
+                 * El estado continúa gestionándose en ReporteVM.
+                 */
+                Box(modifier = Modifier.fillMaxWidth()) {
+                    OutlinedTextField(
+                        value = state.descripcionFisica,
+                        onValueChange = { texto ->
+                            viewModel.setDescripcionFisica(texto.take(100))
+                            if (texto.trim().isNotBlank()) mostrarError = false
+                        },
+                        isError = tieneError,
+                        shape = RoundedCornerShape(12.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .heightIn(min = 185.dp),
+                        placeholder = { Text("Escribe aquí la descripción física") },
+                        trailingIcon = {
+                            if (tieneError) {
+                                Icon(
+                                    imageVector = Icons.Default.Error,
+                                    contentDescription = "Campo requerido",
+                                    tint = Color.Red
+                                )
+                            }
+                        },
+                        supportingText = {
+                            if (tieneError) {
+                                Text(
+                                    text = "* Campo obligatorio para poder continuar",
+                                    color = Color.Red,
+                                    fontSize = 12.sp,
+                                    fontWeight = FontWeight.Medium
+                                )
+                            }
+                        },
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = colorMorado,
+                            unfocusedBorderColor = Color.LightGray,
+                            errorBorderColor = Color.Red,
+                            errorContainerColor = Color(0xFFFFF5F5),
+                            focusedContainerColor = Color.White,
+                            unfocusedContainerColor = Color.White
+                        )
                     )
-                )
+                    Text(
+                        text = "${state.descripcionFisica.length}/100 caracteres",
+                        fontSize = 12.sp,
+                        color = Color.Gray,
+                        modifier = Modifier
+                            .align(Alignment.BottomEnd)
+                            .padding(end = 16.dp, bottom = if (tieneError) 42.dp else 12.dp)
+                    )
+                }
             }
         }
 

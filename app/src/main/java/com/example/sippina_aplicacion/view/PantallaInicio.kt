@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material3.ButtonDefaults
@@ -44,25 +43,21 @@ val colorMorado = Color(0xFF381DC3)
 /**
  * Pantalla principal de inicio de la aplicación SIPINNA.
  *
- * Muestra el saludo de bienvenida, accesos superiores a notificaciones, búsqueda y perfil de usuario.
+ * Muestra el saludo de bienvenida, accesos superiores a búsqueda y perfil de usuario.
  * Si el usuario se encuentra autenticado, presenta una tarjeta flotante con el estatus del último reporte registrado.
  * Ofrece botones de navegación hacia la generación de reportes, información institucional, guías de qué reportar,
- * gestión de sesión y un botón de emergencia de acceso rápido.
+ * un botón de emergencia de acceso rápido.
  *
  * @param modifier [Modifier] opcional para el contenedor principal.
- * @param mostrarNotificaciones Flag que indica si se muestran notificaciones y funciones exclusivas para usuarios autenticados.
+ * @param mostrarNotificaciones Flag que permite mostrar el último reporte a usuarios autenticados.
  * @param ultimoReporteFolio Folio del último reporte enviado por el usuario, o `null`.
  * @param ultimoReporteEstatus Estado actual del último reporte registrado.
  * @param accionBoton Callback ejecutado al presionar el botón de emergencia.
  * @param onNavegarAReporte Callback para iniciar el asistente de creación de un reporte anónimo.
  * @param onNavegarAPerfil Callback para navegar a la vista de perfil (invitado o autenticado).
- * @param onNavegarANotificaciones Callback para abrir la bandeja de notificaciones.
  * @param onQueSituacionesReportar Callback para consultar la guía de situaciones reportables.
  * @param onConoceSIPINNA Callback para consultar información institucional sobre SIPINNA.
  * @param onBuscarReporte Callback para buscar un reporte existente por folio y código.
- * @param onNavegarALogin Callback para iniciar sesión o registrar cuenta.
- * @param onNavegarCrearCuenta Callback para registrar una nueva cuenta de usuario.
- * @param onCerrarSesion Callback para cerrar la sesión activa actual.
  * @param onVerTodosReportes Callback para listar todos los reportes del usuario.
  * @param onAbrirUltimoReporte Callback para consultar el detalle del último reporte usando su folio.
  * @param usuarioAutenticado Flag que indica si hay una sesión activa en la aplicación.
@@ -82,15 +77,11 @@ fun PantallaInicio(
     accionBoton: () -> Unit = {},
     onNavegarAReporte: () -> Unit = {},
     onNavegarAPerfil: () -> Unit = {},
-    onNavegarANotificaciones: () -> Unit = {},
     onQueSituacionesReportar: () -> Unit = {},
     onConoceSIPINNA: () -> Unit = {},
     onBuscarReporte: () -> Unit = {},
 
     // Este es cuando esta registrado
-    onNavegarALogin: () -> Unit = {},
-    onNavegarCrearCuenta:() -> Unit = {},
-    onCerrarSesion:() -> Unit = {},
 
     // Estas son las navegaciones de la tarjeta
     onVerTodosReportes : () -> Unit = {},
@@ -124,18 +115,7 @@ fun PantallaInicio(
                 Row(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    if (mostrarNotificaciones) {
-                        IconButton(
-                            onClick = onNavegarANotificaciones
-                        ) {
-                            Icon(
-                                imageVector = Icons.Outlined.Notifications,
-                                contentDescription = "Notificaciones",
-                                tint = colorMorado,
-                                modifier = Modifier.size(40.dp)
-                            )
-                        }
-                    }
+
 
                     IconButton(onClick = onBuscarReporte) {
                         Icon(
@@ -233,40 +213,6 @@ fun PantallaInicio(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
 
-                if(!mostrarNotificaciones){
-                    ElevatedButton(
-                        onClick = { onNavegarALogin() },
-                        modifier = Modifier
-                            .height(50.dp)
-                            .fillMaxWidth(),
-                        shape = RoundedCornerShape(20.dp))
-                    {
-                        Text(
-                            text = "Iniciar Sesión / Crear Cuenta",
-                            color = colorMorado,
-                            fontSize = 18.sp
-                        )
-                    }
-                }else
-                {
-                    ElevatedButton(
-                        onClick = { onCerrarSesion() },
-                        modifier = Modifier
-                            .height(50.dp)
-                            .fillMaxWidth(),
-                        shape = RoundedCornerShape(20.dp),
-                        colors = ButtonDefaults.elevatedButtonColors(
-                            containerColor = Color(0xFFC01B1E)
-                        )
-                    ){
-                        Text(
-                            text = "Cerrar Sesión",
-                            color = Color(0xFFDDEEFB),
-                            fontSize = 18.sp
-                        )
-
-                    }
-                }
 
                 ElevatedButton(
                     onClick = { onNavegarAReporte() },

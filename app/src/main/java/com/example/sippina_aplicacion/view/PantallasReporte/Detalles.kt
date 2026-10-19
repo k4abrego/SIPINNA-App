@@ -133,7 +133,7 @@ fun Detalles(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             EncabezadoReporte(onGuardarBorrador = {viewModel.guardarBorrador()
-            Toast.makeText(appContext, "Borrador guardado exitosamente", Toast.LENGTH_SHORT).show()})
+                Toast.makeText(appContext, "Borrador guardado exitosamente", Toast.LENGTH_SHORT).show()})
 
             Spacer(modifier = Modifier.height(4.dp))
 
@@ -383,55 +383,69 @@ fun Detalles(
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                OutlinedTextField(
-                    value = state.descripcionHechos,
-                    onValueChange = { texto ->
-                        viewModel.setDescripcionHechos(texto)
-                        if (texto.trim().isNotBlank()) {
-                            mostrarError = false
-                        }
-                    },
-                    isError = tieneError,
-                    shape = RoundedCornerShape(12.dp),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .heightIn(min = 110.dp),
-                    placeholder = {
-                        Text(
-                            text = "Escribe aquí los detalles"
-                        )
-                    },
-
-                    trailingIcon = {
-                        if (tieneError) {
-                            Icon(
-                                imageVector = Icons.Default.Error,
-                                contentDescription = "Campo requerido",
-                                tint = Color.Red
-                            )
-                        }
-                    },
-
-                    supportingText = {
-                        if (tieneError) {
+                /**
+                 * Descripción con límite de 100 caracteres y contador en la esquina inferior.
+                 * El estado continúa gestionándose en ReporteVM.
+                 */
+                Box(modifier = Modifier.fillMaxWidth()) {
+                    OutlinedTextField(
+                        value = state.descripcionHechos,
+                        onValueChange = { texto ->
+                            viewModel.setDescripcionHechos(texto.take(100))
+                            if (texto.trim().isNotBlank()) {
+                                mostrarError = false
+                            }
+                        },
+                        isError = tieneError,
+                        shape = RoundedCornerShape(12.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .heightIn(min = 165.dp),
+                        placeholder = {
                             Text(
-                                text = "* Campo obligatorio para poder continuar",
-                                color = Color.Red,
-                                fontSize = 12.sp,
-                                fontWeight = FontWeight.Medium
+                                text = "Escribe aquí los detalles"
                             )
-                        }
-                    },
+                        },
 
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = colorMorado,
-                        unfocusedBorderColor = colorMorado,
-                        errorBorderColor = Color.Red,
-                        errorContainerColor = Color(0xFFFFF5F5),
-                        focusedContainerColor = Color.White,
-                        unfocusedContainerColor = Color.White
+                        trailingIcon = {
+                            if (tieneError) {
+                                Icon(
+                                    imageVector = Icons.Default.Error,
+                                    contentDescription = "Campo requerido",
+                                    tint = Color.Red
+                                )
+                            }
+                        },
+
+                        supportingText = {
+                            if (tieneError) {
+                                Text(
+                                    text = "* Campo obligatorio para poder continuar",
+                                    color = Color.Red,
+                                    fontSize = 12.sp,
+                                    fontWeight = FontWeight.Medium
+                                )
+                            }
+                        },
+
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = colorMorado,
+                            unfocusedBorderColor = colorMorado,
+                            errorBorderColor = Color.Red,
+                            errorContainerColor = Color(0xFFFFF5F5),
+                            focusedContainerColor = Color.White,
+                            unfocusedContainerColor = Color.White
+                        )
                     )
-                )
+                    Text(
+                        text = "${state.descripcionHechos.length}/100 caracteres",
+                        fontSize = 12.sp,
+                        color = Color.Gray,
+                        modifier = Modifier
+                            .align(Alignment.BottomEnd)
+                            .padding(end = 16.dp, bottom = if (tieneError) 42.dp else 12.dp)
+                    )
+                }
             }
             Spacer(modifier = Modifier.height(12.dp))
         }

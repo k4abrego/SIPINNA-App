@@ -152,18 +152,6 @@ fun AppNavHost(
                     }
                     context.startActivity(intent)
                 },
-                onNavegarALogin = {
-                    if (usuarioAutenticado) {
-                        authViewModel.cerrarSesion()
-                    }
-                    navController.navigate(Pantalla.PantallaInicioSesion.ruta)
-                },
-                onCerrarSesion = {
-                    authViewModel.cerrarSesion()
-                    navController.navigate(Pantalla.PantallaInicioSesion.ruta) {
-                        popUpTo(Pantalla.PantallaInicio.ruta) { inclusive = false }
-                    }
-                },
                 onNavegarAReporte = {
                     reporteViewModel.limpiarFormulario()
                     navController.navigate(Pantalla.DondeOcurrio.ruta)
@@ -176,11 +164,6 @@ fun AppNavHost(
                         navController.navigate(Pantalla.VistaPerfil2.ruta)
                     } else {
                         navController.navigate(Pantalla.VistaPerfil1.ruta)
-                    }
-                },
-                onNavegarANotificaciones = {
-                    if (usuarioAutenticado) {
-                        navController.navigate(Pantalla.Notificaciones.ruta)
                     }
                 },
                 onQueSituacionesReportar = {
@@ -253,7 +236,8 @@ fun AppNavHost(
                 onBorradores = { navController.navigate(Pantalla.Borradores.ruta) },
                 onBuscarReporte = { navController.navigate(Pantalla.BuscarReporteExis.ruta) },
                 onAvisoPrivacidad = { navController.navigate(Pantalla.AvisoPrivacidad.ruta) },
-                onCrearCuenta = { navController.navigate(Pantalla.PantallaInicioSesion.ruta) }
+                onCrearCuenta = { navController.navigate(Pantalla.PantallaInicioSesion.ruta) },
+                onIniciarSesion = { navController.navigate(Pantalla.PantallaInicioSesion.ruta) }
             )
         }
 
@@ -267,10 +251,17 @@ fun AppNavHost(
                 },
                 onBorradores = { navController.navigate(Pantalla.Borradores.ruta) },
                 onMisReportes = { navController.navigate(Pantalla.MisReportes.ruta) },
-                onNotificaciones = { navController.navigate(Pantalla.Notificaciones.ruta) },
                 onAvisoPrivacidad = { navController.navigate(Pantalla.AvisoPrivacidad.ruta) },
                 onEditarPerfil = { navController.navigate(Pantalla.EditarPerfil.ruta) },
-                onEliminarCuenta = { /* Pendiente */ }
+                onCerrarSesion = {
+                    // AuthVM notifica al repositorio y limpia el estado local de sesión.
+                    authViewModel.cerrarSesion()
+                    // Vuelve al inicio sin permitir retroceder al perfil autenticado.
+                    navController.navigate(Pantalla.PantallaInicio.ruta) {
+                        popUpTo(Pantalla.PantallaInicio.ruta) { inclusive = true }
+                        launchSingleTop = true
+                    }
+                }
             )
         }
 
@@ -443,7 +434,7 @@ fun AppNavHost(
             )
         }
 
-            composable(Pantalla.ReporteGenerado.ruta) {
+        composable(Pantalla.ReporteGenerado.ruta) {
             ReporteGenerado(
                 viewModel = reporteViewModel,
                 token = authState.token,

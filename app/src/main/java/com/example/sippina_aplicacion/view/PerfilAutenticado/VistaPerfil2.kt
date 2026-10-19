@@ -20,7 +20,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Button
@@ -55,10 +55,10 @@ import androidx.compose.ui.window.Dialog
  * Pantalla principal de perfil para usuarios autenticados en la plataforma SIPINNA.
  *
  * Ofrece acceso rápido a la edición de información del usuario ([onEditarPerfil]), la gestión de borradores ([onBorradores]),
- * consulta de historial de reportes ([onMisReportes]), centro de notificaciones ([onNotificaciones]) y
+ * consulta de historial de reportes ([onMisReportes]) y
  * el Aviso de Privacidad ([onAvisoPrivacidad]).
  *
- * Además, incluye la acción crítica de eliminación de cuenta mediante un diálogo de confirmación personalizado ([Dialog])
+ * Además, incluye la acción de cierre de sesión mediante un diálogo de confirmación personalizado ([Dialog])
  * de advertencia e indicador de carga ([CircularProgressIndicator]) mientras se obtienen los datos del perfil.
  *
  * @param modifier [Modifier] opcional para personalizar el diseño del contenedor principal.
@@ -68,9 +68,8 @@ import androidx.compose.ui.window.Dialog
  * @param onBorradores Callback para navegar hacia la vista de gestión de borradores guardados localmente.
  * @param onMisReportes Callback para navegar a la lista de reportes enviados por el usuario.
  * @param onAvisoPrivacidad Callback para abrir el documento del Aviso de Privacidad.
- * @param onEliminarCuenta Callback invocado tras confirmar la eliminación permanente de la cuenta.
+ * @param onCerrarSesion Callback invocado tras confirmar el cierre de sesión.
  * @param onEditarPerfil Callback para abrir el formulario de actualización de datos de perfil.
- * @param onNotificaciones Callback para consultar el centro de notificaciones del usuario.
  */
 @Composable
 fun VistaPerfil2(
@@ -81,211 +80,192 @@ fun VistaPerfil2(
     onBorradores: () -> Unit = {},
     onMisReportes: () -> Unit = {},
     onAvisoPrivacidad: () -> Unit = {},
-    onEliminarCuenta: () -> Unit = {},
-    onEditarPerfil: () -> Unit = {},
-    onNotificaciones: () -> Unit = {}
+    onCerrarSesion: () -> Unit = {},
+    onEditarPerfil: () -> Unit = {}
 ) {
     val morado = Color(0xFF381DC3)
     val fondo = Color(0xFFEAF4FC)
-    var mostrarAlertaEliminar by remember { mutableStateOf(false) }
+    var mostrarAlertaCerrarSesion by remember { mutableStateOf(false) }
 
     Box(
         modifier = modifier
             .fillMaxSize()
             .background(fondo)
     ) {
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(horizontal = 20.dp, vertical = 15.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth(),
-            contentAlignment = Alignment.Center
+        Column(
+            modifier = modifier
+                .fillMaxSize()
+                .padding(horizontal = 20.dp, vertical = 15.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            FilledIconButton(
-                onClick = onAtras,
-                modifier = Modifier
-                    .size(48.dp)
-                    .align(Alignment.CenterStart),
-                colors = IconButtonDefaults.filledIconButtonColors(
-                    containerColor = fondo,
-                    contentColor = Color(0xFF3D27C9)
-                )
-            ) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "Regresar",
-                    modifier = Modifier.size(30.dp)
-                )
-            }
-            Image(
-                painter = painterResource(id = R.drawable.logorieti),
-                contentDescription = "Logo SIPINNA",
-                modifier = Modifier.size(120.dp)
-            )
-        }
-
-        Spacer(modifier = Modifier.height(25.dp))
-
-        Box(
-            modifier = Modifier.size(145.dp),
-            contentAlignment = Alignment.Center
-        ) {
-
             Box(
                 modifier = Modifier
-                    .size(130.dp)
-                    .border(width = 3.dp, color = morado, shape = CircleShape)
-                    .clickable(onClick = onEditarPerfil),
+                    .fillMaxWidth(),
                 contentAlignment = Alignment.Center
             ) {
-                Icon(
-                    imageVector = Icons.Default.Person,
-                    contentDescription = "Perfil",
-                    tint = morado,
-                    modifier = Modifier.size(90.dp)
+                FilledIconButton(
+                    onClick = onAtras,
+                    modifier = Modifier
+                        .size(48.dp)
+                        .align(Alignment.CenterStart),
+                    colors = IconButtonDefaults.filledIconButtonColors(
+                        containerColor = fondo,
+                        contentColor = Color(0xFF3D27C9)
+                    )
+                ) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = "Regresar",
+                        modifier = Modifier.size(30.dp)
+                    )
+                }
+                Image(
+                    painter = painterResource(id = R.drawable.logorieti),
+                    contentDescription = "Logo SIPINNA",
+                    modifier = Modifier.size(120.dp)
                 )
             }
-            IconButton(
-                onClick = onEditarPerfil,
-                modifier = Modifier
-                    .size(40.dp)
-                    .align(Alignment.TopEnd)
-                    .offset(x = (-1).dp, y = 2.dp)
+
+            Spacer(modifier = Modifier.height(25.dp))
+
+            Box(
+                modifier = Modifier.size(145.dp),
+                contentAlignment = Alignment.Center
             ) {
-                Icon(
-                    imageVector = Icons.Default.Edit,
-                    contentDescription = "Editar perfil",
-                    tint = morado,
-                    modifier = Modifier.size(28.dp)
-                )
+
+                Box(
+                    modifier = Modifier
+                        .size(130.dp)
+                        .border(width = 3.dp, color = morado, shape = CircleShape)
+                        .clickable(onClick = onEditarPerfil),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Person,
+                        contentDescription = "Perfil",
+                        tint = morado,
+                        modifier = Modifier.size(90.dp)
+                    )
+                }
+                IconButton(
+                    onClick = onEditarPerfil,
+                    modifier = Modifier
+                        .size(40.dp)
+                        .align(Alignment.TopEnd)
+                        .offset(x = (-1).dp, y = 2.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Edit,
+                        contentDescription = "Editar perfil",
+                        tint = morado,
+                        modifier = Modifier.size(28.dp)
+                    )
+                }
             }
+
+            if(cargando){
+                CircularProgressIndicator(color = morado, modifier = Modifier.padding(16.dp))
+            }
+            else {
+                Text(
+                    text = nombreUsuario.ifBlank { "Usuario" },
+                    color = Color(0xFF3D20C9),
+                    fontSize = 28.sp,
+                    fontWeight = FontWeight.Bold,
+                    lineHeight = 32.sp,
+                    textAlign = TextAlign.Center
+
+                )
+
+            }
+            Spacer(modifier = Modifier.height(55.dp))
+
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(20.dp)
+            ) {
+
+                Button(
+                    onClick = onBorradores,
+                    modifier = Modifier.fillMaxWidth().height(55.dp),
+                    shape = RoundedCornerShape(15.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color.White,
+                        contentColor = Color(0xFF666666)
+                    )
+                ) {
+                    Text(
+                        text = "Borradores",
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                }
+
+                Button(
+                    onClick = onMisReportes,
+                    modifier = Modifier.fillMaxWidth().height(55.dp),
+                    shape = RoundedCornerShape(15.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color.White, contentColor = Color(0xFF666666)
+                    )
+                ) {
+                    Text(
+                        text = "Mis reportes",
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                }
+
+                Button(
+                    onClick = onAvisoPrivacidad,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(55.dp),
+                    shape = RoundedCornerShape(15.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color.White,
+                        contentColor = Color(0xFF666666)
+                    )
+                ) {
+                    Text(
+                        text = "Aviso de privacidad",
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                }
+
+                OutlinedButton(
+                    onClick = { mostrarAlertaCerrarSesion = true },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(50.dp),
+                    shape = RoundedCornerShape(18.dp),
+                    border = BorderStroke(width = 1.dp, color = Color.Red),
+                    colors = ButtonDefaults.outlinedButtonColors(
+                        contentColor = Color.Red
+                    )
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.ExitToApp,
+                        contentDescription = "Cerrar sesión",
+                        modifier = Modifier.size(22.dp)
+                    )
+
+                    Spacer(modifier = Modifier.size(8.dp))
+
+                    Text(
+                        text = "Cerrar sesión",
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+            }
+            Spacer(modifier = Modifier.height(35.dp))
         }
-
-        if(cargando){
-            CircularProgressIndicator(color = morado, modifier = Modifier.padding(16.dp))
-        }
-        else {
-            Text(
-                text = nombreUsuario.ifBlank { "Usuario" },
-                color = Color(0xFF3D20C9),
-                fontSize = 28.sp,
-                fontWeight = FontWeight.Bold,
-                lineHeight = 32.sp,
-                textAlign = TextAlign.Center
-
-            )
-
-        }
-        Spacer(modifier = Modifier.height(55.dp))
-
-        Column(
-            modifier = Modifier.fillMaxWidth(),
-            verticalArrangement = Arrangement.spacedBy(20.dp)
-        ) {
-
-            Button(
-                onClick = onBorradores,
-                modifier = Modifier.fillMaxWidth().height(55.dp),
-                shape = RoundedCornerShape(15.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color.White,
-                    contentColor = Color(0xFF666666)
-                )
-            ) {
-                Text(
-                    text = "Borradores",
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.SemiBold
-                )
-            }
-
-            Button(
-                onClick = onMisReportes,
-                modifier = Modifier.fillMaxWidth().height(55.dp),
-                shape = RoundedCornerShape(15.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color.White, contentColor = Color(0xFF666666)
-                )
-            ) {
-                Text(
-                    text = "Mis reportes",
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.SemiBold
-                )
-            }
-
-            Button(
-                onClick = onNotificaciones,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(55.dp),
-                shape = RoundedCornerShape(15.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color.White,
-                    contentColor = Color(0xFF666666)
-                )
-            ) {
-                Text(
-                    text = "Notificaciones",
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.SemiBold
-                )
-            }
-
-            Button(
-                onClick = onAvisoPrivacidad,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(55.dp),
-                shape = RoundedCornerShape(15.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color.White,
-                    contentColor = Color(0xFF666666)
-                )
-            ) {
-                Text(
-                    text = "Aviso de privacidad",
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.SemiBold
-                )
-            }
-
-            OutlinedButton(
-                onClick = { mostrarAlertaEliminar = true },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(50.dp),
-                shape = RoundedCornerShape(18.dp),
-                border = BorderStroke(width = 1.dp, color = Color.Red),
-                colors = ButtonDefaults.outlinedButtonColors(
-                    contentColor = Color.Red
-                )
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Delete,
-                    contentDescription = "Eliminar cuenta",
-                    modifier = Modifier.size(22.dp)
-                )
-
-                Spacer(modifier = Modifier.size(8.dp))
-
-                Text(
-                    text = "Eliminar cuenta",
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold
-                )
-            }
-        }
-        Spacer(modifier = Modifier.height(35.dp))
-    }
-        if (mostrarAlertaEliminar){
+        if (mostrarAlertaCerrarSesion){
             Dialog(
                 onDismissRequest = {
-                    mostrarAlertaEliminar = false
+                    mostrarAlertaCerrarSesion = false
                 }
             ) {
                 Surface(
@@ -301,7 +281,7 @@ fun VistaPerfil2(
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Text(
-                            text = "¿Estás seguro que quieres eliminar tu cuenta?",
+                            text = "¿Estás seguro de que quieres cerrar sesión?",
                             fontSize = 22.sp,
                             fontWeight = FontWeight.Bold,
                             color = Color.White,
@@ -311,7 +291,7 @@ fun VistaPerfil2(
                         Spacer(modifier = Modifier.height(15.dp))
 
                         Text(
-                            text = "Esta acción es irreversible",
+                            text = "Podrás volver a iniciar sesión con tu cuenta.",
                             fontSize = 16.sp,
                             fontWeight = FontWeight.Bold,
                             color = Color.White,
@@ -327,9 +307,9 @@ fun VistaPerfil2(
                         ) {
                             OutlinedButton(
                                 onClick = {
-                                    mostrarAlertaEliminar = false
-                                    //solicita la eliminación de la cuenta, la lógica real se conectará después.
-                                    onEliminarCuenta()
+                                    mostrarAlertaCerrarSesion = false
+                                    // Solicita el cierre de sesión a través del callback existente.
+                                    onCerrarSesion()
                                 },
                                 modifier = Modifier
                                     .weight(1f)
@@ -342,13 +322,13 @@ fun VistaPerfil2(
                                 )
                             ) {
                                 Text(
-                                    text = "Eliminar",
+                                    text = "Cerrar sesión",
                                     fontSize = 16.sp,
                                     fontWeight = FontWeight.Bold
                                 )
                             }
                             Button(
-                                onClick = { mostrarAlertaEliminar = false },
+                                onClick = { mostrarAlertaCerrarSesion = false },
                                 modifier = Modifier
                                     .weight(1f)
                                     .height(48.dp),

@@ -190,6 +190,23 @@ fun VistaPerfil1(
                         fontWeight = FontWeight.SemiBold
                     )
                 }
+                /** Acceso al inicio de sesión desde el perfil de invitado. */
+                Button(
+                    onClick = onIniciarSesion,
+                    modifier = Modifier.fillMaxWidth().height(50.dp),
+                    shape = RoundedCornerShape(15.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = morado,
+                        contentColor = Color.White
+                    )
+                ) {
+                    Text(
+                        text = "Iniciar sesión",
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                }
+                Spacer(modifier = Modifier.height(12.dp))
                 OutlinedButton(
                     onClick = onCrearCuenta,
                     modifier = Modifier
