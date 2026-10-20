@@ -323,7 +323,12 @@ class ReporteVM(
     fun correoSeguimientoValido(): Boolean {
         val estado = _uiState.value
         if (estado.opcionPrivacidad == "anonimo") return true
-        return Patterns.EMAIL_ADDRESS.matcher(estado.correoSeguimiento.trim()).matches()
+        val correo = estado.correoSeguimiento.trim()
+        return try {
+            Patterns.EMAIL_ADDRESS.matcher(correo).matches()
+        } catch (_: Throwable) {
+            Regex("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$").matches(correo)
+        }
     }
 
     fun limpiarErrorEnvio() {

@@ -54,6 +54,15 @@ android {
     buildFeatures {
         compose = true
     }
+    // Los puse porque fallaban los test para android con compose
+    packaging {
+        resources {
+            excludes += "META-INF/LICENSE.md"
+            excludes += "META-INF/LICENSE-notice.md"
+            excludes += "/META-INF/{AL2.0,LGPL2.1}"
+        }
+    }
+
 }
 
 dependencies {
@@ -112,4 +121,28 @@ dependencies {
 
     implementation(libs.google.play.services.location)
 
+    // Estas implementaciones son herramientas para realizar testin en Android Studio
+
+    testImplementation("junit:junit:4.13.2")
+    testImplementation("io.mockk:mockk:1.13.10")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.8.0")
+    testImplementation("app.cash.turbine:turbine:1.1.0")
+    testImplementation("androidx.arch.core:core-testing:2.2.0")
+
+
+    // Implementaciones de test de Android para la aplicacion
+    debugImplementation("androidx.compose.ui:ui-test-manifest")
+    androidTestImplementation("androidx.test.ext:junit:1.2.1")
+    androidTestImplementation("androidx.test.espresso:espresso-core:3.6.1")
+    androidTestImplementation("androidx.compose.ui:ui-test-junit4")
+
+
+}
+
+tasks.withType<Test> {
+    useJUnit()
+    failOnNoDiscoveredTests = false
+    filter {
+        isFailOnNoMatchingTests = false
+    }
 }

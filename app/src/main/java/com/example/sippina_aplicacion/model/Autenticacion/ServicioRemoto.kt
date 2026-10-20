@@ -17,8 +17,8 @@ import retrofit2.converter.scalars.ScalarsConverterFactory
  * tanto respuestas en texto plano (como tokens de sesión) como objetos formateados en JSON.
  */
 object ServicioRemoto {
-    private const val BASE_URL_AUTH= "http://localhost:8080/"
-    private const val BASE_URL_REPORTES= "http://localhost:8085/"
+    private const val BASE_URL_AUTH = "https://utr3lk2ps2zrzyzwyezkqe2z4a0rowtl.lambda-url.us-east-1.on.aws/"
+    private const val BASE_URL_REPORTES = "https://xjshlpn2t7ibspdbszdu7v5q3m0stpqx.lambda-url.us-east-1.on.aws/"
 
     private val httpClient = OkHttpClient.Builder().build()
 
