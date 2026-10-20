@@ -263,9 +263,14 @@ fun DetalleReporte(
                         if (latitud != 0.0 && longitud != 0.0) {
                             val nuevaUbicacion = LatLng(latitud, longitud)
                             markerState.position = nuevaUbicacion
-                            cameraPositionState.animate(
-                                CameraUpdateFactory.newLatLngZoom(nuevaUbicacion, 16f)
-                            )
+                            try {
+                                kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main) {
+                                    cameraPositionState.animate(
+                                        CameraUpdateFactory.newLatLngZoom(nuevaUbicacion, 16f)
+                                    )
+                                }
+                            } catch (_: Throwable) {
+                            }
                         }
                     }
 
