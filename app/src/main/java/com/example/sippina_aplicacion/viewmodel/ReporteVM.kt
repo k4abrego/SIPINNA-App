@@ -531,6 +531,36 @@ class ReporteVM(
         _uiState.value = EstadoReporte()
     }
 
+    fun buscarReportePorFolio(folio: String, codigo: String) {
+        if (folio.isBlank() || codigo.isBlank()) {
+            _reporteEncontrado.value = null
+            _errorBusqueda.value = null
+            return
+        }
+        viewModelScope.launch {
+            _buscandoReporte.value = true
+            _reporteEncontrado.value = null
+            _errorBusqueda.value = null
+
+            val resultado = repository.consultarConCodigo(folio.trim(), codigo.trim())
+            resultado.onSuccess { res ->
+                _reporteEncontrado.value = ReporteModel(
+                    folio = res.folio ?: "",
+                    estatus = res.estatus ?: "Pendiente",
+                    fechaEnvio = formatearFechaLocal(res.fechaEnvio),
+                    descripcion = res.descripcion ?: res.mensaje ?: "",
+                    direccion = res.direccion ?: "",
+                    latitud = res.latitud ?: 0.0,
+                    longitud = res.longitud ?: 0.0
+                )
+            }.onFailure { error ->
+                _errorBusqueda.value = error.localizedMessage ?: "No se encontró ningún reporte con esos datos."
+            }
+            _buscandoReporte.value = false
+        }
+    }
+
+
     // Función auxiliar para formatear la fecha UTC a hora local legible:
 
     fun formatearFechaLocal(fechaIso: String?): String {

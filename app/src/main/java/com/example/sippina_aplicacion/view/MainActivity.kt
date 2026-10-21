@@ -305,10 +305,13 @@ fun AppNavHost(
             val errrorBusqueda by reporteViewModel.errorBusqueda.collectAsState()
 
             BuscarReporteExistente(
-                onAtras = { navController.popBackStack() },
+                onAtras = {
+                    reporteViewModel.limpiarBusqueda()
+                    navController.popBackStack()
+                },
                 onVerDetalleReporte = { folio -> abrirDetalleReporte(folio) },
                 onBuscar = { folio, codigo ->
-                    reporteViewModel.obtenerDetalleReportePorFolio(folio, codigo)
+                    reporteViewModel.buscarReportePorFolio(folio, codigo)
                 },
                 reporteEncontrado = reporteEncontradoState,
                 buscando = buscando,
